@@ -22,22 +22,24 @@ def inject_css():
         /* ── 隱藏預設頁面導航 ── */
         [data-testid="stSidebarNavItems"]    { display: none !important; }
         [data-testid="stSidebarNavSeparator"]{ display: none !important; }
-        #MainMenu { visibility: hidden; }
-        footer    { visibility: hidden; }
-        [data-testid="stToolbar"]   { display: none; }
-        [data-testid="stDecoration"]{ display: none; }
-        [data-testid="stHeader"]    { display: none; }
+        footer { visibility: hidden; }
 
-        /* ── 側欄展開按鈕（折疊後仍可見）── */
+        /* header 本身保留（其內含側欄展開鈕），只隱藏多餘子元件 */
+        [data-testid="stHeader"] {
+            background: transparent !important;
+            border-bottom: none !important;
+        }
+        [data-testid="stToolbar"]    { display: none !important; }
+        [data-testid="stDecoration"] { display: none !important; }
+        #MainMenu                    { display: none !important; }
+
+        /* ── 側欄展開按鈕樣式 ── */
         [data-testid="stSidebarCollapsedControl"] {
-            visibility: visible !important;
-            display: flex !important;
             background: white !important;
             border-radius: 0 8px 8px 0 !important;
             border: 1px solid #E2E8F0 !important;
             border-left: none !important;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
-            top: 1rem !important;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.08) !important;
         }
 
         /* ── 側欄 page_link ── */
