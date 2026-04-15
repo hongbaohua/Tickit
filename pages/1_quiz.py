@@ -216,7 +216,7 @@ def show_result():
                                 margin-bottom:0.8rem;">
                       <div style="font-weight:700;color:#0F172A;font-size:0.84rem;
                                   margin-bottom:0.4rem;">
-                        第 {q['number']} 題 · {q['unit']}
+                        第 {i + 1} 題 · {q['unit']}
                       </div>
                       <div style="color:#374151;font-size:0.87rem;line-height:1.65;
                                   margin-bottom:0.6rem;">
@@ -252,7 +252,7 @@ def show_result():
                                 margin-bottom:0.8rem;">
                       <div style="font-weight:700;color:#0F172A;font-size:0.84rem;
                                   margin-bottom:0.4rem;">
-                        ✓ 第 {q['number']} 題
+                        ✓ 第 {i + 1} 題
                       </div>
                       <div style="color:#374151;font-size:0.87rem;line-height:1.65;
                                   margin-bottom:0.4rem;">
@@ -274,7 +274,7 @@ def show_result():
                                 margin-bottom:0.8rem;">
                       <div style="font-weight:700;color:#0F172A;font-size:0.84rem;
                                   margin-bottom:0.4rem;">
-                        ✗ 第 {q['number']} 題
+                        ✗ 第 {i + 1} 題
                       </div>
                       <div style="color:#374151;font-size:0.87rem;line-height:1.65;
                                   margin-bottom:0.6rem;">
@@ -356,7 +356,7 @@ st.markdown(
         <div style="background:#6366F1;color:white;border-radius:6px;
                     padding:3px 9px;font-size:0.72rem;font-weight:700;
                     flex-shrink:0;margin-top:3px;letter-spacing:0.3px;">
-          Q{q['number']}
+          Q{idx + 1}
         </div>
         <p style="font-size:0.96rem;font-weight:600;color:#0F172A;
                   line-height:1.7;margin:0;">
