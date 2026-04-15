@@ -233,7 +233,7 @@ def show_result():
                     unsafe_allow_html=True,
                 )
                 if q["explanation"]:
-                    st.info(f"解析：{q['explanation']}")
+                    st.info(q["explanation"])
 
     # ── All questions expander ──
     with st.expander("📖 查看所有題目解析", expanded=False):
@@ -345,6 +345,24 @@ st.markdown(
 )
 st.progress(progress_pct)
 st.markdown("</div>", unsafe_allow_html=True)
+
+# ── 題組上文（承上題）──
+if q.get("group_context"):
+    st.markdown(
+        f"""
+        <div style="background:#F1F5F9;border-radius:10px;padding:0.9rem 1.1rem;
+                    border:1px solid #CBD5E1;margin-bottom:0.6rem;">
+          <div style="font-size:0.7rem;font-weight:700;color:#64748B;
+                      letter-spacing:0.6px;text-transform:uppercase;margin-bottom:0.4rem;">
+            題組 — 上一題
+          </div>
+          <div style="font-size:0.87rem;color:#374151;line-height:1.65;">
+            {q['group_context']}
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ── Question card ──
 st.markdown(

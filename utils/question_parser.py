@@ -118,7 +118,13 @@ def load_questions_from_file(filepath: Path, topic: str) -> list[dict]:
             "options": q["options"],
             "answer": answer_letter,
             "explanation": explanation,
+            "group_context": None,
         })
+
+    # 偵測題組題：含「承上題」的題目需附帶上一題作為情境
+    for i in range(1, len(result)):
+        if "承上題" in result[i]["question"]:
+            result[i]["group_context"] = result[i - 1]["question"]
 
     return result
 

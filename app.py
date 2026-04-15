@@ -219,8 +219,16 @@ if st.button(
         st.error("選取的單元中找不到題目，請確認題庫格式正確。")
     else:
         if mode == "隨機抽取 N 題" and random_n:
-            n = min(int(random_n), len(questions))
-            questions = random.sample(questions, n)
+            # 將題組題（承上題）與前一題綁定為同一 group，抽題以 group 為單位
+            groups: list[list] = []
+            for q in questions:
+                if q.get("group_context") is not None and groups:
+                    groups[-1].append(q)
+                else:
+                    groups.append([q])
+            n = min(int(random_n), len(groups))
+            sampled = random.sample(groups, n)
+            questions = [q for grp in sampled for q in grp]
 
         st.session_state.quiz_questions = questions
         st.session_state.quiz_topic = topic
