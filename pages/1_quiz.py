@@ -131,7 +131,7 @@ q = questions[idx]
 st.progress((idx) / total)
 st.caption(f"第 {idx + 1} 題，共 {total} 題　｜　主題：{q['topic']}　單元：{q['unit']}")
 
-st.subheader(f"Q{q['number']}. {q['question']}")
+st.markdown(f"<p style='font-size:1.05rem; font-weight:600; line-height:1.6;'>Q{q['number']}. {q['question']}</p>", unsafe_allow_html=True)
 
 option_labels = [f"({k}) {v}" for k, v in q["options"].items()]
 option_keys = list(q["options"].keys())
