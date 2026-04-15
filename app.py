@@ -20,7 +20,7 @@ st.markdown(
                 border-radius: 20px; padding: 2.5rem 2rem; margin-bottom: 2rem; text-align: center;">
       <div style="font-size: 2.5rem;">📝</div>
       <h1 style="color:white; font-size:1.8rem; font-weight:800; margin:0.3rem 0 0; letter-spacing:-0.5px;">線上測驗平台</h1>
-      <p style="color:rgba(255,255,255,0.7); margin:0.4rem 0 0; font-size:0.9rem;">品牌企劃師備考系統</p>
+      <p style="color:rgba(255,255,255,0.7); margin:0.4rem 0 0; font-size:0.9rem;">選擇你的主題，開始練習</p>
     </div>
     """,
     unsafe_allow_html=True,
