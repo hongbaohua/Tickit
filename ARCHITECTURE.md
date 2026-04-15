@@ -168,14 +168,41 @@ Obsidian 上傳的 MD 檔案需遵循以下格式，供解析器正確讀取：
 
 ---
 
-## 部署流程
+## 本地啟動
 
-1. 推送專案至 GitHub（含 `questions/` 資料夾）
-https://github.com/hongbaohua/quiz-app.git
+```bash
+cd C:\Users\Master\Projects\quiz-app
+streamlit run app.py
+```
 
-2. 至 [Streamlit Community Cloud](https://streamlit.io/cloud) 連結 GitHub repo
-3. 設定 `app.py` 為入口點
-4. 若使用 Supabase：在 Streamlit Secrets 填入資料庫連線資訊
+本地網址：http://localhost:8501
+
+---
+
+## GitHub
+
+Repository：https://github.com/hongbaohua/quiz-app.git
+
+推送更新：
+```bash
+cd C:\Users\Master\Projects\quiz-app
+git add .
+git commit -m "說明"
+git push
+```
+
+---
+
+## 線上部署（Streamlit Community Cloud）
+
+管理頁面：https://share.streamlit.io
+
+部署設定：
+- Repository：`hongbaohua/quiz-app`
+- Branch：`master`
+- Main file：`app.py`
+
+> 每次推送至 GitHub 後，Streamlit Cloud 會自動重新部署。
 
 ---
 
