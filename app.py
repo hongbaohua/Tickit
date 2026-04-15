@@ -52,10 +52,13 @@ if st.session_state.user_id is None:
         if not name.strip():
             st.warning("請輸入姓名。")
         else:
-            user_id = get_or_create_user(name.strip())
-            st.session_state.user_id = user_id
-            st.session_state.user_name = name.strip()
-            st.rerun()
+            try:
+                user_id = get_or_create_user(name.strip())
+                st.session_state.user_id = user_id
+                st.session_state.user_name = name.strip()
+                st.rerun()
+            except Exception as e:
+                st.error(f"無法連線至資料庫，請稍後再試。\n\n錯誤訊息：{e}")
 
     st.stop()
 

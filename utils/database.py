@@ -20,12 +20,29 @@ def _url(table: str) -> str:
     return f"{base}/rest/v1/{table}"
 
 
+def _check(r: requests.Response, context: str = "") -> None:
+    """Supabase API 回傳錯誤時拋出易讀的例外。"""
+    if not r.ok:
+        try:
+            err = r.json()
+            msg = err.get("message", r.text)
+            code = err.get("code", r.status_code)
+        except Exception:
+            msg = r.text
+            code = r.status_code
+        label = f" [{context}]" if context else ""
+        raise RuntimeError(
+            f"Supabase 錯誤{label} (HTTP {r.status_code}, code={code}): {msg}"
+        )
+
+
 def get_or_create_user(name: str) -> int:
     r = requests.get(
         _url("users"),
         headers=_headers(),
         params={"name": f"eq.{name}", "select": "id"},
     )
+    _check(r, "查詢使用者")
     data = r.json()
     if data:
         return data[0]["id"]
@@ -34,6 +51,7 @@ def get_or_create_user(name: str) -> int:
         headers=_headers(),
         json={"name": name},
     )
+    _check(r, "建立使用者")
     return r.json()[0]["id"]
 
 
@@ -57,6 +75,7 @@ def save_session(
             "taken_at": datetime.now().isoformat(),
         },
     )
+    _check(r, "儲存測驗紀錄")
     session_id = r.json()[0]["id"]
 
     records = [
@@ -71,7 +90,8 @@ def save_session(
         }
         for a in answers
     ]
-    requests.post(_url("question_results"), headers=_headers(), json=records)
+    r2 = requests.post(_url("question_results"), headers=_headers(), json=records)
+    _check(r2, "儲存題目結果")
     return session_id
 
 
@@ -81,6 +101,7 @@ def get_user_sessions(user_id: int) -> list[dict]:
         headers=_headers(),
         params={"user_id": f"eq.{user_id}", "order": "taken_at.desc"},
     )
+    _check(r, "讀取測驗紀錄")
     rows = r.json()
     for row in rows:
         if isinstance(row.get("units"), str):
@@ -94,6 +115,7 @@ def get_user_question_results(user_id: int) -> list[dict]:
         headers=_headers(),
         params={"user_id": f"eq.{user_id}", "select": "id"},
     )
+    _check(r, "讀取 session IDs")
     session_ids = [s["id"] for s in r.json()]
     if not session_ids:
         return []
@@ -103,6 +125,7 @@ def get_user_question_results(user_id: int) -> list[dict]:
         headers=_headers(),
         params={"session_id": ids_str},
     )
+    _check(r, "讀取題目結果")
     return r.json()
 
 
@@ -112,4 +135,5 @@ def get_all_users() -> list[dict]:
         headers=_headers(),
         params={"select": "id,name", "order": "name"},
     )
+    _check(r, "讀取所有使用者")
     return r.json()
