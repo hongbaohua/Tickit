@@ -24,9 +24,21 @@ def inject_css():
         [data-testid="stSidebarNavSeparator"]{ display: none !important; }
         #MainMenu { visibility: hidden; }
         footer    { visibility: hidden; }
-        header    { visibility: hidden; }
         [data-testid="stToolbar"]   { display: none; }
         [data-testid="stDecoration"]{ display: none; }
+        [data-testid="stHeader"]    { display: none; }
+
+        /* ── 側欄展開按鈕（折疊後仍可見）── */
+        [data-testid="stSidebarCollapsedControl"] {
+            visibility: visible !important;
+            display: flex !important;
+            background: white !important;
+            border-radius: 0 8px 8px 0 !important;
+            border: 1px solid #E2E8F0 !important;
+            border-left: none !important;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
+            top: 1rem !important;
+        }
 
         /* ── 側欄 page_link ── */
         [data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] {
