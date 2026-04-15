@@ -1,80 +1,40 @@
-import sqlite3
 import json
 from datetime import datetime
-from pathlib import Path
 
-DB_DIR = Path(__file__).parent.parent / "data"
-DB_PATH = DB_DIR / "quiz_results.db"
-
-
-def _get_conn():
-    DB_DIR.mkdir(exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
+import requests
+import streamlit as st
 
 
-def init_db():
-    conn = _get_conn()
-    cur = conn.cursor()
+def _headers() -> dict:
+    key = st.secrets["supabase"]["key"]
+    return {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+    }
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS quiz_sessions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            topic TEXT NOT NULL,
-            units TEXT NOT NULL,
-            total_questions INTEGER NOT NULL,
-            correct_count INTEGER NOT NULL,
-            taken_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS question_results (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            session_id INTEGER NOT NULL,
-            question_id TEXT NOT NULL,
-            topic TEXT NOT NULL,
-            unit TEXT NOT NULL,
-            is_correct INTEGER NOT NULL,
-            user_answer TEXT NOT NULL,
-            correct_answer TEXT NOT NULL,
-            FOREIGN KEY (session_id) REFERENCES quiz_sessions(id)
-        )
-    """)
-
-    conn.commit()
-    conn.close()
+def _url(table: str) -> str:
+    base = st.secrets["supabase"]["url"]
+    return f"{base}/rest/v1/{table}"
 
 
 def get_or_create_user(name: str) -> int:
-    conn = _get_conn()
-    cur = conn.cursor()
-
-    cur.execute("SELECT id FROM users WHERE name = ?", (name,))
-    row = cur.fetchone()
-    if row:
-        conn.close()
-        return row["id"]
-
-    cur.execute(
-        "INSERT INTO users (name, created_at) VALUES (?, ?)",
-        (name, datetime.now().isoformat())
+    r = requests.get(
+        _url("users"),
+        headers=_headers(),
+        params={"name": f"eq.{name}", "select": "id"},
     )
-    conn.commit()
-    user_id = cur.lastrowid
-    conn.close()
-    return user_id
+    data = r.json()
+    if data:
+        return data[0]["id"]
+    r = requests.post(
+        _url("users"),
+        headers=_headers(),
+        json={"name": name},
+    )
+    return r.json()[0]["id"]
 
 
 def save_session(
@@ -83,82 +43,73 @@ def save_session(
     units: list[str],
     total: int,
     correct: int,
-    answers: list[dict]
+    answers: list[dict],
 ) -> int:
-    conn = _get_conn()
-    cur = conn.cursor()
-
-    cur.execute(
-        """
-        INSERT INTO quiz_sessions (user_id, topic, units, total_questions, correct_count, taken_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """,
-        (user_id, topic, json.dumps(units, ensure_ascii=False), total, correct, datetime.now().isoformat())
+    r = requests.post(
+        _url("quiz_sessions"),
+        headers=_headers(),
+        json={
+            "user_id": user_id,
+            "topic": topic,
+            "units": json.dumps(units, ensure_ascii=False),
+            "total_questions": total,
+            "correct_count": correct,
+            "taken_at": datetime.now().isoformat(),
+        },
     )
-    session_id = cur.lastrowid
+    session_id = r.json()[0]["id"]
 
-    for a in answers:
-        cur.execute(
-            """
-            INSERT INTO question_results
-                (session_id, question_id, topic, unit, is_correct, user_answer, correct_answer)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                session_id,
-                a["question_id"],
-                a["topic"],
-                a["unit"],
-                1 if a["is_correct"] else 0,
-                a["user_answer"],
-                a["correct_answer"],
-            )
-        )
-
-    conn.commit()
-    conn.close()
+    records = [
+        {
+            "session_id": session_id,
+            "question_id": a["question_id"],
+            "topic": a["topic"],
+            "unit": a["unit"],
+            "is_correct": bool(a["is_correct"]),
+            "user_answer": a["user_answer"],
+            "correct_answer": a["correct_answer"],
+        }
+        for a in answers
+    ]
+    requests.post(_url("question_results"), headers=_headers(), json=records)
     return session_id
 
 
 def get_user_sessions(user_id: int) -> list[dict]:
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM quiz_sessions WHERE user_id = ? ORDER BY taken_at DESC",
-        (user_id,)
+    r = requests.get(
+        _url("quiz_sessions"),
+        headers=_headers(),
+        params={"user_id": f"eq.{user_id}", "order": "taken_at.desc"},
     )
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    for r in rows:
-        r["units"] = json.loads(r["units"])
+    rows = r.json()
+    for row in rows:
+        if isinstance(row.get("units"), str):
+            row["units"] = json.loads(row["units"])
     return rows
 
 
 def get_user_question_results(user_id: int) -> list[dict]:
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT qr.*
-        FROM question_results qr
-        JOIN quiz_sessions qs ON qr.session_id = qs.id
-        WHERE qs.user_id = ?
-        ORDER BY qs.taken_at DESC
-        """,
-        (user_id,)
+    r = requests.get(
+        _url("quiz_sessions"),
+        headers=_headers(),
+        params={"user_id": f"eq.{user_id}", "select": "id"},
     )
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    return rows
+    session_ids = [s["id"] for s in r.json()]
+    if not session_ids:
+        return []
+    ids_str = f"in.({','.join(str(i) for i in session_ids)})"
+    r = requests.get(
+        _url("question_results"),
+        headers=_headers(),
+        params={"session_id": ids_str},
+    )
+    return r.json()
 
 
 def get_all_users() -> list[dict]:
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute("SELECT id, name FROM users ORDER BY name")
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    return rows
-
-
-init_db()
+    r = requests.get(
+        _url("users"),
+        headers=_headers(),
+        params={"select": "id,name", "order": "name"},
+    )
+    return r.json()
