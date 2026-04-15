@@ -197,6 +197,8 @@ git push
 
 管理頁面：https://share.streamlit.io
 
+線上網址：https://quiz-app-tjny6p3phdsrrbci2cijtx.streamlit.app
+
 部署設定：
 - Repository：`hongbaohua/quiz-app`
 - Branch：`master`
