@@ -93,7 +93,10 @@ if not topics:
     st.error("找不到任何題庫，請確認 questions/ 資料夾中有 Markdown 題目檔案。")
     st.stop()
 
-topic = st.selectbox("主題", topics)
+topic = st.selectbox("主題", ["— 請選擇主題 —"] + topics)
+
+if topic == "— 請選擇主題 —":
+    st.stop()
 
 units = get_units(topic)
 if not units:
@@ -103,7 +106,7 @@ if not units:
 selected_units = st.multiselect(
     "單元（可複選）",
     units,
-    default=[units[0]] if units else [],
+    default=[],
 )
 
 st.markdown(
