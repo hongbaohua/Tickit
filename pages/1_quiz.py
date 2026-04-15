@@ -64,14 +64,17 @@ def show_result():
                 "correct_answer": q["answer"],
             })
 
-        save_session(
-            user_id=st.session_state.user_id,
-            topic=st.session_state.quiz_topic,
-            units=st.session_state.quiz_units,
-            total=total,
-            correct=correct_count,
-            answers=answer_records,
-        )
+        try:
+            save_session(
+                user_id=st.session_state.user_id,
+                topic=st.session_state.quiz_topic,
+                units=st.session_state.quiz_units,
+                total=total,
+                correct=correct_count,
+                answers=answer_records,
+            )
+        except Exception as e:
+            st.warning(f"成績儲存失敗（資料庫錯誤），但你仍可查看本次結果。\n\n錯誤訊息：{e}")
         st.session_state.quiz_saved = True
 
     pct = correct_count / total * 100 if total > 0 else 0
