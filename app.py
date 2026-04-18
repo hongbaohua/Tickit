@@ -11,7 +11,7 @@ from utils.nav import render_sidebar
 from utils.question_parser import get_all_topics, get_units, load_questions
 from utils.styles import inject_css
 
-st.set_page_config(page_title="線上測驗平台", page_icon="📝", layout="centered")
+st.set_page_config(page_title="線上測驗平台", page_icon="", layout="centered")
 inject_css()
 render_sidebar()
 
@@ -29,14 +29,19 @@ if st.session_state.user_id is None:
 
     col_l, col_c, col_r = st.columns([1, 2, 1])
     with col_c:
-        # Brand
+        # Brand mark
         st.markdown(
             """
             <div style="text-align:center;margin-bottom:1.8rem;">
-              <div style="font-size:2.4rem;line-height:1;margin-bottom:0.6rem;">📝</div>
-              <div style="font-size:1.4rem;font-weight:800;color:#0F172A;
+              <div style="display:flex;justify-content:center;margin-bottom:0.9rem;">
+                <div style="width:40px;height:40px;background:#4F46E5;border-radius:8px;
+                            display:flex;align-items:center;justify-content:center;">
+                  <div style="width:18px;height:18px;border:2.5px solid white;border-radius:3px;"></div>
+                </div>
+              </div>
+              <div style="font-size:1.3rem;font-weight:800;color:#111827;
                           letter-spacing:-0.5px;margin-bottom:0.3rem;">線上測驗平台</div>
-              <div style="font-size:0.82rem;color:#94A3B8;font-weight:500;">
+              <div style="font-size:0.82rem;color:#9CA3AF;font-weight:500;">
                 選擇主題與單元，隨時開始練習
               </div>
             </div>
@@ -44,13 +49,15 @@ if st.session_state.user_id is None:
             unsafe_allow_html=True,
         )
 
-        # Login card
+        # Login card with indigo top accent
         st.markdown(
             """
-            <div style="background:white;border-radius:14px;padding:1.8rem 1.8rem 1.6rem;
-                        border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-              <div style="font-size:0.78rem;font-weight:700;color:#64748B;
-                          letter-spacing:0.8px;text-transform:uppercase;margin-bottom:0.7rem;">
+            <div style="background:white;border-radius:8px;
+                        border-top:3px solid #4F46E5;border-left:1px solid #E5E7EB;
+                        border-right:1px solid #E5E7EB;border-bottom:1px solid #E5E7EB;
+                        padding:1.75rem 1.75rem 1.5rem;">
+              <div style="font-size:0.68rem;font-weight:700;color:#6B7280;
+                          letter-spacing:0.8px;text-transform:uppercase;margin-bottom:0.6rem;">
                 用戶代號
               </div>
             """,
@@ -63,7 +70,7 @@ if st.session_state.user_id is None:
             label_visibility="collapsed",
         )
         st.markdown(
-            "<div style='font-size:0.74rem;color:#94A3B8;margin:-0.3rem 0 1.2rem;'>"
+            "<div style='font-size:0.74rem;color:#9CA3AF;margin:-0.3rem 0 1.2rem;'>"
             "輸入代號即可識別身份，無需密碼</div>",
             unsafe_allow_html=True,
         )
@@ -92,27 +99,28 @@ if st.session_state.user_id is None:
 # ── Slim user status bar ──
 st.markdown(
     f"""
-    <div style="background:white;border-radius:10px;padding:0.65rem 1.1rem;
-                border:1px solid #E2E8F0;margin-bottom:1.6rem;
+    <div style="background:white;border-radius:8px;padding:0.6rem 1rem;
+                border:1px solid #E5E7EB;margin-bottom:1.5rem;
                 display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:0.65rem;">
-        <div style="width:30px;height:30px;border-radius:50%;
-                    background:#6366F1;
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div style="width:28px;height:28px;border-radius:4px;
+                    background:#4F46E5;
                     display:flex;align-items:center;justify-content:center;
-                    color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">
+                    color:white;font-weight:700;font-size:0.75rem;flex-shrink:0;">
           {st.session_state.user_name[0].upper()}
         </div>
         <div>
-          <div style="font-weight:700;color:#0F172A;font-size:0.88rem;line-height:1.3;">
+          <div style="font-weight:700;color:#111827;font-size:0.85rem;line-height:1.3;">
             {st.session_state.user_name}
           </div>
-          <div style="color:#94A3B8;font-size:0.7rem;">用戶代號</div>
+          <div style="color:#9CA3AF;font-size:0.68rem;">用戶代號</div>
         </div>
       </div>
-      <div style="background:#F0FDF4;color:#10B981;border-radius:20px;
-                  padding:3px 12px;font-size:0.7rem;font-weight:600;
-                  border:1px solid #BBF7D0;letter-spacing:0.2px;">
-        ● 已登入
+      <div style="display:flex;align-items:center;gap:0.4rem;
+                  font-size:0.7rem;font-weight:600;color:#6B7280;">
+        <span style="width:6px;height:6px;border-radius:50%;background:#10B981;
+                     display:inline-block;"></span>
+        已登入
       </div>
     </div>
     """,
@@ -124,14 +132,13 @@ st.markdown(
 def step_card_open(number: str, label: str):
     st.markdown(
         f"""
-        <div style="background:white;border-radius:12px;padding:1.3rem 1.5rem;
-                    border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);
-                    margin-bottom:0.9rem;">
+        <div style="background:white;border-radius:8px;padding:1.25rem 1.5rem;
+                    border:1px solid #E5E7EB;margin-bottom:0.8rem;">
           <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
-            <div style="background:#6366F1;color:white;border-radius:6px;
-                        padding:2px 8px;font-size:0.7rem;font-weight:700;
-                        letter-spacing:0.5px;flex-shrink:0;">{number}</div>
-            <span style="font-size:0.9rem;font-weight:700;color:#0F172A;">{label}</span>
+            <div style="background:#4F46E5;color:white;border-radius:3px;
+                        padding:1px 7px;font-size:0.65rem;font-weight:700;
+                        letter-spacing:1px;">{number}</div>
+            <span style="font-size:0.85rem;font-weight:700;color:#111827;letter-spacing:-0.1px;">{label}</span>
           </div>
         """,
         unsafe_allow_html=True,
@@ -182,7 +189,7 @@ selected_units = st.multiselect(
 
 if selected_units:
     st.markdown(
-        f"<div style='font-size:0.74rem;color:#64748B;margin-top:0.3rem;'>"
+        f"<div style='font-size:0.74rem;color:#6B7280;margin-top:0.3rem;'>"
         f"已選 {len(selected_units)} / {len(units)} 個單元</div>",
         unsafe_allow_html=True,
     )
@@ -240,7 +247,7 @@ if st.button(
 
 if start_disabled:
     st.markdown(
-        "<div style='text-align:center;font-size:0.76rem;color:#94A3B8;margin-top:0.5rem;'>"
+        "<div style='text-align:center;font-size:0.76rem;color:#9CA3AF;margin-top:0.5rem;'>"
         "請先選擇至少一個單元</div>",
         unsafe_allow_html=True,
     )
