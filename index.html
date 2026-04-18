@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>線上測驗平台</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-icon"></div>
+      <span class="sidebar-title">線上測驗平台</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-link active"><span class="nav-dot"></span>首頁</a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Login view -->
+    <div id="view-login">
+      <div style="height:2.5rem;"></div>
+      <div style="max-width:360px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:1.8rem;">
+          <div style="display:flex;justify-content:center;margin-bottom:0.9rem;">
+            <div style="width:40px;height:40px;background:#4F46E5;border-radius:8px;
+                        display:flex;align-items:center;justify-content:center;">
+              <div style="width:18px;height:18px;border:2.5px solid white;border-radius:3px;"></div>
+            </div>
+          </div>
+          <div style="font-size:1.3rem;font-weight:800;color:#111827;letter-spacing:-0.5px;margin-bottom:0.3rem;">
+            線上測驗平台
+          </div>
+          <div style="font-size:0.82rem;color:#9CA3AF;font-weight:500;">選擇主題與單元，隨時開始練習</div>
+        </div>
+
+        <div class="card card-top-accent">
+          <div class="field-label">用戶代號</div>
+          <input type="text" id="input-name" placeholder="輸入你的專屬代號" autocomplete="off" />
+          <p class="field-hint">輸入代號即可識別身份，無需密碼</p>
+          <div style="margin-top:1.2rem;">
+            <button class="btn btn-primary btn-full" id="btn-login">進入系統 →</button>
+          </div>
+        </div>
+
+        <div id="login-error" style="color:#EF4444;font-size:0.8rem;text-align:center;margin-top:0.75rem;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Quiz setup view -->
+    <div id="view-setup" style="display:none;">
+
+      <div class="user-bar">
+        <div class="user-info">
+          <div class="user-avatar" id="avatar-letter">U</div>
+          <div>
+            <div class="user-name" id="display-name">—</div>
+            <div class="user-label">用戶代號</div>
+          </div>
+        </div>
+        <div class="status-dot">已登入</div>
+      </div>
+
+      <!-- Step 01: Topic -->
+      <div class="card">
+        <div class="step-header">
+          <span class="step-badge">01</span>主題
+        </div>
+        <select id="select-topic">
+          <option value="">— 請選擇主題 —</option>
+        </select>
+      </div>
+
+      <!-- Step 02: Units -->
+      <div class="card" id="card-units" style="display:none;">
+        <div class="step-header">
+          <span class="step-badge">02</span>單元
+        </div>
+        <div class="select-all-row">
+          <button class="btn btn-ghost btn-sm" id="btn-select-all">全選</button>
+        </div>
+        <div class="checkbox-group" id="units-list"></div>
+        <div class="unit-count" id="unit-count"></div>
+      </div>
+
+      <!-- Step 03: Count -->
+      <div class="card" id="card-count" style="display:none;">
+        <div class="step-header">
+          <span class="step-badge">03</span>題數
+        </div>
+        <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
+            <input type="radio" name="mode" value="all" checked style="accent-color:#4F46E5;" /> 全部題目
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
+            <input type="radio" name="mode" value="random" style="accent-color:#4F46E5;" /> 隨機抽取 N 題
+          </label>
+        </div>
+        <div id="random-input" style="display:none;">
+          <input type="number" id="input-n" min="1" max="200" value="10" style="width:100px;" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="btn-start" disabled>開始測驗 →</button>
+      <p id="start-hint" style="text-align:center;font-size:0.76rem;color:#9CA3AF;margin-top:0.5rem;">
+        請先選擇至少一個單元
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/parser.js"></script>
+<script>
+  const state = {
+    userId: null,
+    userName: null,
+    manifest: null,
+    selectedUnits: new Set(),
+  };
+
+  // ── Restore session ──
+  const saved = sessionStorage.getItem("quizUser");
+  if (saved) {
+    const { id, name } = JSON.parse(saved);
+    state.userId = id;
+    state.userName = name;
+    showSetup();
+  }
+
+  // ── Toast ──
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), duration);
+  }
+
+  // ── Login ──
+  document.getElementById("btn-login").addEventListener("click", doLogin);
+  document.getElementById("input-name").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doLogin();
+  });
+
+  async function doLogin() {
+    const name = document.getElementById("input-name").value.trim();
+    const errEl = document.getElementById("login-error");
+    errEl.style.display = "none";
+    if (!name) { errEl.textContent = "請輸入用戶代號。"; errEl.style.display = "block"; return; }
+
+    const btn = document.getElementById("btn-login");
+    btn.disabled = true;
+    btn.textContent = "連線中…";
+
+    try {
+      const id = await getOrCreateUser(name);
+      state.userId = id;
+      state.userName = name;
+      sessionStorage.setItem("quizUser", JSON.stringify({ id, name }));
+      showSetup();
+    } catch (e) {
+      errEl.textContent = "無法連線至資料庫，請稍後再試。";
+      errEl.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "進入系統 →";
+    }
+  }
+
+  // ── Setup view ──
+  async function showSetup() {
+    document.getElementById("view-login").style.display = "none";
+    document.getElementById("view-setup").style.display = "block";
+    document.getElementById("display-name").textContent = state.userName;
+    document.getElementById("avatar-letter").textContent = state.userName[0].toUpperCase();
+
+    if (!state.manifest) {
+      const res = await fetch("questions/manifest.json");
+      state.manifest = await res.json();
+    }
+
+    const sel = document.getElementById("select-topic");
+    sel.innerHTML = '<option value="">— 請選擇主題 —</option>';
+    state.manifest.topics.forEach((t) => {
+      const opt = document.createElement("option");
+      opt.value = t.name;
+      opt.textContent = t.name;
+      sel.appendChild(opt);
+    });
+  }
+
+  // ── Topic change ──
+  document.getElementById("select-topic").addEventListener("change", function () {
+    const topicName = this.value;
+    const cardUnits = document.getElementById("card-units");
+    const cardCount = document.getElementById("card-count");
+    state.selectedUnits.clear();
+    updateStartBtn();
+
+    if (!topicName) {
+      cardUnits.style.display = "none";
+      cardCount.style.display = "none";
+      return;
+    }
+
+    const topic = state.manifest.topics.find((t) => t.name === topicName);
+    const list = document.getElementById("units-list");
+    list.innerHTML = "";
+    topic.units.forEach((u) => {
+      const label = document.createElement("label");
+      label.className = "checkbox-item";
+      label.innerHTML = `<input type="checkbox" value="${u.unit}" /> ${u.unit}`;
+      label.querySelector("input").addEventListener("change", onUnitChange);
+      list.appendChild(label);
+    });
+
+    cardUnits.style.display = "block";
+    cardCount.style.display = "block";
+    updateUnitCount();
+  });
+
+  function onUnitChange(e) {
+    const label = e.target.closest(".checkbox-item");
+    if (e.target.checked) {
+      state.selectedUnits.add(e.target.value);
+      label.classList.add("checked");
+    } else {
+      state.selectedUnits.delete(e.target.value);
+      label.classList.remove("checked");
+    }
+    updateUnitCount();
+    updateStartBtn();
+  }
+
+  document.getElementById("btn-select-all").addEventListener("click", () => {
+    const checkboxes = document.querySelectorAll("#units-list input[type=checkbox]");
+    const allChecked = [...checkboxes].every((c) => c.checked);
+    checkboxes.forEach((c) => {
+      c.checked = !allChecked;
+      const label = c.closest(".checkbox-item");
+      if (!allChecked) { state.selectedUnits.add(c.value); label.classList.add("checked"); }
+      else { state.selectedUnits.delete(c.value); label.classList.remove("checked"); }
+    });
+    updateUnitCount();
+    updateStartBtn();
+  });
+
+  function updateUnitCount() {
+    const total = document.querySelectorAll("#units-list input[type=checkbox]").length;
+    const el = document.getElementById("unit-count");
+    if (state.selectedUnits.size > 0) {
+      el.textContent = `已選 ${state.selectedUnits.size} / ${total} 個單元`;
+    } else {
+      el.textContent = "";
+    }
+  }
+
+  function updateStartBtn() {
+    const btn = document.getElementById("btn-start");
+    const hint = document.getElementById("start-hint");
+    btn.disabled = state.selectedUnits.size === 0;
+    hint.style.display = state.selectedUnits.size === 0 ? "block" : "none";
+  }
+
+  // ── Random mode toggle ──
+  document.querySelectorAll("input[name=mode]").forEach((r) => {
+    r.addEventListener("change", () => {
+      document.getElementById("random-input").style.display =
+        r.value === "random" && r.checked ? "block" : "none";
+    });
+  });
+
+  // ── Start quiz ──
+  document.getElementById("btn-start").addEventListener("click", async () => {
+    const topic = document.getElementById("select-topic").value;
+    const units = [...state.selectedUnits];
+    const mode = document.querySelector("input[name=mode]:checked").value;
+    const n = parseInt(document.getElementById("input-n").value, 10) || 10;
+
+    const btn = document.getElementById("btn-start");
+    btn.disabled = true;
+    btn.textContent = "載入題目…";
+
+    try {
+      let questions = await loadQuestions(topic, units);
+      if (!questions.length) { showToast("選取的單元中找不到題目"); btn.disabled = false; btn.textContent = "開始測驗 →"; return; }
+      if (mode === "random") questions = sampleQuestions(questions, n);
+
+      sessionStorage.setItem("quizSession", JSON.stringify({
+        questions,
+        topic,
+        units,
+        userId: state.userId,
+        userName: state.userName,
+      }));
+      window.location.href = "quiz.html";
+    } catch (e) {
+      showToast("載入題目失敗，請稍後再試");
+      btn.disabled = false;
+      btn.textContent = "開始測驗 →";
+    }
+  });
+</script>
+</body>
+</html>

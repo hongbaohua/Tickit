@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>考生管理</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-icon"></div>
+      <span class="sidebar-title">線上測驗平台</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
+      <a href="dashboard.html" class="nav-link active"><span class="nav-dot"></span>考生管理</a>
+    </nav>
+  </aside>
+
+  <main class="main" style="max-width:820px;">
+
+    <!-- Header banner -->
+    <div style="background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#334155 100%);
+                border-radius:14px;padding:1.5rem 1.8rem;margin-bottom:1.5rem;
+                border:1px solid #334155;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:1.15rem;font-weight:800;color:white;
+                      margin-bottom:0.2rem;letter-spacing:-0.3px;">考生管理</div>
+          <div style="color:#64748B;font-size:0.78rem;">查看測驗記錄與弱點診斷分析</div>
+        </div>
+        <div style="background:rgba(99,102,241,0.2);border-radius:10px;
+                    padding:0.5rem 1rem;border:1px solid rgba(99,102,241,0.3);">
+          <div style="color:#A5B4FC;font-size:0.72rem;font-weight:600;
+                      letter-spacing:0.5px;text-transform:uppercase;">Dashboard</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading" class="loading">載入中…</div>
+    <div id="content" style="display:none;">
+
+      <!-- User selector -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">👤 選擇用戶</span>
+        </div>
+        <select id="user-select"></select>
+      </div>
+
+      <!-- Metrics row -->
+      <div id="metrics-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;"></div>
+
+      <!-- Sessions table -->
+      <div class="card" id="card-sessions">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">📋 測驗紀錄</span>
+        </div>
+        <div id="sessions-content"></div>
+      </div>
+
+      <!-- Trend chart -->
+      <div class="card" id="card-trend">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">📈 答對率趨勢</span>
+        </div>
+        <div id="trend-content">
+          <div class="chart-container"><canvas id="trend-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Weakness diagnosis -->
+      <div class="card" id="card-weakness">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">🔍 弱點診斷</span>
+        </div>
+        <div id="weakness-content"></div>
+      </div>
+
+      <!-- Unit accuracy chart -->
+      <div class="card" id="card-unit-chart">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">📊 各單元答對率</span>
+        </div>
+        <div class="chart-container" style="height:260px;"><canvas id="unit-chart"></canvas></div>
+      </div>
+
+      <!-- Top wrong questions -->
+      <div class="card" id="card-top-wrong">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">❌ 高頻錯題 Top 10</span>
+        </div>
+        <div id="top-wrong-content"></div>
+      </div>
+
+    </div>
+
+    <div id="no-users" style="display:none;" class="empty-state">
+      <p>目前尚無任何用戶紀錄。請先至首頁進行測驗。</p>
+      <a href="index.html" class="btn btn-primary" style="margin-top:1rem;">前往首頁</a>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script>
+  let trendChartInst = null;
+  let unitChartInst = null;
+
+  async function init() {
+    const users = await getAllUsers();
+    document.getElementById("loading").style.display = "none";
+
+    if (!users.length) {
+      document.getElementById("no-users").style.display = "block";
+      return;
+    }
+
+    document.getElementById("content").style.display = "block";
+
+    const sel = document.getElementById("user-select");
+    users.forEach((u) => {
+      const opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = u.name;
+      sel.appendChild(opt);
+    });
+
+    sel.addEventListener("change", () => loadUser(parseInt(sel.value)));
+    loadUser(parseInt(sel.value));
+  }
+
+  async function loadUser(userId) {
+    const [sessions, results] = await Promise.all([
+      getUserSessions(userId),
+      getUserQuestionResults(userId),
+    ]);
+    renderMetrics(sessions);
+    renderSessions(sessions);
+    renderTrend(sessions);
+    renderWeakness(results);
+    renderUnitChart(results);
+    renderTopWrong(results);
+  }
+
+  function renderMetrics(sessions) {
+    const el = document.getElementById("metrics-row");
+    if (!sessions.length) { el.innerHTML = ""; return; }
+
+    const totalS = sessions.length;
+    const avgAcc = sessions.reduce((a, s) => a + (s.total_questions > 0 ? s.correct_count / s.total_questions * 100 : 0), 0) / totalS;
+    const totalQ = sessions.reduce((a, s) => a + s.total_questions, 0);
+    const best = Math.max(...sessions.filter(s => s.total_questions > 0).map(s => s.correct_count / s.total_questions * 100));
+
+    el.innerHTML = [
+      { label: "測驗次數", value: `${totalS} 次` },
+      { label: "平均答對率", value: `${avgAcc.toFixed(1)}%` },
+      { label: "累計作答題數", value: `${totalQ} 題` },
+      { label: "最高答對率", value: `${best.toFixed(1)}%` },
+    ].map(m => `
+      <div class="card" style="margin-bottom:0;text-align:center;padding:1rem;">
+        <div style="font-size:1.3rem;font-weight:800;color:#111827;">${m.value}</div>
+        <div style="font-size:0.72rem;color:#6B7280;margin-top:0.25rem;">${m.label}</div>
+      </div>
+    `).join("");
+  }
+
+  function renderSessions(sessions) {
+    const el = document.getElementById("sessions-content");
+    if (!sessions.length) {
+      el.innerHTML = `<div class="empty-state"><p>此用戶尚無測驗紀錄。</p></div>`;
+      return;
+    }
+    const rows = sessions.map((s) => {
+      const acc = s.total_questions > 0 ? (s.correct_count / s.total_questions * 100) : 0;
+      const badgeCls = acc >= 80 ? "badge-green" : acc >= 60 ? "badge-yellow" : "badge-red";
+      const unitsStr = Array.isArray(s.units) ? s.units.join("、") : s.units;
+      return `<tr>
+        <td>${s.taken_at.slice(0, 16).replace("T", " ")}</td>
+        <td>${s.topic}</td>
+        <td style="font-size:0.78rem;color:#6B7280;">${unitsStr}</td>
+        <td>${s.correct_count} / ${s.total_questions}</td>
+        <td><span class="badge ${badgeCls}">${acc.toFixed(1)}%</span></td>
+      </tr>`;
+    }).join("");
+    el.innerHTML = `<table>
+      <thead><tr><th>日期</th><th>主題</th><th>單元</th><th>答對</th><th>答對率</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  function renderTrend(sessions) {
+    const el = document.getElementById("trend-content");
+    if (trendChartInst) { trendChartInst.destroy(); trendChartInst = null; }
+
+    if (sessions.length < 2) {
+      el.innerHTML = sessions.length === 1
+        ? `<div style="font-size:0.875rem;color:#6B7280;">最近一次答對率：${(sessions[0].correct_count/sessions[0].total_questions*100).toFixed(1)}%<br><span style="font-size:0.78rem;color:#9CA3AF;">需 2 次以上才能顯示趨勢圖。</span></div>`
+        : `<div class="empty-state"><p>需要 2 次以上測驗才能顯示趨勢圖。</p></div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="chart-container"><canvas id="trend-chart"></canvas></div>`;
+
+    const reversed = [...sessions].reverse();
+    const labels = reversed.map((_, i) => `第 ${i + 1} 次`);
+    const data = reversed.map(s => s.total_questions > 0 ? +(s.correct_count / s.total_questions * 100).toFixed(1) : 0);
+
+    trendChartInst = new Chart(document.getElementById("trend-chart"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: "#6366F1",
+          backgroundColor: "rgba(99,102,241,0.08)",
+          pointBackgroundColor: "#6366F1",
+          pointRadius: 4,
+          borderWidth: 2.5,
+          tension: 0.3,
+          fill: true,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 0, max: 105, grid: { color: "#F1F5F9" }, ticks: { callback: v => v + "%" } },
+          x: { grid: { display: false } },
+        },
+      },
+    });
+  }
+
+  function renderWeakness(results) {
+    const el = document.getElementById("weakness-content");
+    if (!results.length) {
+      el.innerHTML = `<div class="empty-state"><p>尚無題目作答紀錄，完成測驗後即可查看弱點分析。</p></div>`;
+      return;
+    }
+
+    const unitCorrect = {}, unitTotal = {};
+    results.forEach((r) => {
+      unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
+      if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+    });
+
+    const unitAcc = {};
+    Object.keys(unitTotal).forEach((u) => {
+      if (unitTotal[u] >= 3) unitAcc[u] = ((unitCorrect[u] || 0) / unitTotal[u]) * 100;
+    });
+
+    if (!Object.keys(unitAcc).length) {
+      el.innerHTML = `<div style="font-size:0.82rem;color:#6B7280;">作答題數尚不足（每單元需至少 3 題）。</div>`;
+      return;
+    }
+
+    const weak = Object.entries(unitAcc).filter(([,a]) => a < 60).sort((a,b) => a[1]-b[1]);
+    const mid  = Object.entries(unitAcc).filter(([,a]) => a >= 60 && a < 80).sort((a,b) => a[1]-b[1]);
+    const good = Object.entries(unitAcc).filter(([,a]) => a >= 80).sort((a,b) => b[1]-a[1]);
+
+    const col = (entries, bg, border, titleColor, title, valColor) => {
+      const items = entries.length
+        ? entries.map(([u, a]) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;
+                      padding:0.3rem 0;border-bottom:1px solid ${border};">
+            <span style="font-size:0.81rem;color:#374151;">${u}</span>
+            <span style="font-weight:700;color:${valColor};font-size:0.84rem;">${a.toFixed(1)}%</span>
+          </div>`).join("")
+        : `<div style="font-size:0.78rem;color:#94A3B8;">無</div>`;
+
+      return `<div style="background:${bg};border-radius:10px;padding:1rem 1.1rem;
+                           border:1px solid ${border};min-height:80px;">
+        <div style="font-weight:700;color:${titleColor};font-size:0.82rem;margin-bottom:0.7rem;">${title}</div>
+        ${items}
+      </div>`;
+    };
+
+    const priority = [...weak, ...mid].slice(0, 3);
+    const suggestion = priority.length
+      ? `<div style="background:#EEF2FF;border-radius:10px;padding:1rem 1.1rem;
+                     border:1px solid #C7D2FE;margin-top:0.9rem;">
+          <div style="font-weight:700;color:#3730A3;font-size:0.82rem;margin-bottom:0.5rem;">💡 強化建議</div>
+          <div style="font-size:0.8rem;color:#374151;line-height:1.7;">
+            建議優先複習 <strong>${priority.map(([u])=>u).join("、")}</strong> 等單元。<br>
+            可至首頁單獨選取這些單元進行針對性練習，透過多次重複練習提升答對率。
+          </div>
+        </div>` : "";
+
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
+        ${col(weak, "#FFF5F5", "#FED7D7", "#C53030", "🔴 需要加強", "#EF4444")}
+        ${col(mid,  "#FFFBEB", "#FDE68A", "#92400E", "🟡 尚可，可繼續加強", "#F59E0B")}
+        ${col(good, "#F0FDF4", "#BBF7D0", "#166534", "🟢 掌握良好", "#10B981")}
+      </div>
+      ${suggestion}
+    `;
+  }
+
+  function renderUnitChart(results) {
+    if (unitChartInst) { unitChartInst.destroy(); unitChartInst = null; }
+    if (!results.length) return;
+
+    const unitCorrect = {}, unitTotal = {};
+    results.forEach((r) => {
+      const k = `${r.topic} / ${r.unit}`;
+      unitTotal[k] = (unitTotal[k] || 0) + 1;
+      if (r.is_correct) unitCorrect[k] = (unitCorrect[k] || 0) + 1;
+    });
+
+    const sorted = Object.keys(unitTotal)
+      .map((k) => ({ k, acc: +((unitCorrect[k] || 0) / unitTotal[k] * 100).toFixed(1) }))
+      .sort((a, b) => a.acc - b.acc);
+
+    const getColor = (v) => v >= 80 ? "#10B981" : v >= 60 ? "#F59E0B" : "#EF4444";
+
+    unitChartInst = new Chart(document.getElementById("unit-chart"), {
+      type: "bar",
+      data: {
+        labels: sorted.map(d => d.k),
+        datasets: [{
+          data: sorted.map(d => d.acc),
+          backgroundColor: sorted.map(d => getColor(d.acc)),
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { min: 0, max: 115, grid: { display: false }, ticks: { callback: v => v + "%" } },
+          y: { grid: { color: "#F1F5F9" } },
+        },
+      },
+    });
+  }
+
+  function renderTopWrong(results) {
+    const el = document.getElementById("top-wrong-content");
+    const wrongCounts = {};
+    results.forEach((r) => {
+      if (!r.is_correct) wrongCounts[r.question_id] = (wrongCounts[r.question_id] || 0) + 1;
+    });
+
+    if (!Object.keys(wrongCounts).length) {
+      el.innerHTML = `<div style="color:#10B981;font-size:0.875rem;padding:0.5rem 0;">目前沒有答錯的題目！</div>`;
+      return;
+    }
+
+    const top10 = Object.entries(wrongCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const rows = top10.map(([qid, cnt]) => {
+      const display = qid.length > 60 ? qid.slice(0, 60) + "..." : qid;
+      return `<tr><td style="font-size:0.8rem;color:#374151;">${display}</td><td style="text-align:center;"><span class="badge badge-red">${cnt}</span></td></tr>`;
+    }).join("");
+
+    el.innerHTML = `<table>
+      <thead><tr><th>題目 ID</th><th style="text-align:center;">答錯次數</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  init().catch((e) => {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("content").innerHTML =
+      `<div class="empty-state"><p>載入失敗，請重新整理。<br><small>${e.message}</small></p></div>`;
+    document.getElementById("content").style.display = "block";
+  });
+</script>
+</body>
+</html>

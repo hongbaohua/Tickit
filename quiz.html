@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>測驗進行</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-icon"></div>
+      <span class="sidebar-title">線上測驗平台</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <!-- No session -->
+    <div id="view-no-session" style="display:none;">
+      <div class="card" style="text-align:center;padding:2.8rem 2rem;margin-top:2rem;">
+        <div style="width:36px;height:36px;background:#4F46E5;border-radius:6px;
+                    display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+          <div style="width:16px;height:16px;border:2px solid white;border-radius:2px;"></div>
+        </div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:0.4rem;">尚未設定測驗</div>
+        <div style="color:#6B7280;font-size:0.86rem;margin-bottom:1.5rem;">請先回首頁選擇主題與單元。</div>
+        <a href="index.html" class="btn btn-primary">回首頁</a>
+      </div>
+    </div>
+
+    <!-- Quiz in progress -->
+    <div id="view-quiz" style="display:none;">
+
+      <!-- Progress card -->
+      <div class="card" style="padding:0.9rem 1.2rem 0.75rem;margin-bottom:1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.55rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="background:#4F46E5;color:white;border-radius:3px;
+                        padding:1px 7px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;"
+                 id="q-label">Q1</div>
+            <span style="color:#9CA3AF;font-weight:500;font-size:0.78rem;" id="q-total">/ 0</span>
+          </div>
+          <div style="display:flex;gap:0.4rem;" id="q-badges"></div>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%;"></div>
+        </div>
+      </div>
+
+      <!-- Group context -->
+      <div id="context-card" class="context-card" style="display:none;">
+        <div>
+          <span class="context-tag">題組</span>
+          <span class="context-label">上一題情境</span>
+        </div>
+        <div class="context-text" id="context-text"></div>
+      </div>
+
+      <!-- Question card -->
+      <div class="card" style="margin-bottom:1.1rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="background:#4F46E5;color:white;border-radius:3px;
+                      padding:3px 8px;font-size:0.7rem;font-weight:700;
+                      flex-shrink:0;margin-top:3px;" id="q-badge-inline">Q1</div>
+          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;"
+             id="question-text"></p>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-list" id="options-list"></div>
+
+      <hr style="border:none;border-top:1px solid #E5E7EB;margin:1rem 0;" />
+
+      <!-- Nav row -->
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="btn-prev" style="display:none;">← 上一題</button>
+        <div class="nav-center" id="answered-count"></div>
+        <button class="btn btn-primary" id="btn-next">下一題 →</button>
+      </div>
+    </div>
+
+    <!-- Results view -->
+    <div id="view-results" style="display:none;">
+
+      <!-- Score card -->
+      <div class="card score-card">
+        <div class="donut-wrap">
+          <div class="donut" id="donut">
+            <div class="donut-inner">
+              <div class="donut-score" id="score-fraction"></div>
+              <div class="donut-pct" id="score-pct"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:1rem;font-weight:800;color:#111827;margin-bottom:1rem;">測驗完成</div>
+        <div class="score-stats">
+          <div class="score-stat">
+            <div class="score-stat-val" style="color:#10B981;" id="stat-correct">0</div>
+            <div class="score-stat-lbl">答對</div>
+          </div>
+          <div class="score-stat">
+            <div class="score-stat-val" style="color:#EF4444;" id="stat-wrong">0</div>
+            <div class="score-stat-lbl">答錯</div>
+          </div>
+          <div class="score-stat">
+            <div class="score-stat-val" id="stat-label">—</div>
+            <div class="score-stat-lbl">評等</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weakness summary -->
+      <div id="weakness-section"></div>
+
+      <!-- Wrong questions expandable -->
+      <div class="expandable" id="expand-wrong">
+        <div class="expandable-header open" id="expand-wrong-header">
+          <span id="wrong-count-label">答錯題目</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="expandable-body open" id="expand-wrong-body"></div>
+      </div>
+
+      <!-- All questions expandable -->
+      <div class="expandable">
+        <div class="expandable-header" id="expand-all-header">
+          <span>查看所有題目解析</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="expandable-body" id="expand-all-body"></div>
+      </div>
+
+      <div style="margin-top:1.4rem;max-width:280px;margin-left:auto;margin-right:auto;">
+        <a href="index.html" class="btn btn-primary btn-full">返回首頁</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script>
+  // ── Load session ──
+  const raw = sessionStorage.getItem("quizSession");
+  if (!raw) {
+    document.getElementById("view-no-session").style.display = "block";
+  } else {
+    const { questions, topic, units, userId, userName } = JSON.parse(raw);
+    runQuiz(questions, topic, units, userId, userName);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+
+  function runQuiz(questions, topic, units, userId, userName) {
+    const total = questions.length;
+    let idx = 0;
+    const answers = {};
+    let submitted = false;
+    let saved = false;
+
+    document.getElementById("view-quiz").style.display = "block";
+    render();
+
+    function render() {
+      const q = questions[idx];
+      document.getElementById("q-label").textContent = `Q${idx + 1}`;
+      document.getElementById("q-badge-inline").textContent = `Q${idx + 1}`;
+      document.getElementById("q-total").textContent = `/ ${total}`;
+      document.getElementById("progress-fill").style.width = `${(idx / total) * 100}%`;
+
+      // Badges
+      const badges = document.getElementById("q-badges");
+      badges.innerHTML = `
+        <span style="background:#F3F4F6;color:#6B7280;border-radius:3px;padding:2px 8px;font-size:0.68rem;font-weight:600;">${q.topic}</span>
+        <span style="background:#F3F4F6;color:#6B7280;border-radius:3px;padding:2px 8px;font-size:0.68rem;font-weight:600;">${q.unit}</span>
+      `;
+
+      // Context
+      const ctxCard = document.getElementById("context-card");
+      if (q.group_context) {
+        ctxCard.style.display = "block";
+        document.getElementById("context-text").textContent = q.group_context;
+      } else {
+        ctxCard.style.display = "none";
+      }
+
+      document.getElementById("question-text").textContent = q.question;
+
+      // Options
+      const list = document.getElementById("options-list");
+      list.innerHTML = "";
+      Object.entries(q.options).forEach(([letter, text]) => {
+        const div = document.createElement("div");
+        div.className = "option-item" + (answers[idx] === letter ? " selected" : "");
+        div.innerHTML = `<div class="option-letter">${letter}</div><span>${text}</span>`;
+        div.addEventListener("click", () => {
+          answers[idx] = letter;
+          render();
+        });
+        list.appendChild(div);
+      });
+
+      // Nav
+      const btnPrev = document.getElementById("btn-prev");
+      const btnNext = document.getElementById("btn-next");
+      btnPrev.style.display = idx > 0 ? "inline-flex" : "none";
+
+      if (idx < total - 1) {
+        btnNext.textContent = "下一題 →";
+        btnNext.onclick = () => {
+          if (!answers[idx]) { showToast("請先選擇答案再繼續"); return; }
+          idx++;
+          render();
+        };
+      } else {
+        btnNext.textContent = "送出";
+        btnNext.onclick = () => {
+          if (!answers[idx]) { showToast("請先選擇答案再送出"); return; }
+          submitted = true;
+          showResults();
+        };
+      }
+
+      btnPrev.onclick = () => { idx--; render(); };
+
+      // Answered count
+      document.getElementById("answered-count").textContent =
+        `已作答 ${Object.keys(answers).length} / ${total} 題`;
+    }
+
+    async function showResults() {
+      document.getElementById("view-quiz").style.display = "none";
+      document.getElementById("view-results").style.display = "block";
+
+      const correctCount = questions.reduce((acc, q, i) => acc + (answers[i] === q.answer ? 1 : 0), 0);
+      const wrongQuestions = questions.map((q, i) => ({ q, i })).filter(({ q, i }) => answers[i] !== q.answer);
+      const pct = total > 0 ? (correctCount / total) * 100 : 0;
+
+      // Score color
+      const color = pct >= 80 ? "#10B981" : pct >= 60 ? "#F59E0B" : "#EF4444";
+      const label = pct >= 80 ? "優秀" : pct >= 60 ? "加油" : "需補強";
+
+      // Donut
+      const conic = `conic-gradient(${color} 0% ${pct.toFixed(1)}%, #E5E7EB ${pct.toFixed(1)}% 100%)`;
+      document.getElementById("donut").style.background = conic;
+      document.getElementById("score-fraction").textContent = `${correctCount}/${total}`;
+      document.getElementById("score-pct").textContent = `${Math.round(pct)}%`;
+      document.getElementById("score-pct").style.color = color;
+      document.getElementById("stat-correct").textContent = correctCount;
+      document.getElementById("stat-wrong").textContent = wrongQuestions.length;
+      document.getElementById("stat-label").textContent = label;
+      document.getElementById("stat-label").style.color = color;
+
+      // Weakness
+      if (wrongQuestions.length > 0) {
+        const wrongByUnit = {};
+        const totalByUnit = {};
+        questions.forEach((q) => { totalByUnit[q.unit] = (totalByUnit[q.unit] || 0) + 1; });
+        wrongQuestions.forEach(({ q }) => { wrongByUnit[q.unit] = (wrongByUnit[q.unit] || 0) + 1; });
+
+        const weakUnits = Object.entries(wrongByUnit)
+          .map(([unit, wc]) => ({ unit, wc, tc: totalByUnit[unit], acc: ((totalByUnit[unit] - wc) / totalByUnit[unit]) * 100 }))
+          .filter((u) => u.acc < 75)
+          .sort((a, b) => a.acc - b.acc);
+
+        if (weakUnits.length > 0) {
+          const itemsHtml = weakUnits.map((u) => `
+            <div class="weakness-item">
+              <div>
+                <div class="weakness-unit">${u.unit}</div>
+                <div class="weakness-sub">答錯 ${u.wc} / ${u.tc} 題</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="weakness-pct" style="color:${u.acc < 50 ? "#EF4444" : "#F59E0B"};">${Math.round(u.acc)}%</div>
+                <div style="font-size:0.66rem;color:#6B7280;">答對率</div>
+              </div>
+            </div>
+          `).join("");
+
+          document.getElementById("weakness-section").innerHTML = `
+            <div class="card weakness-card">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">
+                <div style="width:8px;height:8px;background:#F59E0B;border-radius:1px;flex-shrink:0;"></div>
+                <span style="font-weight:700;color:#111827;font-size:0.84rem;">本次弱點摘要</span>
+              </div>
+              ${itemsHtml}
+              <div class="weakness-hint">
+                建議優先複習 <strong style="color:#111827;">${weakUnits[0].unit}</strong>，該單元答對率偏低
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // Wrong expandable
+      document.getElementById("wrong-count-label").textContent = `答錯題目（${wrongQuestions.length} 題）`;
+      const wrongBody = document.getElementById("expand-wrong-body");
+      if (wrongQuestions.length === 0) {
+        wrongBody.innerHTML = `<div style="color:#10B981;padding:1rem;font-size:0.875rem;">全部答對！</div>`;
+      } else {
+        wrongBody.innerHTML = wrongQuestions.map(({ q, i }) => buildReviewItem(q, i, answers, false)).join("");
+      }
+
+      // All expandable
+      document.getElementById("expand-all-body").innerHTML =
+        questions.map((q, i) => buildReviewItem(q, i, answers, true)).join("");
+
+      // Expandable toggles
+      setupExpandable("expand-wrong-header", "expand-wrong-body");
+      setupExpandable("expand-all-header", "expand-all-body");
+
+      // Save to DB
+      if (!saved) {
+        saved = true;
+        const answerRecords = questions.map((q, i) => ({
+          question_id: q.id,
+          topic: q.topic,
+          unit: q.unit,
+          is_correct: answers[i] === q.answer,
+          user_answer: answers[i] || "",
+          correct_answer: q.answer,
+        }));
+        try {
+          await saveSession(userId, topic, units, total, correctCount, answerRecords);
+        } catch (e) {
+          showToast("成績儲存失敗，但仍可查看本次結果");
+        }
+      }
+    }
+  }
+
+  function buildReviewItem(q, i, answers, showAll) {
+    const userAns = answers[i] || "";
+    const isCorrect = userAns === q.answer;
+    const userText = q.options[userAns] || "（未作答）";
+    const correctText = q.options[q.answer] || "";
+    const cls = isCorrect ? "correct-item" : "wrong-item";
+    const tagColor = isCorrect ? "#10B981" : "#EF4444";
+    const tagLabel = isCorrect ? "答對" : "答錯";
+
+    return `
+      <div class="review-item ${cls}">
+        <div>
+          <span class="review-tag" style="background:${tagColor};">第 ${i + 1} 題</span>
+          <span style="font-size:0.75rem;color:#6B7280;">${q.unit}</span>
+        </div>
+        <p class="review-q">${q.question}</p>
+        ${!isCorrect ? `
+          <div class="review-answer" style="color:#EF4444;">✗ 你的答案：(${userAns}) ${userText}</div>
+          <div class="review-answer" style="color:#10B981;">✓ 正確答案：(${q.answer}) ${correctText}</div>
+        ` : `
+          <div class="review-answer" style="color:#10B981;">✓ 你的答案：(${userAns}) ${userText}</div>
+        `}
+        ${q.explanation ? `<div class="review-explanation">${q.explanation}</div>` : ""}
+      </div>
+    `;
+  }
+
+  function setupExpandable(headerId, bodyId) {
+    const header = document.getElementById(headerId);
+    const body = document.getElementById(bodyId);
+    header.addEventListener("click", () => {
+      header.classList.toggle("open");
+      body.classList.toggle("open");
+    });
+  }
+</script>
+</body>
+</html>
