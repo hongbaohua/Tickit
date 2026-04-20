@@ -129,6 +129,7 @@
     manifest: null,
     selectedUnits: new Set(),
   };
+  let unitQuestionCounts = {};
 
   // ── Restore session ──
   const saved = sessionStorage.getItem("quizUser");
@@ -217,10 +218,11 @@
     const topic = state.manifest.topics.find((t) => t.name === topicName);
     const list = document.getElementById("units-list");
     list.innerHTML = "";
-    topic.units.forEach((u) => {
+    unitQuestionCounts = {};
+    topic.units.forEach((u, idx) => {
       // 提取檔名中除去「Day X：」與「.md」的部分作為標題
       const title = u.file.replace(/^Day\s*\d+\s*[：:]\s*/i, "").replace(/\.md$/i, "");
-      
+
       const label = document.createElement("label");
       label.className = "checkbox-item";
       label.innerHTML = `
@@ -228,6 +230,8 @@
         <div class="unit-info-wrapper">
           <span class="unit-tag">${u.unit}</span>
           <span class="unit-title">${title}</span>
+          <span id="uqc-${idx}" style="margin-left:auto;font-size:0.72rem;color:#9CA3AF;
+                white-space:nowrap;padding-left:0.5rem;">…</span>
         </div>
       `;
       label.querySelector("input").addEventListener("change", onUnitChange);
@@ -237,6 +241,24 @@
     cardUnits.style.display = "block";
     cardCount.style.display = "block";
     updateUnitCount();
+
+    // 非同步載入各單元題目數
+    topic.units.forEach(async (u, idx) => {
+      try {
+        const path = `questions/${encodeURIComponent(topicName)}/${encodeURIComponent(u.file)}`;
+        const res = await fetch(path);
+        if (!res.ok) return;
+        const text = await res.text();
+        const qs = parseMarkdown(text, topicName, u.file);
+        unitQuestionCounts[u.unit] = qs.length;
+        const countEl = document.getElementById(`uqc-${idx}`);
+        if (countEl) countEl.textContent = `${qs.length} 題`;
+        updateUnitCount();
+      } catch (e) {
+        const countEl = document.getElementById(`uqc-${idx}`);
+        if (countEl) countEl.textContent = "";
+      }
+    });
   });
 
   function onUnitChange(e) {
@@ -269,7 +291,10 @@
     const total = document.querySelectorAll("#units-list input[type=checkbox]").length;
     const el = document.getElementById("unit-count");
     if (state.selectedUnits.size > 0) {
-      el.textContent = `已選 ${state.selectedUnits.size} / ${total} 個單元`;
+      const totalQs = [...state.selectedUnits].reduce((sum, u) => sum + (unitQuestionCounts[u] || 0), 0);
+      const allLoaded = [...state.selectedUnits].every(u => unitQuestionCounts[u] !== undefined);
+      const qsText = allLoaded && totalQs > 0 ? `，共 ${totalQs} 題` : "";
+      el.textContent = `已選 ${state.selectedUnits.size} / ${total} 個單元${qsText}`;
     } else {
       el.textContent = "";
     }

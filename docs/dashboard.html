@@ -71,9 +71,7 @@
           <div class="section-bar"></div>
           <span class="section-title">📈 答對率趨勢</span>
         </div>
-        <div id="trend-content">
-          <div class="chart-container"><canvas id="trend-chart"></canvas></div>
-        </div>
+        <div id="trend-content"></div>
       </div>
 
       <!-- Weakness diagnosis -->
@@ -91,7 +89,7 @@
           <div class="section-bar"></div>
           <span class="section-title">📊 各單元答對率</span>
         </div>
-        <div class="chart-container" style="height:260px;"><canvas id="unit-chart"></canvas></div>
+        <div id="unit-chart-content"></div>
       </div>
 
       <!-- Top wrong questions -->
@@ -115,9 +113,28 @@
 
 <script src="js/config.js"></script>
 <script src="js/db.js"></script>
+<script src="js/parser.js"></script>
 <script>
-  let trendChartInst = null;
-  let unitChartInst = null;
+  let chartInstances = {};
+  let allResults = [];
+  let sessionLookup = {};
+  let manifestData = null;
+
+  async function getManifest() {
+    if (!manifestData) {
+      const res = await fetch("questions/manifest.json");
+      manifestData = await res.json();
+    }
+    return manifestData;
+  }
+
+  function getUnitFullName(topicName, unitId, manifest) {
+    const topicData = manifest.topics.find(t => t.name === topicName);
+    if (!topicData) return unitId;
+    const unitData = topicData.units.find(u => u.unit === unitId);
+    if (!unitData) return unitId;
+    return unitData.file.replace(/\.md$/i, "");
+  }
 
   async function init() {
     const users = await getAllUsers();
@@ -142,13 +159,29 @@
     loadUser(parseInt(sel.value));
   }
 
+  function groupBy(arr, keyFn) {
+    return arr.reduce((acc, item) => {
+      const key = keyFn(item);
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
+  }
+
   async function loadUser(userId) {
-    const [sessions, results] = await Promise.all([
+    Object.values(chartInstances).forEach(c => c.destroy());
+    chartInstances = {};
+
+    const [sessions, results, manifest] = await Promise.all([
       getUserSessions(userId),
       getUserQuestionResults(userId),
+      getManifest(),
     ]);
+    allResults = results;
+    sessionLookup = {};
+    sessions.forEach(s => { sessionLookup[s.id] = s; });
     renderMetrics(sessions);
-    renderSessions(sessions);
+    renderSessions(sessions, manifest);
     renderTrend(sessions);
     renderWeakness(results);
     renderUnitChart(results);
@@ -177,70 +210,180 @@
     `).join("");
   }
 
-  function renderSessions(sessions) {
+  function renderSessions(sessions, manifest) {
     const el = document.getElementById("sessions-content");
     if (!sessions.length) {
       el.innerHTML = `<div class="empty-state"><p>此用戶尚無測驗紀錄。</p></div>`;
       return;
     }
+
+    const wrongCountMap = {};
+    allResults.forEach(r => {
+      if (!r.is_correct) wrongCountMap[r.session_id] = (wrongCountMap[r.session_id] || 0) + 1;
+    });
+
     const rows = sessions.map((s) => {
       const acc = s.total_questions > 0 ? (s.correct_count / s.total_questions * 100) : 0;
       const badgeCls = acc >= 80 ? "badge-green" : acc >= 60 ? "badge-yellow" : "badge-red";
-      const unitsStr = Array.isArray(s.units) ? s.units.join("、") : s.units;
-      return `<tr>
-        <td>${s.taken_at.slice(0, 16).replace("T", " ")}</td>
-        <td>${s.topic}</td>
-        <td style="font-size:0.78rem;color:#6B7280;">${unitsStr}</td>
-        <td>${s.correct_count} / ${s.total_questions}</td>
-        <td><span class="badge ${badgeCls}">${acc.toFixed(1)}%</span></td>
-      </tr>`;
+
+      const units = Array.isArray(s.units) ? s.units : [s.units];
+      const unitNames = units.map(u => getUnitFullName(s.topic, u, manifest));
+      const unitsHtml = unitNames.map(n =>
+        `<span style="display:block;font-size:0.75rem;color:#374151;line-height:1.55;">${n}</span>`
+      ).join("");
+
+      const wrongCount = wrongCountMap[s.id] || 0;
+      const btnStyle = wrongCount > 0
+        ? "background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;"
+        : "background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;";
+      const btnText = wrongCount > 0 ? `回顧錯題（${wrongCount} 題）` : "全對 ✓";
+
+      return `
+        <tr>
+          <td>${s.taken_at.slice(0, 16).replace("T", " ")}</td>
+          <td style="font-size:0.82rem;">${s.topic}</td>
+          <td>${unitsHtml}</td>
+          <td>${s.correct_count} / ${s.total_questions}</td>
+          <td><span class="badge ${badgeCls}">${acc.toFixed(1)}%</span></td>
+          <td>
+            <button onclick="toggleReview(${s.id}, this)"
+                    style="font-size:0.74rem;padding:0.28rem 0.6rem;border-radius:6px;
+                           cursor:pointer;${btnStyle}font-weight:600;white-space:nowrap;">
+              ${btnText}
+            </button>
+          </td>
+        </tr>
+        <tr id="review-row-${s.id}" style="display:none;">
+          <td colspan="6" style="padding:0;background:#FAFAFA;"></td>
+        </tr>`;
     }).join("");
+
     el.innerHTML = `<table>
-      <thead><tr><th>日期</th><th>主題</th><th>單元</th><th>答對</th><th>答對率</th></tr></thead>
+      <thead><tr><th>日期</th><th>主題</th><th>單元</th><th>答對</th><th>答對率</th><th>回顧</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }
 
-  function renderTrend(sessions) {
-    const el = document.getElementById("trend-content");
-    if (trendChartInst) { trendChartInst.destroy(); trendChartInst = null; }
+  async function toggleReview(sessionId, btn) {
+    const reviewRow = document.getElementById(`review-row-${sessionId}`);
+    const td = reviewRow.querySelector("td");
 
-    if (sessions.length < 2) {
-      el.innerHTML = sessions.length === 1
-        ? `<div style="font-size:0.875rem;color:#6B7280;">最近一次答對率：${(sessions[0].correct_count/sessions[0].total_questions*100).toFixed(1)}%<br><span style="font-size:0.78rem;color:#9CA3AF;">需 2 次以上才能顯示趨勢圖。</span></div>`
-        : `<div class="empty-state"><p>需要 2 次以上測驗才能顯示趨勢圖。</p></div>`;
+    if (reviewRow.style.display !== "none") {
+      reviewRow.style.display = "none";
       return;
     }
 
-    el.innerHTML = `<div class="chart-container"><canvas id="trend-chart"></canvas></div>`;
+    reviewRow.style.display = "";
+    td.innerHTML = `<div style="padding:1rem;color:#6B7280;font-size:0.82rem;">載入題目中…</div>`;
 
-    const reversed = [...sessions].reverse();
-    const labels = reversed.map((_, i) => `第 ${i + 1} 次`);
-    const data = reversed.map(s => s.total_questions > 0 ? +(s.correct_count / s.total_questions * 100).toFixed(1) : 0);
+    const wrongResults = allResults.filter(r => r.session_id === sessionId && !r.is_correct);
 
-    trendChartInst = new Chart(document.getElementById("trend-chart"), {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          data,
-          borderColor: "#6366F1",
-          backgroundColor: "rgba(99,102,241,0.08)",
-          pointBackgroundColor: "#6366F1",
-          pointRadius: 4,
-          borderWidth: 2.5,
-          tension: 0.3,
-          fill: true,
-        }],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { min: 0, max: 105, grid: { color: "#F1F5F9" }, ticks: { callback: v => v + "%" } },
-          x: { grid: { display: false } },
+    if (wrongResults.length === 0) {
+      td.innerHTML = `<div style="padding:1rem;color:#10B981;font-size:0.82rem;">🎉 本次測驗全部答對！</div>`;
+      return;
+    }
+
+    const session = sessionLookup[sessionId];
+
+    try {
+      const questions = await loadQuestions(session.topic, session.units);
+      const questionMap = {};
+      for (const q of questions) questionMap[q.id] = q;
+
+      const items = wrongResults.map(r => {
+        const q = questionMap[r.question_id];
+
+        const optHtml = ["A","B","C","D"].map(letter => {
+          if (!q || !q.options[letter]) return "";
+          const isUser = letter === r.user_answer;
+          const isCorrect = letter === r.correct_answer;
+          let style = "font-size:0.79rem;padding:0.1rem 0;";
+          if (isCorrect)      style += "color:#10B981;font-weight:700;";
+          else if (isUser)    style += "color:#EF4444;text-decoration:line-through;opacity:0.8;";
+          else                style += "color:#6B7280;";
+          return `<div style="${style}">(${letter}) ${q.options[letter]}</div>`;
+        }).join("");
+
+        const qText  = q ? `${q.number}. ${q.question}` : `（題目 ID：${r.question_id}）`;
+        const expText = q ? q.explanation : "（解析無法載入）";
+
+        return `
+          <div style="border:1px solid #FECDD3;border-radius:8px;padding:0.85rem 1rem;
+                      margin-bottom:0.65rem;background:#FFFAFA;">
+            <div style="font-size:0.83rem;font-weight:600;color:#111827;
+                        margin-bottom:0.45rem;line-height:1.5;">${qText}</div>
+            <div style="margin-bottom:0.5rem;">${optHtml}</div>
+            <div style="background:#EEF2FF;border-radius:6px;padding:0.45rem 0.7rem;
+                        font-size:0.77rem;color:#3730A3;line-height:1.65;">
+              <strong>💡 解析：</strong>${expText}
+            </div>
+          </div>`;
+      }).join("");
+
+      td.innerHTML = `<div style="padding:0.8rem 1.1rem 1rem;">${items}</div>`;
+    } catch (e) {
+      td.innerHTML = `<div style="padding:1rem;color:#EF4444;font-size:0.82rem;">載入失敗：${e.message}</div>`;
+    }
+  }
+
+  function renderTrend(sessions) {
+    const el = document.getElementById("trend-content");
+
+    if (!sessions.length) {
+      el.innerHTML = `<div class="empty-state"><p>需要 2 次以上測驗才能顯示趨勢圖。</p></div>`;
+      return;
+    }
+
+    const byTopic = groupBy(sessions, s => s.topic);
+    const topics = Object.keys(byTopic);
+
+    const topicColors = ["#6366F1","#10B981","#F59E0B","#EF4444","#8B5CF6","#06B6D4"];
+
+    el.innerHTML = topics.map((topic, i) => {
+      const topicSessions = byTopic[topic];
+      const sep = i > 0 ? "margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid #E5E7EB;" : "";
+      const header = topics.length > 1
+        ? `<div style="font-size:0.8rem;font-weight:700;color:${topicColors[i % topicColors.length]};
+                       margin-bottom:0.6rem;">${topic}</div>`
+        : "";
+      if (topicSessions.length < 2) {
+        const msg = topicSessions.length === 1
+          ? `最近一次答對率：${(topicSessions[0].correct_count/topicSessions[0].total_questions*100).toFixed(1)}%<br>
+             <span style="font-size:0.78rem;color:#9CA3AF;">需 2 次以上才能顯示趨勢圖。</span>`
+          : "需要 2 次以上測驗才能顯示趨勢圖。";
+        return `<div style="${sep}">${header}<div style="font-size:0.875rem;color:#6B7280;">${msg}</div></div>`;
+      }
+      return `<div style="${sep}">${header}
+        <div class="chart-container"><canvas id="trend-c-${i}"></canvas></div>
+      </div>`;
+    }).join("");
+
+    topics.forEach((topic, i) => {
+      const topicSessions = byTopic[topic];
+      if (topicSessions.length < 2) return;
+      const reversed = [...topicSessions].reverse();
+      const color = topicColors[i % topicColors.length];
+      chartInstances[`trend-${i}`] = new Chart(document.getElementById(`trend-c-${i}`), {
+        type: "line",
+        data: {
+          labels: reversed.map((_, j) => `第 ${j + 1} 次`),
+          datasets: [{
+            data: reversed.map(s => s.total_questions > 0 ? +(s.correct_count / s.total_questions * 100).toFixed(1) : 0),
+            borderColor: color,
+            backgroundColor: color.replace(")", ",0.08)").replace("rgb", "rgba"),
+            pointBackgroundColor: color,
+            pointRadius: 4, borderWidth: 2.5, tension: 0.3, fill: true,
+          }],
         },
-      },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0, max: 105, grid: { color: "#F1F5F9" }, ticks: { callback: v => v + "%" } },
+            x: { grid: { display: false } },
+          },
+        },
+      });
     });
   }
 
@@ -251,26 +394,6 @@
       return;
     }
 
-    const unitCorrect = {}, unitTotal = {};
-    results.forEach((r) => {
-      unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
-      if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
-    });
-
-    const unitAcc = {};
-    Object.keys(unitTotal).forEach((u) => {
-      if (unitTotal[u] >= 3) unitAcc[u] = ((unitCorrect[u] || 0) / unitTotal[u]) * 100;
-    });
-
-    if (!Object.keys(unitAcc).length) {
-      el.innerHTML = `<div style="font-size:0.82rem;color:#6B7280;">作答題數尚不足（每單元需至少 3 題）。</div>`;
-      return;
-    }
-
-    const weak = Object.entries(unitAcc).filter(([,a]) => a < 60).sort((a,b) => a[1]-b[1]);
-    const mid  = Object.entries(unitAcc).filter(([,a]) => a >= 60 && a < 80).sort((a,b) => a[1]-b[1]);
-    const good = Object.entries(unitAcc).filter(([,a]) => a >= 80).sort((a,b) => b[1]-a[1]);
-
     const col = (entries, bg, border, titleColor, title, valColor) => {
       const items = entries.length
         ? entries.map(([u, a]) => `
@@ -280,7 +403,6 @@
             <span style="font-weight:700;color:${valColor};font-size:0.84rem;">${a.toFixed(1)}%</span>
           </div>`).join("")
         : `<div style="font-size:0.78rem;color:#94A3B8;">無</div>`;
-
       return `<div style="background:${bg};border-radius:10px;padding:1rem 1.1rem;
                            border:1px solid ${border};min-height:80px;">
         <div style="font-weight:700;color:${titleColor};font-size:0.82rem;margin-bottom:0.7rem;">${title}</div>
@@ -288,88 +410,159 @@
       </div>`;
     };
 
-    const priority = [...weak, ...mid].slice(0, 3);
-    const suggestion = priority.length
-      ? `<div style="background:#EEF2FF;border-radius:10px;padding:1rem 1.1rem;
-                     border:1px solid #C7D2FE;margin-top:0.9rem;">
-          <div style="font-weight:700;color:#3730A3;font-size:0.82rem;margin-bottom:0.5rem;">💡 強化建議</div>
-          <div style="font-size:0.8rem;color:#374151;line-height:1.7;">
-            建議優先複習 <strong>${priority.map(([u])=>u).join("、")}</strong> 等單元。<br>
-            可至首頁單獨選取這些單元進行針對性練習，透過多次重複練習提升答對率。
-          </div>
-        </div>` : "";
+    const byTopic = groupBy(results, r => r.topic);
+    const topics = Object.keys(byTopic);
 
-    el.innerHTML = `
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
-        ${col(weak, "#FFF5F5", "#FED7D7", "#C53030", "🔴 需要加強", "#EF4444")}
-        ${col(mid,  "#FFFBEB", "#FDE68A", "#92400E", "🟡 尚可，可繼續加強", "#F59E0B")}
-        ${col(good, "#F0FDF4", "#BBF7D0", "#166534", "🟢 掌握良好", "#10B981")}
-      </div>
-      ${suggestion}
-    `;
+    const blocks = topics.map((topic, tIdx) => {
+      const topicResults = byTopic[topic];
+      const unitCorrect = {}, unitTotal = {};
+      topicResults.forEach(r => {
+        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
+        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+      });
+
+      const unitAcc = {};
+      Object.keys(unitTotal).forEach(u => {
+        if (unitTotal[u] >= 3) unitAcc[u] = ((unitCorrect[u] || 0) / unitTotal[u]) * 100;
+      });
+
+      const sep = tIdx > 0 ? "margin-top:1.3rem;padding-top:1.3rem;border-top:1px solid #E5E7EB;" : "";
+      const header = topics.length > 1
+        ? `<div style="font-size:0.82rem;font-weight:700;color:#4F46E5;margin-bottom:0.8rem;
+                       padding-bottom:0.4rem;border-bottom:2px solid #E0E7FF;">${topic}</div>`
+        : "";
+
+      if (!Object.keys(unitAcc).length) {
+        return `<div style="${sep}">${header}
+          <div style="font-size:0.82rem;color:#6B7280;">作答題數尚不足（每單元需至少 3 題）。</div>
+        </div>`;
+      }
+
+      const weak = Object.entries(unitAcc).filter(([,a]) => a < 60).sort((a,b) => a[1]-b[1]);
+      const mid  = Object.entries(unitAcc).filter(([,a]) => a >= 60 && a < 80).sort((a,b) => a[1]-b[1]);
+      const good = Object.entries(unitAcc).filter(([,a]) => a >= 80).sort((a,b) => b[1]-a[1]);
+
+      const priority = [...weak, ...mid].slice(0, 3);
+      const suggestion = priority.length
+        ? `<div style="background:#EEF2FF;border-radius:10px;padding:1rem 1.1rem;
+                       border:1px solid #C7D2FE;margin-top:0.9rem;">
+            <div style="font-weight:700;color:#3730A3;font-size:0.82rem;margin-bottom:0.5rem;">💡 強化建議</div>
+            <div style="font-size:0.8rem;color:#374151;line-height:1.7;">
+              建議優先複習 <strong>${priority.map(([u])=>u).join("、")}</strong> 等單元。<br>
+              可至首頁單獨選取這些單元進行針對性練習，透過多次重複練習提升答對率。
+            </div>
+          </div>` : "";
+
+      return `<div style="${sep}">
+        ${header}
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
+          ${col(weak, "#FFF5F5", "#FED7D7", "#C53030", "🔴 需要加強", "#EF4444")}
+          ${col(mid,  "#FFFBEB", "#FDE68A", "#92400E", "🟡 尚可，可繼續加強", "#F59E0B")}
+          ${col(good, "#F0FDF4", "#BBF7D0", "#166534", "🟢 掌握良好", "#10B981")}
+        </div>
+        ${suggestion}
+      </div>`;
+    });
+
+    el.innerHTML = blocks.join("");
   }
 
   function renderUnitChart(results) {
-    if (unitChartInst) { unitChartInst.destroy(); unitChartInst = null; }
-    if (!results.length) return;
+    const el = document.getElementById("unit-chart-content");
+    if (!results.length) { el.innerHTML = ""; return; }
 
-    const unitCorrect = {}, unitTotal = {};
-    results.forEach((r) => {
-      const k = `${r.topic} / ${r.unit}`;
-      unitTotal[k] = (unitTotal[k] || 0) + 1;
-      if (r.is_correct) unitCorrect[k] = (unitCorrect[k] || 0) + 1;
-    });
+    const getColor = v => v >= 80 ? "#10B981" : v >= 60 ? "#F59E0B" : "#EF4444";
+    const byTopic = groupBy(results, r => r.topic);
+    const topics = Object.keys(byTopic);
 
-    const sorted = Object.keys(unitTotal)
-      .map((k) => ({ k, acc: +((unitCorrect[k] || 0) / unitTotal[k] * 100).toFixed(1) }))
-      .sort((a, b) => a.acc - b.acc);
+    el.innerHTML = topics.map((topic, i) => {
+      const topicResults = byTopic[topic];
+      const unitCorrect = {}, unitTotal = {};
+      topicResults.forEach(r => {
+        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
+        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+      });
+      const unitCount = Object.keys(unitTotal).length;
+      const chartH = Math.max(180, unitCount * 36);
+      const sep = i > 0 ? "margin-top:1.3rem;padding-top:1.3rem;border-top:1px solid #E5E7EB;" : "";
+      const header = topics.length > 1
+        ? `<div style="font-size:0.82rem;font-weight:700;color:#4F46E5;margin-bottom:0.7rem;
+                       padding-bottom:0.4rem;border-bottom:2px solid #E0E7FF;">${topic}</div>`
+        : "";
+      return `<div style="${sep}">${header}
+        <div class="chart-container" style="height:${chartH}px;"><canvas id="unit-c-${i}"></canvas></div>
+      </div>`;
+    }).join("");
 
-    const getColor = (v) => v >= 80 ? "#10B981" : v >= 60 ? "#F59E0B" : "#EF4444";
+    topics.forEach((topic, i) => {
+      const topicResults = byTopic[topic];
+      const unitCorrect = {}, unitTotal = {};
+      topicResults.forEach(r => {
+        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
+        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+      });
+      const sorted = Object.keys(unitTotal)
+        .map(k => ({ k, acc: +((unitCorrect[k] || 0) / unitTotal[k] * 100).toFixed(1) }))
+        .sort((a, b) => a.acc - b.acc);
 
-    unitChartInst = new Chart(document.getElementById("unit-chart"), {
-      type: "bar",
-      data: {
-        labels: sorted.map(d => d.k),
-        datasets: [{
-          data: sorted.map(d => d.acc),
-          backgroundColor: sorted.map(d => getColor(d.acc)),
-          borderRadius: 4,
-        }],
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { min: 0, max: 115, grid: { display: false }, ticks: { callback: v => v + "%" } },
-          y: { grid: { color: "#F1F5F9" } },
+      chartInstances[`unit-${i}`] = new Chart(document.getElementById(`unit-c-${i}`), {
+        type: "bar",
+        data: {
+          labels: sorted.map(d => d.k),
+          datasets: [{ data: sorted.map(d => d.acc), backgroundColor: sorted.map(d => getColor(d.acc)), borderRadius: 4 }],
         },
-      },
+        options: {
+          indexAxis: "y",
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { min: 0, max: 115, grid: { display: false }, ticks: { callback: v => v + "%" } },
+            y: { grid: { color: "#F1F5F9" } },
+          },
+        },
+      });
     });
   }
 
   function renderTopWrong(results) {
     const el = document.getElementById("top-wrong-content");
-    const wrongCounts = {};
-    results.forEach((r) => {
-      if (!r.is_correct) wrongCounts[r.question_id] = (wrongCounts[r.question_id] || 0) + 1;
+
+    const wrongByTopic = {};
+    results.forEach(r => {
+      if (!r.is_correct) {
+        if (!wrongByTopic[r.topic]) wrongByTopic[r.topic] = {};
+        wrongByTopic[r.topic][r.question_id] = (wrongByTopic[r.topic][r.question_id] || 0) + 1;
+      }
     });
 
-    if (!Object.keys(wrongCounts).length) {
+    const topics = Object.keys(wrongByTopic);
+
+    if (!topics.length) {
       el.innerHTML = `<div style="color:#10B981;font-size:0.875rem;padding:0.5rem 0;">目前沒有答錯的題目！</div>`;
       return;
     }
 
-    const top10 = Object.entries(wrongCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const rows = top10.map(([qid, cnt]) => {
-      const display = qid.length > 60 ? qid.slice(0, 60) + "..." : qid;
-      return `<tr><td style="font-size:0.8rem;color:#374151;">${display}</td><td style="text-align:center;"><span class="badge badge-red">${cnt}</span></td></tr>`;
+    el.innerHTML = topics.map((topic, tIdx) => {
+      const top10 = Object.entries(wrongByTopic[topic]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const sep = tIdx > 0 ? "margin-top:1.3rem;padding-top:1.3rem;border-top:1px solid #E5E7EB;" : "";
+      const header = topics.length > 1
+        ? `<div style="font-size:0.82rem;font-weight:700;color:#4F46E5;margin-bottom:0.7rem;
+                       padding-bottom:0.4rem;border-bottom:2px solid #E0E7FF;">${topic}</div>`
+        : "";
+      const rows = top10.map(([qid, cnt]) => {
+        const display = qid.length > 60 ? qid.slice(0, 60) + "..." : qid;
+        return `<tr>
+          <td style="font-size:0.8rem;color:#374151;">${display}</td>
+          <td style="text-align:center;"><span class="badge badge-red">${cnt}</span></td>
+        </tr>`;
+      }).join("");
+      return `<div style="${sep}">${header}
+        <table>
+          <thead><tr><th>題目 ID</th><th style="text-align:center;">答錯次數</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
     }).join("");
-
-    el.innerHTML = `<table>
-      <thead><tr><th>題目 ID</th><th style="text-align:center;">答錯次數</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
   }
 
   init().catch((e) => {
