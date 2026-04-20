@@ -218,9 +218,18 @@
     const list = document.getElementById("units-list");
     list.innerHTML = "";
     topic.units.forEach((u) => {
+      // 提取檔名中除去「Day X：」與「.md」的部分作為標題
+      const title = u.file.replace(/^Day\s*\d+\s*[：:]\s*/i, "").replace(/\.md$/i, "");
+      
       const label = document.createElement("label");
       label.className = "checkbox-item";
-      label.innerHTML = `<input type="checkbox" value="${u.unit}" /> ${u.unit}`;
+      label.innerHTML = `
+        <input type="checkbox" value="${u.unit}" />
+        <div class="unit-info-wrapper">
+          <span class="unit-tag">${u.unit}</span>
+          <span class="unit-title">${title}</span>
+        </div>
+      `;
       label.querySelector("input").addEventListener("change", onUnitChange);
       list.appendChild(label);
     });
