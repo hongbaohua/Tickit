@@ -66,7 +66,7 @@ function _parseQuestionsBlock(block) {
 
 function _parseAnswersBlock(block) {
   const answers = {};
-  const pattern = /^(\d+)\.\s+\(([ABCD])\)\s*(.*)/gm;
+  const pattern = /^(\d+)\.\s+(?:\*\*)?\(([ABCD])\)(?:\*\*)?\s*(.*)/gm;
   const matches = [...block.matchAll(pattern)];
 
   for (let i = 0; i < matches.length; i++) {
