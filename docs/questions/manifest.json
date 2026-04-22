@@ -3,10 +3,9 @@
     {
       "name": "ERP軟體應用師_配銷模組_S4HANA",
       "units": [
-        { "unit": "Day 1", "file": "Day 1：配銷模組(SD) - 組織架構、主數據、銷售流程與財務整合。.md" },
-        { "unit": "Day 2", "file": "Day 2：物料管理模組(MM) - 採購流程、主數據、庫存管理與財務整合。.md" },
-        { "unit": "Day 3", "file": "Day 3：倉儲管理模組(WM) - 倉庫架構、庫存狀態與移轉作業。.md" },
-        { "unit": "Day 4", "file": "Day 4：SAP S4HANA 共同科目 - 系統演進、平台特性與資料類型。.md" }
+        { "unit": "單元一", "file": "配銷模組(SD)與整合(一).md" },
+        { "unit": "單元二", "file": "配銷模組(SD)與整合(二).md" },
+        { "unit": "單元三", "file": "SAP S4HANA 共同科目.md" }
       ]
     },
     {
