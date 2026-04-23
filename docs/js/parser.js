@@ -21,8 +21,11 @@ function _makeId(topic, unit, number) {
 
 function _parseQuestionsBlock(block) {
   const questions = [];
-  const pattern = /^(\d+)\.\s/gm;
+  // 支援 1. 1、 1 (空格) 等格式
+  const pattern = /^\s*(\d+)[.、\s]\s*/gm;
   const matches = [...block.matchAll(pattern)];
+
+  const optionPattern = /^\s*\(([A-D])\)\s*(.*)/;
 
   for (let i = 0; i < matches.length; i++) {
     const start = matches[i].index;
@@ -31,34 +34,27 @@ function _parseQuestionsBlock(block) {
     const lines = chunk.split("\n");
     const number = parseInt(matches[i][1], 10);
 
-    const optionPattern = /^\s*\(([ABCD])\)\s*(.*)/;
     const options = {};
-    let questionTextRaw = lines[0].slice(matches[i][0].length).trim();
+    let questionTextRaw = "";
 
+    // 取得題目文字：從題號後開始，直到遇到第一個選項 (A)
+    let headerLine = lines[0].replace(/^\s*\d+[.、\s]\s*/, "").trim();
+    questionTextRaw = headerLine;
+
+    let foundOptions = false;
     for (let j = 1; j < lines.length; j++) {
       const line = lines[j];
       const optMatch = line.match(optionPattern);
       if (optMatch) {
         options[optMatch[1]] = optMatch[2].trim();
-      } else if (line.trim() && !line.match(/^\s*\([ABCD]\)/)) {
+        foundOptions = true;
+      } else if (!foundOptions && line.trim()) {
         questionTextRaw += " " + line.trim();
-      } else if (optMatch) {
-        break;
       }
     }
 
-    // Stop appending question text once options start
-    questionTextRaw = (() => {
-      let text = lines[0].slice(matches[i][0].length).trim();
-      for (let j = 1; j < lines.length; j++) {
-        if (lines[j].match(optionPattern)) break;
-        if (lines[j].trim()) text += " " + lines[j].trim();
-      }
-      return text.replace(/\s+/g, " ").trim();
-    })();
-
-    if (questionTextRaw && Object.keys(options).length === 4) {
-      questions.push({ number, question: questionTextRaw, options });
+    if (questionTextRaw && Object.keys(options).length > 0) {
+      questions.push({ number, question: questionTextRaw.replace(/\s+/g, " ").trim(), options });
     }
   }
   return questions;
@@ -66,30 +62,56 @@ function _parseQuestionsBlock(block) {
 
 function _parseAnswersBlock(block) {
   const answers = {};
-  const pattern = /^(\d+)\.\s+(?:\*\*)?\(([ABCD])\)(?:\*\*)?\s*(.*)/gm;
+  // 匹配行首的題號 1. 1、 或 1 (空格)，接著是 (A) 或 (A/B) 等格式
+  const pattern = /^\s*(\d+)[.、\s]?\s*(?:\*\*)?\(([^)]+)\)(?:\*\*)?\s*(.*)/gm;
   const matches = [...block.matchAll(pattern)];
 
   for (let i = 0; i < matches.length; i++) {
     const number = parseInt(matches[i][1], 10);
-    const letter = matches[i][2];
-    let explanation = matches[i][3].trim();
+    const letter = matches[i][2].trim();
+    let initialExp = matches[i][3].trim();
 
     const start = matches[i].index + matches[i][0].length;
     const end = i + 1 < matches.length ? matches[i + 1].index : block.length;
     const continuation = block.slice(start, end).trim();
 
-    if (continuation) explanation = (explanation + " " + continuation).trim();
-    explanation = explanation.replace(/\s+/g, " ").trim();
-    answers[number] = { letter, explanation };
+    let fullExplanation = initialExp;
+    if (continuation) {
+      fullExplanation = fullExplanation ? (fullExplanation + " " + continuation) : continuation;
+    }
+    
+    answers[number] = { 
+      letter: letter, 
+      explanation: fullExplanation.replace(/\s+/g, " ").trim() 
+    };
   }
   return answers;
 }
 
 function parseMarkdown(text, topic, filename) {
-  const SEPARATOR = "解答與詳細解析";
-  if (!text.includes(SEPARATOR)) return [];
+  // 更加靈活的切割點，支援各種標題與分隔線組合
+  const separatorKeywords = ["解答與詳細解析", "答案與解析"];
+  let sepIndex = -1;
+  let sepLength = 0;
 
-  const [questionsBlock, answersBlock] = text.split(SEPARATOR);
+  for (const kw of separatorKeywords) {
+    const regex = new RegExp(`(?:^|\\n)[#\\s\\-]*${kw}[#\\s\\-]*`, "i");
+    const match = text.match(regex);
+    if (match) {
+      sepIndex = match.index;
+      sepLength = match[0].length;
+      break;
+    }
+  }
+  
+  if (sepIndex === -1) {
+    console.warn("未能在檔案中找到解答區段標記:", filename);
+    return [];
+  }
+
+  const questionsBlock = text.slice(0, sepIndex);
+  const answersBlock = text.slice(sepIndex + sepLength);
+  
   const questions = _parseQuestionsBlock(questionsBlock);
   const answers = _parseAnswersBlock(answersBlock);
   const unit = _getUnitName(filename);
@@ -103,8 +125,8 @@ function parseMarkdown(text, topic, filename) {
       number: q.number,
       question: q.question,
       options: q.options,
-      answer: ans.letter,
-      explanation: ans.explanation,
+      answer: ans.letter || "",
+      explanation: ans.explanation || "",
       group_context: null,
     };
   });
@@ -123,18 +145,28 @@ async function loadQuestions(topic, selectedUnits) {
   const manifestRes = await fetch("questions/manifest.json");
   const manifest = await manifestRes.json();
 
-  const topicData = manifest.topics.find((t) => t.name === topic);
-  if (!topicData) return [];
+  // 規範化比對主題名稱，忽略空格與底線差異
+  const normalize = s => s.trim().replace(/[_\s]+/g, "_");
+  const targetTopic = normalize(topic);
+  const topicData = manifest.topics.find((t) => normalize(t.name) === targetTopic);
+  
+  if (!topicData) {
+    console.error("Topic not found in manifest:", topic);
+    return [];
+  }
 
   const units = topicData.units.filter((u) => selectedUnits.includes(u.unit));
   const allQuestions = [];
 
   for (const u of units) {
-    const path = `questions/${encodeURIComponent(topic)}/${encodeURIComponent(u.file)}`;
+    const path = `questions/${encodeURIComponent(topicData.name)}/${encodeURIComponent(u.file)}`;
     const res = await fetch(path);
-    if (!res.ok) continue;
+    if (!res.ok) {
+      console.error("Failed to fetch unit file:", path);
+      continue;
+    }
     const text = await res.text();
-    const qs = parseMarkdown(text, topic, u.file);
+    const qs = parseMarkdown(text, topicData.name, u.file);
     allQuestions.push(...qs);
   }
 

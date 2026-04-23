@@ -287,11 +287,29 @@
 
     try {
       const questions = await loadQuestions(session.topic, session.units);
+      if (!questions || questions.length === 0) {
+        throw new Error("無法從題庫載入任何題目，請檢查題庫檔案路徑或格式。");
+      }
+
       const questionMap = {};
       for (const q of questions) questionMap[q.id] = q;
 
       const items = wrongResults.map(r => {
-        const q = questionMap[r.question_id];
+        let q = questionMap[r.question_id];
+
+        // 備援機制：如果 ID 不匹配，嘗試透過序號比對
+        if (!q) {
+          const idParts = r.question_id.split("__");
+          const qNum = parseInt(idParts[idParts.length - 1], 10);
+          
+          // 先嘗試在同單元找
+          q = questions.find(qu => qu.number === qNum && qu.unit === r.unit);
+          
+          // 若還是找不到，就在所有載入的題目中找相同序號者（處理單元名稱異動）
+          if (!q) {
+            q = questions.find(qu => qu.number === qNum);
+          }
+        }
 
         const optHtml = ["A","B","C","D"].map(letter => {
           if (!q || !q.options[letter]) return "";
@@ -304,8 +322,8 @@
           return `<div style="${style}">(${letter}) ${q.options[letter]}</div>`;
         }).join("");
 
-        const qText  = q ? `${q.number}. ${q.question}` : `（題目 ID：${r.question_id}）`;
-        const expText = q ? q.explanation : "（解析無法載入）";
+        const qText  = q ? `${q.number}. ${q.question}` : `（找不到題目內容，ID：${r.question_id}）`;
+        const expText = q && q.explanation ? q.explanation : (q ? "（此題無詳細解析內容）" : "（解析無法載入，請確認題庫檔案是否存在或格式正確）");
 
         return `
           <div style="border:1px solid #FECDD3;border-radius:8px;padding:0.85rem 1rem;
