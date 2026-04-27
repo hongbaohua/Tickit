@@ -8,7 +8,13 @@ body {
 }
 
 /* ── Layout ── */
-.layout { display: flex; min-height: 100vh; }
+.layout {
+  display: flex;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
 
 .sidebar {
   width: 220px;
@@ -17,8 +23,10 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1rem;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
   border-right: 1px solid rgba(255,255,255,0.06);
 }
 
@@ -77,16 +85,24 @@ body {
 .nav-link.active .nav-dot { opacity: 1; }
 
 .main {
-  margin-left: 220px;
   flex: 1;
-  /* 水平 padding 自動置中：sidebar 220px + 內容 680px + 兩側留白 */
-  padding: 2rem max(1.5rem, calc((100vw - 220px - 680px) / 2));
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  min-width: 0;
 }
 
-/* 考生管理頁：內容較寬，以 820px 為基準置中 */
-.main-wide {
-  padding-left: max(1.5rem, calc((100vw - 220px - 820px) / 2));
-  padding-right: max(1.5rem, calc((100vw - 220px - 820px) / 2));
+/* 所有直接子元素水平置中，最寬 660px */
+.main > * {
+  width: 100%;
+  max-width: 660px;
+}
+
+/* 考生管理頁：較寬內容，最寬 860px */
+.main-wide > * {
+  max-width: 860px;
 }
 
 /* ── Cards ── */
@@ -539,7 +555,8 @@ tr:last-child td { border-bottom: none; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+  .layout { flex-direction: column; }
   .sidebar { display: none; }
-  .main { margin-left: 0; padding: 1rem; }
-  .main-wide { padding: 1rem; }
+  .main { padding: 1rem; align-items: stretch; min-height: auto; }
+  .main > *, .main-wide > * { max-width: none; }
 }
