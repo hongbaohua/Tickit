@@ -46,8 +46,21 @@
           <div class="field-label">用戶代號</div>
           <input type="text" id="input-name" placeholder="輸入你的專屬代號" autocomplete="off" />
           <p class="field-hint">輸入代號即可識別身份，無需密碼</p>
-          <div style="margin-top:1.2rem;">
+
+          <!-- 一般登入按鈕 -->
+          <div id="login-action" style="margin-top:1.2rem;">
             <button class="btn btn-primary btn-full" id="btn-login">進入系統 →</button>
+          </div>
+
+          <!-- 新用戶確認區塊（找不到代號時顯示） -->
+          <div id="confirm-create" style="display:none;margin-top:1.2rem;">
+            <div style="font-size:0.84rem;color:#374151;margin-bottom:0.85rem;line-height:1.6;">
+              找不到代號 <strong id="confirm-name"></strong>，要建立新帳號嗎？
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn btn-primary" style="flex:1;" id="btn-confirm-create">建立帳號</button>
+              <button class="btn btn-ghost" style="flex:1;" id="btn-reenter">重新輸入</button>
+            </div>
           </div>
         </div>
 
@@ -66,7 +79,8 @@
             <div class="user-label">用戶代號</div>
           </div>
         </div>
-        <div class="status-dot">已登入</div>
+        <button class="btn btn-ghost btn-sm" id="btn-logout"
+                style="color:#6B7280;font-size:0.75rem;">登出</button>
       </div>
 
       <!-- Step 01: Topic -->
@@ -173,11 +187,17 @@
     btn.textContent = "連線中…";
 
     try {
-      const id = await getOrCreateUser(name);
-      state.userId = id;
-      state.userName = name;
-      sessionStorage.setItem("quizUser", JSON.stringify({ id, name }));
-      showSetup();
+      const existing = await getUserByName(name);
+      if (existing) {
+        // 已有帳號 → 直接登入
+        await completeLogin(existing.id, name);
+      } else {
+        // 查無此代號 → 顯示確認建立區塊
+        document.getElementById("input-name").disabled = true;
+        document.getElementById("login-action").style.display = "none";
+        document.getElementById("confirm-create").style.display = "block";
+        document.getElementById("confirm-name").textContent = `「${name}」`;
+      }
     } catch (e) {
       errEl.textContent = "無法連線至資料庫，請稍後再試。";
       errEl.style.display = "block";
@@ -186,6 +206,58 @@
       btn.textContent = "進入系統 →";
     }
   }
+
+  // 確認建立新帳號
+  document.getElementById("btn-confirm-create").addEventListener("click", async () => {
+    const name = document.getElementById("input-name").value.trim();
+    const btn = document.getElementById("btn-confirm-create");
+    btn.disabled = true; btn.textContent = "建立中…";
+    try {
+      const id = await getOrCreateUser(name);
+      await completeLogin(id, name);
+    } catch (e) {
+      document.getElementById("login-error").textContent = "無法連線至資料庫，請稍後再試。";
+      document.getElementById("login-error").style.display = "block";
+      resetLoginForm();
+    }
+  });
+
+  // 重新輸入
+  document.getElementById("btn-reenter").addEventListener("click", resetLoginForm);
+
+  function resetLoginForm() {
+    document.getElementById("input-name").disabled = false;
+    document.getElementById("input-name").value = "";
+    document.getElementById("login-action").style.display = "block";
+    document.getElementById("confirm-create").style.display = "none";
+    document.getElementById("login-error").style.display = "none";
+    document.getElementById("input-name").focus();
+  }
+
+  async function completeLogin(id, name) {
+    state.userId = id;
+    state.userName = name;
+    sessionStorage.setItem("quizUser", JSON.stringify({ id, name }));
+    showSetup();
+  }
+
+  // ── Logout ──
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    sessionStorage.removeItem("quizUser");
+    state.userId = null;
+    state.userName = null;
+    state.selectedUnits.clear();
+    // 重置選擇狀態
+    document.getElementById("select-topic").value = "";
+    document.getElementById("card-units").style.display = "none";
+    document.getElementById("card-count").style.display = "none";
+    document.getElementById("btn-start").disabled = true;
+    document.getElementById("start-hint").style.display = "block";
+    // 切回登入頁
+    document.getElementById("view-setup").style.display = "none";
+    document.getElementById("view-login").style.display = "block";
+    resetLoginForm();
+  });
 
   // ── Setup view ──
   async function showSetup() {
