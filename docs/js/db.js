@@ -105,3 +105,25 @@ async function getAllUsers() {
   await _check(res, "讀取所有使用者");
   return res.json();
 }
+
+// 回傳用戶在指定主題 + 單元中，歷史上答錯過的 question_id Set
+async function getWrongQuestionIds(userId, topic, units) {
+  const unitSet = new Set(units);
+
+  const sessRes = await fetch(
+    `${_url("quiz_sessions")}?user_id=eq.${userId}&topic=eq.${encodeURIComponent(topic)}&select=id`,
+    { headers: _headers() }
+  );
+  await _check(sessRes, "讀取 session IDs（錯題）");
+  const sessions = await sessRes.json();
+  if (!sessions.length) return new Set();
+
+  const ids = sessions.map((s) => s.id).join(",");
+  const res = await fetch(
+    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id,unit`,
+    { headers: _headers() }
+  );
+  await _check(res, "讀取錯題 IDs");
+  const rows = await res.json();
+  return new Set(rows.filter((r) => unitSet.has(r.unit)).map((r) => r.question_id));
+}

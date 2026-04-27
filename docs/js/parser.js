@@ -183,7 +183,43 @@ function sampleQuestions(questions, n) {
       groups.push([q]);
     }
   }
+  // Fisher-Yates shuffle of groups
+  for (let i = groups.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [groups[i], groups[j]] = [groups[j], groups[i]];
+  }
   const count = Math.min(n, groups.length);
-  const shuffled = groups.sort(() => Math.random() - 0.5).slice(0, count);
-  return shuffled.flat();
+  return groups.slice(0, count).flat();
+}
+
+// 打亂每題的選項順序，同步更新正確答案字母，並移除選項末尾的句號
+function shuffleOptions(questions) {
+  return questions.map(q => {
+    const letters = Object.keys(q.options); // ["A","B","C","D"]
+    const origValues = letters.map(l => q.options[l]);
+    const correctOrigText = q.options[q.answer];
+
+    // Fisher-Yates shuffle of values
+    const shuffled = [...origValues];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // 移除末尾句號
+    const cleaned = shuffled.map(v => v.endsWith("。") ? v.slice(0, -1) : v);
+
+    // 建立新選項
+    const newOptions = {};
+    letters.forEach((letter, i) => { newOptions[letter] = cleaned[i]; });
+
+    // 找正確答案在新排列中的字母
+    const cleanCorrectText = correctOrigText.endsWith("。") ? correctOrigText.slice(0, -1) : correctOrigText;
+    let newAnswer = q.answer;
+    for (let i = 0; i < letters.length; i++) {
+      if (cleaned[i] === cleanCorrectText) { newAnswer = letters[i]; break; }
+    }
+
+    return { ...q, options: newOptions, answer: newAnswer };
+  });
 }

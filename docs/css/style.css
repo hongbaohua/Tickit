@@ -551,10 +551,81 @@ tr:last-child td { border-bottom: none; }
   height: 120px; color: #9CA3AF; font-size: 0.875rem;
 }
 
+/* ── Mastery mode ── */
+.mastery-dots {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin: 0.55rem 0 0.3rem;
+}
+.mastery-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: #E5E7EB;
+  flex-shrink: 0;
+  transition: background 0.25s;
+}
+.mastery-dot.current {
+  background: #6366F1;
+  box-shadow: 0 0 0 2.5px rgba(99,102,241,0.3);
+}
+.mastery-dot.retried  { background: #FCA5A5; }
+.mastery-dot.mastered { background: #6EE7B7; }
+
+.retry-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: #FEF3C7; color: #92400E;
+  border: 1px solid #FDE68A;
+  border-radius: 5px; padding: 2px 9px;
+  font-size: 0.72rem; font-weight: 700;
+}
+
+.mastery-explanation {
+  font-size: 0.8rem; color: #374151;
+  background: #EEF2FF; border-radius: 6px;
+  padding: 0.55rem 0.8rem; margin-top: 0.75rem;
+  border: 1px solid #C7D2FE; line-height: 1.65;
+}
+
+/* ── Topic tabs (dashboard analytics) ── */
+.topic-tab {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 1.5px solid #E5E7EB;
+  background: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.topic-tab:hover { border-color: #4F46E5; color: #4F46E5; background: #F5F3FF; }
+.topic-tab--active {
+  border-color: #4F46E5;
+  background: #4F46E5;
+  color: white;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .layout { flex-direction: column; }
-  .sidebar { display: none; }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    overflow-y: visible;
+  }
+  .sidebar-brand { margin-bottom: 0; flex-shrink: 0; }
+  .sidebar nav { flex-direction: row; gap: 0.25rem; margin-left: auto; }
+  .nav-link { padding: 0.4rem 0.65rem; font-size: 0.78rem; }
+
   .main { padding: 1rem; align-items: stretch; min-height: auto; }
   .main > *, .main-wide > * { max-width: none; }
 }

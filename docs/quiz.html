@@ -144,6 +144,89 @@
       </div>
     </div>
 
+    <!-- ══ Mastery in progress ══ -->
+    <div id="view-mastery" style="display:none;">
+
+      <!-- Progress header -->
+      <div class="card" style="padding:0.9rem 1.2rem 0.8rem;margin-bottom:1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="background:#EF4444;color:white;border-radius:3px;
+                        padding:1px 7px;font-size:0.68rem;font-weight:700;letter-spacing:0.5px;">攻克模式</div>
+            <span style="font-size:0.82rem;font-weight:700;color:#111827;" id="mastery-counter">已攻克 0 / 0</span>
+          </div>
+          <span style="font-size:0.72rem;color:#9CA3AF;" id="mastery-queue-info"></span>
+        </div>
+        <div class="mastery-dots" id="mastery-dots"></div>
+        <div class="progress-bar-track" style="margin-top:0.4rem;">
+          <div class="progress-bar-fill" id="mastery-fill"
+               style="width:0%;background:linear-gradient(90deg,#10B981,#34D399);"></div>
+        </div>
+      </div>
+
+      <!-- Retry badge -->
+      <div id="mastery-retry-row" style="display:none;margin-bottom:0.65rem;">
+        <span class="retry-badge">↩ 再練</span>
+        <span style="font-size:0.72rem;color:#9CA3AF;margin-left:0.45rem;">這題之前答錯過</span>
+      </div>
+
+      <!-- Group context -->
+      <div id="mastery-context-card" class="context-card" style="display:none;">
+        <div><span class="context-tag">題組</span><span class="context-label">上一題情境</span></div>
+        <div class="context-text" id="mastery-context-text"></div>
+      </div>
+
+      <!-- Question card -->
+      <div class="card" style="margin-bottom:1.1rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="background:#EF4444;color:white;border-radius:3px;
+                      padding:3px 8px;font-size:0.7rem;font-weight:700;
+                      flex-shrink:0;margin-top:3px;" id="mastery-q-badge">Q1</div>
+          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;"
+             id="mastery-question-text"></p>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-list" id="mastery-options-list"></div>
+
+      <!-- Explanation (shown after confirm) -->
+      <div id="mastery-explanation" class="mastery-explanation" style="display:none;"></div>
+
+      <hr style="border:none;border-top:1px solid #E5E7EB;margin:1rem 0;" />
+
+      <div class="nav-row">
+        <div class="nav-center"></div>
+        <button class="btn btn-primary" id="mastery-btn" disabled>確認答案</button>
+      </div>
+    </div>
+
+    <!-- ══ Mastery complete ══ -->
+    <div id="view-mastery-complete" style="display:none;">
+      <div class="card score-card">
+        <div style="font-size:2.8rem;margin-bottom:0.6rem;">🎉</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:0.25rem;">全部攻克！</div>
+        <div style="font-size:0.84rem;color:#6B7280;margin-bottom:1.4rem;" id="mastery-subtitle"></div>
+        <div class="score-stats">
+          <div class="score-stat">
+            <div class="score-stat-val" style="color:#10B981;" id="mc-total">0</div>
+            <div class="score-stat-lbl">攻克題數</div>
+          </div>
+          <div class="score-stat">
+            <div class="score-stat-val" style="color:#EF4444;" id="mc-retries">0</div>
+            <div class="score-stat-lbl">重練次數</div>
+          </div>
+          <div class="score-stat">
+            <div class="score-stat-val" style="color:#6366F1;" id="mc-first-try">0%</div>
+            <div class="score-stat-lbl">首答答對率</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;max-width:280px;margin-left:auto;margin-right:auto;">
+        <a href="index.html" class="btn btn-primary btn-full">返回首頁</a>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -157,8 +240,12 @@
   if (!raw) {
     document.getElementById("view-no-session").style.display = "block";
   } else {
-    const { questions, topic, units, userId, userName } = JSON.parse(raw);
-    runQuiz(questions, topic, units, userId, userName);
+    const { questions, topic, units, userId, userName, sessionId, mode } = JSON.parse(raw);
+    if (mode === "mastery") {
+      runMastery(questions, topic, units, userId, userName, sessionId);
+    } else {
+      runQuiz(questions, topic, units, userId, userName, sessionId);
+    }
   }
 
   function showToast(msg) {
@@ -168,12 +255,34 @@
     setTimeout(() => t.classList.remove("show"), 2500);
   }
 
-  function runQuiz(questions, topic, units, userId, userName) {
+  function runQuiz(questions, topic, units, userId, userName, sessionId) {
     const total = questions.length;
     let idx = 0;
     const answers = {};
     let submitted = false;
     let saved = false;
+
+    // ── 中斷恢復 ──
+    const progressKey = sessionId ? `quiz_progress_${sessionId}` : null;
+    if (progressKey) {
+      try {
+        const prog = JSON.parse(localStorage.getItem(progressKey) || "null");
+        if (prog && prog.idx > 0) {
+          idx = Math.min(prog.idx, total - 1);
+          Object.assign(answers, prog.answers);
+          showToast(`已從第 ${idx + 1} 題繼續`);
+        }
+      } catch (e) {}
+    }
+
+    function saveProgress() {
+      if (!progressKey) return;
+      localStorage.setItem(progressKey, JSON.stringify({ idx, answers }));
+    }
+
+    function clearProgress() {
+      if (progressKey) localStorage.removeItem(progressKey);
+    }
 
     document.getElementById("view-quiz").style.display = "block";
     render();
@@ -212,6 +321,7 @@
         div.innerHTML = `<div class="option-letter">${letter}</div><span>${text}</span>`;
         div.addEventListener("click", () => {
           answers[idx] = letter;
+          saveProgress();
           render();
         });
         list.appendChild(div);
@@ -227,6 +337,7 @@
         btnNext.onclick = () => {
           if (!answers[idx]) { showToast("請先選擇答案再繼續"); return; }
           idx++;
+          saveProgress();
           render();
         };
       } else {
@@ -234,11 +345,12 @@
         btnNext.onclick = () => {
           if (!answers[idx]) { showToast("請先選擇答案再送出"); return; }
           submitted = true;
+          clearProgress();
           showResults();
         };
       }
 
-      btnPrev.onclick = () => { idx--; render(); };
+      btnPrev.onclick = () => { idx--; saveProgress(); render(); };
 
       // Answered count
       document.getElementById("answered-count").textContent =
@@ -380,6 +492,202 @@
       header.classList.toggle("open");
       body.classList.toggle("open");
     });
+  }
+
+  // ════════════════════════════════════════
+  //  攻克模式（Mastery Drill）
+  // ════════════════════════════════════════
+  function runMastery(questions, topic, units, userId, userName, sessionId) {
+    const totalQ = questions.length;
+    // 工作佇列（可動態插入重練題）
+    const queue = questions.map(q => ({ ...q }));
+    const mastered    = new Set(); // 已攻克的 question_id
+    const retriedSet  = new Set(); // 答錯過至少一次的 question_id
+    const firstRecord = {};        // question_id → 首次答題記錄
+    let totalAttempts = 0;
+    let pos = 0;
+    let phase = "select";   // "select" | "reveal"
+    let currentSelected = null;
+    let saved = false;
+
+    document.getElementById("view-mastery").style.display = "block";
+    renderMastery();
+
+    // ── 點陣 ──
+    function renderDots() {
+      const el = document.getElementById("mastery-dots");
+      if (totalQ > 30) { el.innerHTML = ""; return; }
+      const curId = queue[pos] ? queue[pos].id : null;
+      el.innerHTML = questions.map(q => {
+        let cls = "mastery-dot";
+        if (mastered.has(q.id))     cls += " mastered";
+        else if (q.id === curId)    cls += " current";
+        else if (retriedSet.has(q.id)) cls += " retried";
+        return `<div class="${cls}"></div>`;
+      }).join("");
+    }
+
+    // ── 主渲染 ──
+    function renderMastery() {
+      if (mastered.size === totalQ) { showMasteryComplete(); return; }
+
+      phase = "select";
+      currentSelected = null;
+
+      const q = queue[pos];
+      const origIdx = questions.findIndex(oq => oq.id === q.id);
+
+      // 進度
+      document.getElementById("mastery-counter").textContent =
+        `已攻克 ${mastered.size} / ${totalQ}`;
+      document.getElementById("mastery-fill").style.width =
+        `${(mastered.size / totalQ) * 100}%`;
+      document.getElementById("mastery-queue-info").textContent =
+        `剩餘 ${totalQ - mastered.size} 題`;
+      renderDots();
+
+      // 再練提示
+      document.getElementById("mastery-retry-row").style.display =
+        retriedSet.has(q.id) ? "block" : "none";
+
+      // 題組情境
+      const ctxCard = document.getElementById("mastery-context-card");
+      if (q.group_context) {
+        ctxCard.style.display = "block";
+        document.getElementById("mastery-context-text").textContent = q.group_context;
+      } else {
+        ctxCard.style.display = "none";
+      }
+
+      // 題目
+      document.getElementById("mastery-q-badge").textContent =
+        `Q${origIdx >= 0 ? origIdx + 1 : pos + 1}`;
+      document.getElementById("mastery-question-text").textContent = q.question;
+
+      // 選項
+      renderMasteryOptions(q, null, false);
+
+      // 解析隱藏
+      document.getElementById("mastery-explanation").style.display = "none";
+
+      // 按鈕
+      const btn = document.getElementById("mastery-btn");
+      btn.textContent = "確認答案";
+      btn.disabled = true;
+      btn.onclick = confirmAnswer;
+    }
+
+    // ── 選項渲染 ──
+    function renderMasteryOptions(q, selected, revealed) {
+      const list = document.getElementById("mastery-options-list");
+      list.innerHTML = "";
+      Object.entries(q.options).forEach(([letter, text]) => {
+        const div = document.createElement("div");
+        let cls = "option-item";
+        if (revealed) {
+          if (letter === q.answer)                         cls += " correct";
+          else if (letter === selected && letter !== q.answer) cls += " wrong";
+        } else if (selected === letter) {
+          cls += " selected";
+        }
+        div.className = cls;
+        div.innerHTML = `<div class="option-letter">${letter}</div><span>${text}</span>`;
+        if (!revealed) {
+          div.addEventListener("click", () => {
+            currentSelected = letter;
+            renderMasteryOptions(q, letter, false);
+            document.getElementById("mastery-btn").disabled = false;
+          });
+        }
+        list.appendChild(div);
+      });
+    }
+
+    // ── 確認答案 ──
+    function confirmAnswer() {
+      const q = queue[pos];
+      const isCorrect = currentSelected === q.answer;
+      phase = "reveal";
+      totalAttempts++;
+
+      // 揭曉選項顏色
+      renderMasteryOptions(q, currentSelected, true);
+
+      // 顯示解析
+      const expEl = document.getElementById("mastery-explanation");
+      expEl.innerHTML = q.explanation
+        ? `<strong>💡 解析：</strong>${q.explanation}`
+        : `<strong>💡 正確答案：</strong>(${q.answer}) ${q.options[q.answer]}`;
+      expEl.style.display = "block";
+
+      // 記錄首次作答
+      if (!firstRecord[q.id]) {
+        firstRecord[q.id] = {
+          question_id: q.id, topic: q.topic, unit: q.unit,
+          is_correct: isCorrect,
+          user_answer: currentSelected || "",
+          correct_answer: q.answer,
+        };
+      }
+
+      if (isCorrect) {
+        mastered.add(q.id);
+        document.getElementById("mastery-counter").textContent =
+          `已攻克 ${mastered.size} / ${totalQ}`;
+        document.getElementById("mastery-fill").style.width =
+          `${(mastered.size / totalQ) * 100}%`;
+        renderDots();
+      } else {
+        retriedSet.add(q.id);
+        // 插回佇列（4題後，或末尾）
+        const insertAt = Math.min(pos + 4, queue.length);
+        queue.splice(insertAt, 0, { ...q });
+      }
+
+      // 更新按鈕
+      const btn = document.getElementById("mastery-btn");
+      btn.disabled = false;
+      if (mastered.size === totalQ) {
+        btn.textContent = "查看結果 →";
+        btn.onclick = showMasteryComplete;
+      } else {
+        btn.textContent = isCorrect ? "✓ 攻克！下一題 →" : "✗ 再練！下一題 →";
+        btn.style.background = isCorrect
+          ? "linear-gradient(135deg,#059669,#10B981)"
+          : "linear-gradient(135deg,#DC2626,#EF4444)";
+        btn.onclick = () => {
+          btn.style.background = "";
+          pos++;
+          renderMastery();
+        };
+      }
+    }
+
+    // ── 完成畫面 ──
+    async function showMasteryComplete() {
+      document.getElementById("view-mastery").style.display = "none";
+      document.getElementById("view-mastery-complete").style.display = "block";
+
+      const retryCount = totalAttempts - totalQ; // 超出 totalQ 的作答次數 = 重練次數
+      const firstCorrect = Object.values(firstRecord).filter(r => r.is_correct).length;
+      const firstTryPct = totalQ > 0 ? Math.round((firstCorrect / totalQ) * 100) : 0;
+
+      document.getElementById("mc-total").textContent = totalQ;
+      document.getElementById("mc-retries").textContent = Math.max(0, retryCount);
+      document.getElementById("mc-first-try").textContent = `${firstTryPct}%`;
+      document.getElementById("mastery-subtitle").textContent =
+        `共作答 ${totalAttempts} 次，首次答對率 ${firstTryPct}%`;
+
+      if (!saved) {
+        saved = true;
+        const answerRecords = Object.values(firstRecord);
+        try {
+          await saveSession(userId, topic, units, totalQ, firstCorrect, answerRecords);
+        } catch (e) {
+          showToast("成績儲存失敗，但仍可查看結果");
+        }
+      }
+    }
   }
 </script>
 </body>
