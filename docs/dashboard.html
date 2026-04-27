@@ -85,7 +85,7 @@
       </div>
 
       <!-- Metrics row -->
-      <div id="metrics-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;"></div>
+      <div id="metrics-row" class="metrics-grid"></div>
 
       <!-- Trend chart -->
       <div class="card" id="card-trend">
@@ -598,7 +598,7 @@
 
       return `<div style="${sep}">
         ${header}
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
+        <div class="weakness-cols">
           ${col(weak, "#FFF5F5", "#FED7D7", "#C53030", "🔴 需要加強", "#EF4444")}
           ${col(mid,  "#FFFBEB", "#FDE68A", "#92400E", "🟡 尚可，可繼續加強", "#F59E0B")}
           ${col(good, "#F0FDF4", "#BBF7D0", "#166534", "🟢 掌握良好", "#10B981")}
