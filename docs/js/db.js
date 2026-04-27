@@ -16,6 +16,16 @@ async function _check(res, context = "") {
   return res;
 }
 
+// 只查詢，不建立；找不到回傳 null
+async function getUserByName(name) {
+  const res = await fetch(`${_url("users")}?name=eq.${encodeURIComponent(name)}&select=id,name`, {
+    headers: _headers(),
+  });
+  await _check(res, "查詢使用者");
+  const data = await res.json();
+  return data.length > 0 ? data[0] : null;
+}
+
 async function getOrCreateUser(name) {
   const res = await fetch(`${_url("users")}?name=eq.${encodeURIComponent(name)}&select=id`, {
     headers: _headers(),
