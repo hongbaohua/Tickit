@@ -22,7 +22,7 @@ Tickit 是純前端 HTML/CSS/JS 的線上測驗練習平台。題庫由 Obsidian
 ## 資料夾結構
 
 ```
-quiz-app/
+Tickit/
 ├── notes/
 │   ├── ARCHITECTURE.md        # 本文件
 │   └── UI規劃.md              # UI/UX 設計規劃
@@ -166,7 +166,7 @@ Supabase 專案：https://supabase.com/dashboard/project/svuqajwngmqseqobrkgk
 瀏覽器直接開啟 `index.html` 無法 fetch 本地檔案（CORS 限制），需啟動本地伺服器：
 
 ```bash
-cd C:\Users\Master\Projects\quiz-app\docs
+cd C:\Users\Master\Projects\Tickit\docs
 python -m http.server 8080
 # 開啟 http://localhost:8080
 ```
@@ -175,11 +175,11 @@ python -m http.server 8080
 
 ## GitHub
 
-Repository：https://github.com/hongbaohua/quiz-app.git
+Repository：https://github.com/hongbaohua/Tickit.git
 
 推送更新：
 ```bash
-cd C:\Users\Master\Projects\quiz-app
+cd C:\Users\Master\Projects\Tickit
 git add .
 git commit -m "說明"
 git push
@@ -189,10 +189,10 @@ git push
 
 ## 線上部署（GitHub Pages）
 
-管理頁面：https://github.com/hongbaohua/quiz-app/settings/pages
+管理頁面：https://github.com/hongbaohua/Tickit/settings/pages
 
 部署設定：
-- Repository：`hongbaohua/quiz-app`
+- Repository：`hongbaohua/Tickit`
 - Branch：`master`
 - 來源資料夾：`/docs`
 

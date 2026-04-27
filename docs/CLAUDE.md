@@ -5,7 +5,7 @@
 純前端 HTML/CSS/JS，資料庫使用 Supabase（JS SDK via REST API）。
 
 ```
-quiz-app/
+Tickit/
 ├── notes/              # 規劃文件（ARCHITECTURE.md、UI規劃.md）
 └── web/                # 網頁部署根目錄（GitHub Pages 從此資料夾部署）
     ├── index.html          # 首頁（登入 + 選主題/單元/題數）
@@ -60,7 +60,7 @@ quiz-app/
 需啟動本地伺服器：
 
 ```bash
-cd C:\Users\Master\Projects\quiz-app\web
+cd C:\Users\Master\Projects\Tickit\web
 python -m http.server 8080
 # 開啟 http://localhost:8080
 ```
