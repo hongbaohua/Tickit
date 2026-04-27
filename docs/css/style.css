@@ -642,15 +642,23 @@ tr:last-child td { border-bottom: none; }
   .sidebar nav { flex-direction: row; gap: 0.25rem; margin-left: auto; }
   .nav-link { padding: 0.4rem 0.65rem; font-size: 0.78rem; }
 
-  .main { padding: 1rem; min-height: auto; }
+  /* .main 不讓子內容橫向撐破整頁（防止 navbar 一起滑動） */
+  .main { padding: 1rem; min-height: auto; overflow-x: hidden; }
+  /* 考生管理頁內容很長，不設最低高度 */
+  .main-wide { min-height: auto; }
   .main > *, .main-wide > * { max-width: 100%; }
 
-  /* 首頁登入卡垂直置中 */
+  /* 首頁：登入卡佔滿畫面並置中 */
   #view-login {
-    flex: 1;
+    min-height: calc(100vh - 52px);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+  }
+  #view-login > * {
+    width: 100%;
+    max-width: 360px;
   }
 
   /* Dashboard 響應式格線 */
