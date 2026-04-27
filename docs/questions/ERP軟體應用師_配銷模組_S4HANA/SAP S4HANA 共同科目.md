@@ -2,7 +2,7 @@
 
 > **參考資料來源**：`S4HANA共同_Reference24_202502.pdf`
 
-1. 在 SAP S/4HANA 平台中，針對內部部署(On-Premise)的描述那些是正確的？
+1. 在 SAP S/4HANA 平台中，針對內部部署(On-Premise)的描述哪些是正確的？
     (1) SAP 提供系統維運
     (2) 用戶自行管理資料
     (3) 每季自動版本更新
@@ -13,10 +13,10 @@
     (D) 14。
 
 2. 在 SAP ERP 的版本演化中，若依時序排列，正確的是
-    1. R/2
-    2. ERP ECC
-    3. S/4HANA
-    4. R/3
+    (1) R/2
+    (2) ERP ECC
+    (3) S/4HANA
+    (4) R/3
     (A) 1423
     (B) 4123
     (C) 4321
@@ -58,7 +58,7 @@
     (C) ZH
     (D) CN。
 
-9. SAP S/4HANA 版本能與許多雲端應用程式無縫整合，但不包含下那一項？
+9. SAP S/4HANA 版本能與許多雲端應用程式無縫整合，但不包含下列哪一項？
     (A) SAP Ariba
     (B) SAP Concur
     (C) LinkedIn
@@ -70,7 +70,7 @@
     (C) CS
     (D) PS。
 
-11. SAP S/4HANA 版本能與許多雲端應用程式無縫整合，但不包含下那一項？
+11. SAP S/4HANA 版本能與許多雲端應用程式無縫整合，但不包含下列哪一項？
     (A) NetSuite
     (B) SAP Ariba
     (C) SAP Concur
@@ -159,7 +159,7 @@
 
 1. **(B)** 內部部署（On-Premise）由企業自行控管資料與維運，更新週期較長；雲端版（Cloud）才是由 SAP 維運並每季自動更新。
 2. **(A)** SAP 演進史：R/2 (1979) -> R/3 (1992) -> ERP ECC (2004) -> S/4HANA (2015)。
-3. **(C)** `SEARCH_SAP_MENU` 是非常有用的搜尋 T-CODE 工具。
+3. **(C)** SEARCH_SAP_MENU 是非常有用的搜尋 T-CODE 工具。
 4. **(A)** HANA 是記憶體內資料庫（In-Memory Database），強大效能依賴大量記憶體。
 5. **(D)** 產品別（Division）是組織架構的一部份，而非主數據。工作中心、資產、會計科目均屬主數據。
 6. **(A)** 銷售通路是定義企業銷售區域的基礎架構資料。
