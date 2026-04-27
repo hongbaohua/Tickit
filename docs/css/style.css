@@ -96,6 +96,8 @@ body {
 .main > * {
   width: 100%;
   max-width: 660px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* 考生管理頁：較寬內容，最寬 860px */
@@ -626,6 +628,6 @@ tr:last-child td { border-bottom: none; }
   .sidebar nav { flex-direction: row; gap: 0.25rem; margin-left: auto; }
   .nav-link { padding: 0.4rem 0.65rem; font-size: 0.78rem; }
 
-  .main { padding: 1rem; align-items: stretch; min-height: auto; }
-  .main > *, .main-wide > * { max-width: none; }
+  .main { padding: 1rem; min-height: auto; }
+  .main > *, .main-wide > * { max-width: 100%; }
 }
