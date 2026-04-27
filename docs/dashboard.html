@@ -50,11 +50,11 @@
           <div class="section-bar"></div>
           <span class="section-title">👤 選擇用戶</span>
         </div>
-        <select id="user-select"></select>
+        <input type="text" id="user-input" list="user-datalist"
+               placeholder="輸入或選擇用戶代號" autocomplete="off" />
+        <datalist id="user-datalist"></datalist>
+        <p class="field-hint" id="user-hint" style="display:none;color:#EF4444;"></p>
       </div>
-
-      <!-- Metrics row -->
-      <div id="metrics-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;"></div>
 
       <!-- Sessions table -->
       <div class="card" id="card-sessions">
@@ -64,6 +64,18 @@
         </div>
         <div id="sessions-content"></div>
       </div>
+
+      <!-- Topic selector (for analytics) -->
+      <div class="card" id="card-topic-selector" style="display:none;margin-bottom:1rem;">
+        <div class="section-header">
+          <div class="section-bar"></div>
+          <span class="section-title">📂 選擇主題（分析）</span>
+        </div>
+        <div id="topic-tabs" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;"></div>
+      </div>
+
+      <!-- Metrics row -->
+      <div id="metrics-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;"></div>
 
       <!-- Trend chart -->
       <div class="card" id="card-trend">
@@ -117,8 +129,11 @@
 <script>
   let chartInstances = {};
   let allResults = [];
+  let allSessions = [];
   let sessionLookup = {};
   let manifestData = null;
+  let userNameToId = {};
+  let currentTopic = null;
 
   async function getManifest() {
     if (!manifestData) {
@@ -147,16 +162,33 @@
 
     document.getElementById("content").style.display = "block";
 
-    const sel = document.getElementById("user-select");
+    const datalist = document.getElementById("user-datalist");
     users.forEach((u) => {
+      userNameToId[u.name] = u.id;
       const opt = document.createElement("option");
-      opt.value = u.id;
-      opt.textContent = u.name;
-      sel.appendChild(opt);
+      opt.value = u.name;
+      datalist.appendChild(opt);
     });
 
-    sel.addEventListener("change", () => loadUser(parseInt(sel.value)));
-    loadUser(parseInt(sel.value));
+    const input = document.getElementById("user-input");
+    // 自動載入第一位用戶
+    if (users.length > 0) {
+      input.value = users[0].name;
+      loadUser(users[0].id);
+    }
+
+    input.addEventListener("change", () => {
+      const name = input.value.trim();
+      const id = userNameToId[name];
+      const hint = document.getElementById("user-hint");
+      if (id) {
+        hint.style.display = "none";
+        loadUser(id);
+      } else if (name) {
+        hint.textContent = `找不到用戶「${name}」`;
+        hint.style.display = "block";
+      }
+    });
   }
 
   function groupBy(arr, keyFn) {
@@ -177,11 +209,66 @@
       getUserQuestionResults(userId),
       getManifest(),
     ]);
+    allSessions = sessions;
     allResults = results;
     sessionLookup = {};
     sessions.forEach(s => { sessionLookup[s.id] = s; });
-    renderMetrics(sessions);
+
+    // 測驗紀錄：全部主題，不過濾
     renderSessions(sessions, manifest);
+
+    // 主題 tabs
+    const topics = [...new Set(sessions.map(s => s.topic))];
+    renderTopicTabs(topics);
+  }
+
+  function renderTopicTabs(topics) {
+    const card = document.getElementById("card-topic-selector");
+    const tabsEl = document.getElementById("topic-tabs");
+
+    if (!topics.length) {
+      card.style.display = "none";
+      clearAnalytics();
+      return;
+    }
+
+    card.style.display = "block";
+    tabsEl.innerHTML = topics.map((t, i) => `
+      <button class="topic-tab${i === 0 ? ' topic-tab--active' : ''}"
+              data-topic="${t}"
+              onclick="selectTopic('${t.replace(/'/g,"\\'")}', this)">
+        ${t}
+      </button>
+    `).join("");
+
+    // 預設選第一個主題
+    currentTopic = topics[0];
+    renderAnalytics(currentTopic);
+  }
+
+  function selectTopic(topic, btn) {
+    document.querySelectorAll(".topic-tab").forEach(b => b.classList.remove("topic-tab--active"));
+    btn.classList.add("topic-tab--active");
+    currentTopic = topic;
+    renderAnalytics(topic);
+  }
+
+  function clearAnalytics() {
+    document.getElementById("metrics-row").innerHTML = "";
+    document.getElementById("trend-content").innerHTML = "";
+    document.getElementById("weakness-content").innerHTML = "";
+    document.getElementById("unit-chart-content").innerHTML = "";
+    document.getElementById("top-wrong-content").innerHTML = "";
+  }
+
+  function renderAnalytics(topic) {
+    Object.values(chartInstances).forEach(c => c.destroy());
+    chartInstances = {};
+
+    const sessions = allSessions.filter(s => s.topic === topic);
+    const results  = allResults.filter(r => r.topic === topic);
+
+    renderMetrics(sessions);
     renderTrend(sessions);
     renderWeakness(results);
     renderUnitChart(results);

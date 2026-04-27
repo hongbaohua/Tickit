@@ -7,9 +7,9 @@
 ```
 Tickit/
 ├── notes/              # 規劃文件（ARCHITECTURE.md、UI規劃.md）
-└── web/                # 網頁部署根目錄（GitHub Pages 從此資料夾部署）
-    ├── index.html          # 首頁（登入 + 選主題/單元/題數）
-    ├── quiz.html           # 測驗頁
+└── docs/               # 網頁部署根目錄（GitHub Pages 從此資料夾部署）
+    ├── index.html          # 首頁（登入 + 選主題/單元/練習模式）
+    ├── quiz.html           # 測驗頁（一般模式 + 攻克模式）
     ├── dashboard.html      # 考生管理頁
     ├── css/style.css       # 共用樣式
     ├── js/
@@ -33,6 +33,44 @@ Tickit/
 ### 2. Supabase 資料表結構
 - 禁止新增、刪除、重新命名 `users`、`quiz_sessions`、`question_results` 三張表的欄位
 - 若需擴充欄位，必須先告知使用者並進行資料遷移
+
+---
+
+## 練習模式說明（index.html Step 03）
+
+| 模式 | 說明 |
+|------|------|
+| 全部題目 | 所有選取單元的題目，隨機打亂順序 |
+| 隨機抽取 N 題 | 從選取單元隨機抽 N 題（承上題群組保持相鄰） |
+| 只練習錯題 | 從 DB 撈出歷史錯題，一次性完整測驗 |
+| 攻克模式 | 從 DB 撈出歷史錯題，循環練習直到每題答對，即時揭曉對錯 |
+
+每次開始測驗時，題目順序與選項順序皆隨機打亂（`sampleQuestions` + `shuffleOptions`）；選項末尾句號會自動刪除。
+
+---
+
+## sessionStorage 格式（quizSession）
+
+```js
+{
+  questions: Question[],  // 已打亂題目與選項
+  topic: string,
+  units: string[],
+  userId: number,
+  userName: string,
+  sessionId: string,      // Date.now().toString(36)，用於 localStorage 進度 key
+  mode: "all" | "random" | "wrong-only" | "mastery"
+}
+```
+
+---
+
+## localStorage 答題進度（quiz.html）
+
+- Key：`quiz_progress_{sessionId}`
+- Value：`{ idx, answers }`
+- 適用於一般模式（wrong-only / all / random），刷新或返回後自動恢復
+- 攻克模式（mastery）不使用此機制，中斷後重新開始
 
 ---
 
@@ -60,7 +98,7 @@ Tickit/
 需啟動本地伺服器：
 
 ```bash
-cd C:\Users\Master\Projects\Tickit\web
+cd C:\Users\Master\Projects\Tickit\docs
 python -m http.server 8080
 # 開啟 http://localhost:8080
 ```

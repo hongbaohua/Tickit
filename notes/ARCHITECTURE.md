@@ -26,21 +26,20 @@ Tickit/
 ├── notes/
 │   ├── ARCHITECTURE.md        # 本文件
 │   └── UI規劃.md              # UI/UX 設計規劃
-├── docs/                      # 網頁部署根目錄（GitHub Pages 從此資料夾部署）
-│   ├── index.html             # 首頁（登入 + 選主題/單元/題數）
-│   ├── quiz.html              # 測驗頁
-│   ├── dashboard.html         # 考生管理頁
-│   ├── css/
-│   │   └── style.css          # 共用樣式
-│   ├── js/
-│   │   ├── config.js          # Supabase URL + anon key
-│   │   ├── db.js              # Supabase CRUD 函式
-│   │   └── parser.js          # Markdown 題庫解析器
-│   └── questions/
-│       ├── manifest.json      # 主題與單元清單（新增題庫時需同步更新）
-│       └── {主題}/
-│           └── *.md           # 題庫檔案
-└── 待做筆記.md
+└── docs/                      # 網頁部署根目錄（GitHub Pages 從此資料夾部署）
+    ├── index.html             # 首頁（登入 + 選主題/單元/練習模式）
+    ├── quiz.html              # 測驗頁（一般模式 + 攻克模式）
+    ├── dashboard.html         # 考生管理頁
+    ├── css/
+    │   └── style.css          # 共用樣式
+    ├── js/
+    │   ├── config.js          # Supabase URL + anon key
+    │   ├── db.js              # Supabase CRUD 函式
+    │   └── parser.js          # Markdown 題庫解析器
+    └── questions/
+        ├── manifest.json      # 主題與單元清單（新增題庫時需同步更新）
+        └── {主題}/
+            └── *.md           # 題庫檔案
 ```
 
 ---
@@ -73,6 +72,7 @@ Tickit/
 - 選項格式：`(A)` `(B)` `(C)` `(D)`
 - 解析格式：`{n}. ({字母}) 解析文字`
 - 題目 ID 格式：`主題__Day_N__題號`（由 `parser.js` 的 `_makeId()` 自動產生，**不得修改**）
+- 選項末尾句號（`。`）在出題時自動刪除
 
 ---
 
@@ -82,32 +82,109 @@ Tickit/
 
 1. **登入／識別使用者**：輸入使用者名稱（無需密碼，輕量識別）
 2. **選擇主題**：從 `questions/manifest.json` 自動列出可用主題
-3. **選擇單元**：列出該主題下所有單元，可勾選多個混搭
-4. **選擇題數**：全部題目 or 隨機抽取 N 題
-5. **開始測驗** → 跳轉至測驗頁
+3. **選擇單元**：列出該主題下所有單元，可勾選多個混搭，旁標題數
+4. **選擇練習模式**（Step 03）：
+
+   | 模式 | 說明 |
+   |------|------|
+   | 全部題目 | 所有題目，隨機打亂順序 |
+   | 隨機抽取 N 題 | 隨機抽 N 題（承上題群組保持相鄰） |
+   | 只練習錯題 | 載入歷史錯題，一次性測驗 |
+   | 攻克模式 | 載入歷史錯題，循環練習直到全部答對 |
+
+5. 開始前所有題目與選項皆隨機打亂（`sampleQuestions` + `shuffleOptions`）
+6. **開始測驗** → 跳轉至測驗頁
 
 ---
 
 ### 測驗頁（quiz.html）
 
+#### 一般模式（all / random / wrong-only）
+
 1. **逐題顯示**：題目文字 + 四選項單選，不即時顯示對錯
 2. **題組支援**：「承上題」自動連結上一題情境
-3. **結果呈現**：甜甜圈圖、分數、評等、弱點摘要（單元答對率 < 75%）
-4. **錯題展開**：錯題列表預設開啟，含選項與解析
-5. **儲存至資料庫**：非同步寫入 `quiz_sessions` + `question_results`
+3. **中斷恢復**：每次翻頁 / 答題後將 `{ idx, answers }` 存入 `localStorage`（key：`quiz_progress_{sessionId}`），刷新或返回後自動恢復並顯示 Toast
+4. **結果呈現**：甜甜圈圖、分數、評等、弱點摘要（單元答對率 < 75%）
+5. **錯題展開**：錯題列表預設開啟，含選項與解析
+6. **儲存至資料庫**：非同步寫入 `quiz_sessions` + `question_results`
+
+#### 攻克模式（mastery）
+
+1. **題目點陣**：最多 30 題，每格顏色代表狀態（灰=未到、靛=目前、橙=曾錯、綠=攻克）
+2. **即時揭曉**：選答案後按「確認答案」，選項立即變色並顯示解析
+3. **動態佇列**：答錯則插回佇列（4 題後再出現）；答對則攻克
+4. **再練提示**：曾答錯的題目頂部顯示「↩ 再練」徽章
+5. **完成畫面**：攻克題數、重練次數、首答答對率，並儲存首次作答記錄至 DB
 
 ---
 
 ### 考生管理頁（dashboard.html）
 
-1. **選擇考生**：下拉選單列出所有曾測驗的使用者
-2. **關鍵指標**：測驗次數、平均答對率、累計作答題數、最高答對率
-3. **測驗紀錄表格**：日期、主題、完整單元名稱、分數、答對率、回顧按鈕
-4. **回顧錯題**：每筆紀錄可展開查看該次錯題的題目、選項、解析
+1. **選擇考生**：可直接輸入或從下拉清單選取（`<input list="datalist">`）
+2. **測驗紀錄**：顯示所有主題的歷史紀錄（日期、主題、單元、分數、答對率、回顧錯題）
+3. **主題篩選 Tabs**：其他分析區塊依主題分開，點 Tab 切換
+4. **關鍵指標**：測驗次數、平均答對率、累計作答題數、最高答對率（依選取主題過濾）
 5. **答對率趨勢圖**：Chart.js 折線圖（需 ≥ 2 次）
 6. **弱點診斷**：各單元三色分類（紅/黃/綠）+ 強化建議
 7. **各單元答對率圖**：橫條圖，依準確率排序
 8. **高頻錯題 Top 10**：歷次答錯次數統計
+
+---
+
+## JS 模組說明
+
+### parser.js
+
+| 函式 | 說明 |
+|------|------|
+| `parseMarkdown(text, topic, filename)` | 解析 MD 檔，回傳 Question 陣列 |
+| `loadQuestions(topic, units)` | 依主題 + 單元 fetch 並解析所有題目 |
+| `sampleQuestions(questions, n)` | Fisher-Yates 打亂題目順序，依承上題群組保持相鄰，取前 n 題 |
+| `shuffleOptions(questions)` | 打亂每題選項順序，同步更新 answer 字母，刪末尾句號 |
+
+> `_makeId()` 格式固定為 `主題__Day_N__題號`，**禁止修改**。
+
+### db.js
+
+| 函式 | 說明 |
+|------|------|
+| `getOrCreateUser(name)` | 查詢或建立使用者，回傳 userId |
+| `saveSession(userId, topic, units, total, correct, answers)` | 儲存測驗紀錄與每題結果 |
+| `getUserSessions(userId)` | 取得用戶所有測驗紀錄 |
+| `getUserQuestionResults(userId)` | 取得用戶所有題目作答結果 |
+| `getAllUsers()` | 取得所有使用者 |
+| `getWrongQuestionIds(userId, topic, units)` | 回傳指定主題 + 單元中歷史答錯的 question_id Set |
+
+---
+
+## sessionStorage 格式
+
+```js
+// quizSession（index.html 寫入，quiz.html 讀取）
+{
+  questions: Question[],   // 已打亂題目與選項
+  topic: string,
+  units: string[],
+  userId: number,
+  userName: string,
+  sessionId: string,       // Date.now().toString(36)
+  mode: "all" | "random" | "wrong-only" | "mastery"
+}
+
+// quizUser（登入後保存，跨頁使用）
+{ id: number, name: string }
+```
+
+---
+
+## localStorage 格式
+
+```js
+// 答題進度（一般模式）
+key: "quiz_progress_{sessionId}"
+value: { idx: number, answers: { [idx]: string } }
+// 測驗完成後自動刪除
+```
 
 ---
 
@@ -130,7 +207,7 @@ Supabase 專案：https://supabase.com/dashboard/project/svuqajwngmqseqobrkgk
 | topic | TEXT | 主題名稱 |
 | units | TEXT | 選擇的單元（JSON 陣列，內容為單元代號如 "Day 1"） |
 | total_questions | INTEGER | 總題數 |
-| correct_count | INTEGER | 答對題數 |
+| correct_count | INTEGER | 答對題數（攻克模式為首答答對數） |
 | taken_at | TIMESTAMPTZ | 測驗時間 |
 
 ### question_results 表
@@ -145,7 +222,7 @@ Supabase 專案：https://supabase.com/dashboard/project/svuqajwngmqseqobrkgk
 | user_answer | TEXT | 使用者選擇（A/B/C/D） |
 | correct_answer | TEXT | 正確答案（A/B/C/D） |
 
-> **金鑰管理**：Supabase URL 與 anon key 存於 `docs/js/config.js`，已加入 `.gitignore` 中的 secrets.toml（本地開發用）。
+> **金鑰管理**：Supabase URL 與 anon key 存於 `docs/js/config.js`，已加入 `.gitignore`。
 
 ---
 

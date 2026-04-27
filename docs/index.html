@@ -91,22 +91,29 @@
         <div class="unit-count" id="unit-count"></div>
       </div>
 
-      <!-- Step 03: Count -->
+      <!-- Step 03: Count / Mode -->
       <div class="card" id="card-count" style="display:none;">
         <div class="step-header">
-          <span class="step-badge">03</span>題數
+          <span class="step-badge">03</span>練習模式
         </div>
-        <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;">
+        <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
             <input type="radio" name="mode" value="all" checked style="accent-color:#4F46E5;" /> 全部題目
           </label>
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
             <input type="radio" name="mode" value="random" style="accent-color:#4F46E5;" /> 隨機抽取 N 題
           </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
+            <input type="radio" name="mode" value="wrong-only" style="accent-color:#EF4444;" /> 只練習錯題
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
+            <input type="radio" name="mode" value="mastery" style="accent-color:#DC2626;" /> 攻克模式
+          </label>
         </div>
         <div id="random-input" style="display:none;">
           <input type="number" id="input-n" min="1" max="200" value="10" style="width:100px;" />
         </div>
+        <div id="mode-hint" style="display:none;" class="field-hint"></div>
       </div>
 
       <button class="btn btn-primary btn-full" id="btn-start" disabled>開始測驗 →</button>
@@ -308,11 +315,22 @@
     hint.style.display = state.selectedUnits.size === 0 ? "block" : "none";
   }
 
-  // ── Random mode toggle ──
+  // ── Mode toggle ──
+  const modeHints = {
+    "wrong-only": "從本帳號歷史紀錄篩選曾答錯過的題目，一次性完整測驗。",
+    "mastery": "循環練習錯題，答錯自動排回佇列，直到每一題都攻克為止。",
+  };
   document.querySelectorAll("input[name=mode]").forEach((r) => {
     r.addEventListener("change", () => {
       document.getElementById("random-input").style.display =
         r.value === "random" && r.checked ? "block" : "none";
+      const hintEl = document.getElementById("mode-hint");
+      if ((r.value === "wrong-only" || r.value === "mastery") && r.checked) {
+        hintEl.textContent = modeHints[r.value];
+        hintEl.style.display = "block";
+      } else {
+        hintEl.style.display = "none";
+      }
     });
   });
 
@@ -330,14 +348,37 @@
     try {
       let questions = await loadQuestions(topic, units);
       if (!questions.length) { showToast("選取的單元中找不到題目"); btn.disabled = false; btn.textContent = "開始測驗 →"; return; }
-      if (mode === "random") questions = sampleQuestions(questions, n);
 
+      if (mode === "wrong-only" || mode === "mastery") {
+        const wrongIds = await getWrongQuestionIds(state.userId, topic, units);
+        if (!wrongIds.size) {
+          showToast("這些單元目前沒有答錯紀錄，換個模式試試");
+          btn.disabled = false; btn.textContent = "開始測驗 →"; return;
+        }
+        questions = questions.filter((q) => wrongIds.has(q.id));
+        if (!questions.length) {
+          showToast("找不到對應的錯題（題庫可能已更新），換個模式試試");
+          btn.disabled = false; btn.textContent = "開始測驗 →"; return;
+        }
+        questions = sampleQuestions(questions, questions.length);
+      } else if (mode === "random") {
+        questions = sampleQuestions(questions, n);
+      } else {
+        // 全部模式也打亂題目順序
+        questions = sampleQuestions(questions, questions.length);
+      }
+      // 每題選項打亂並移除末尾句號
+      questions = shuffleOptions(questions);
+
+      const sessionId = Date.now().toString(36);
       sessionStorage.setItem("quizSession", JSON.stringify({
         questions,
         topic,
         units,
         userId: state.userId,
         userName: state.userName,
+        sessionId,
+        mode,
       }));
       window.location.href = "quiz.html";
     } catch (e) {
