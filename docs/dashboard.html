@@ -50,10 +50,20 @@
           <div class="section-bar"></div>
           <span class="section-title">👤 選擇用戶</span>
         </div>
-        <input type="text" id="user-input" list="user-datalist"
-               placeholder="輸入或選擇用戶代號" autocomplete="off" />
+        <div style="display:flex;gap:0.5rem;">
+          <input type="text" id="user-input" list="user-datalist"
+                 placeholder="輸入或選擇用戶代號" autocomplete="off"
+                 style="flex:1;" />
+          <button class="btn btn-primary btn-sm" id="btn-search-user"
+                  style="white-space:nowrap;">查詢</button>
+        </div>
         <datalist id="user-datalist"></datalist>
-        <p class="field-hint" id="user-hint" style="display:none;color:#EF4444;"></p>
+        <p class="field-hint" id="user-hint" style="margin-top:0.4rem;"></p>
+      </div>
+
+      <!-- 未登入且尚未查詢時的佔位提示 -->
+      <div id="no-selection" style="display:none;" class="empty-state">
+        <p>輸入用戶代號並按「查詢」以查看分析資料。</p>
       </div>
 
       <!-- Sessions table -->
@@ -152,6 +162,10 @@
   }
 
   async function init() {
+    // 讀取登入狀態
+    const savedUser = sessionStorage.getItem("quizUser");
+    const loggedInUser = savedUser ? JSON.parse(savedUser) : null;
+
     const users = await getAllUsers();
     document.getElementById("loading").style.display = "none";
 
@@ -171,24 +185,45 @@
     });
 
     const input = document.getElementById("user-input");
-    // 自動載入第一位用戶
-    if (users.length > 0) {
-      input.value = users[0].name;
-      loadUser(users[0].id);
+
+    if (loggedInUser && userNameToId[loggedInUser.name]) {
+      // 已登入 → 預填並自動載入
+      input.value = loggedInUser.name;
+      loadUser(userNameToId[loggedInUser.name]);
+    } else {
+      // 未登入 → 顯示佔位提示，等待主動查詢
+      document.getElementById("no-selection").style.display = "block";
+      hideAnalytics();
     }
 
-    input.addEventListener("change", () => {
+    function triggerSearch() {
       const name = input.value.trim();
       const id = userNameToId[name];
       const hint = document.getElementById("user-hint");
       if (id) {
         hint.style.display = "none";
+        document.getElementById("no-selection").style.display = "none";
         loadUser(id);
       } else if (name) {
+        hint.style.color = "#EF4444";
         hint.textContent = `找不到用戶「${name}」`;
         hint.style.display = "block";
       }
-    });
+    }
+
+    input.addEventListener("change", triggerSearch);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") triggerSearch(); });
+    document.getElementById("btn-search-user").addEventListener("click", triggerSearch);
+  }
+
+  function hideAnalytics() {
+    document.getElementById("card-topic-selector").style.display = "none";
+    document.getElementById("metrics-row").innerHTML = "";
+    document.getElementById("card-sessions").style.display = "none";
+    document.getElementById("card-trend").style.display = "none";
+    document.getElementById("card-weakness").style.display = "none";
+    document.getElementById("card-unit-chart").style.display = "none";
+    document.getElementById("card-top-wrong").style.display = "none";
   }
 
   function groupBy(arr, keyFn) {
@@ -203,6 +238,9 @@
   async function loadUser(userId) {
     Object.values(chartInstances).forEach(c => c.destroy());
     chartInstances = {};
+    // 確保所有分析卡片可見（從未登入隱藏狀態恢復）
+    ["card-sessions","card-trend","card-weakness","card-unit-chart","card-top-wrong"]
+      .forEach(id => document.getElementById(id).style.display = "block");
 
     const [sessions, results, manifest] = await Promise.all([
       getUserSessions(userId),
