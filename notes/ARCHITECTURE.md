@@ -1,8 +1,8 @@
-# 線上測驗網站 架構文件
+# Tickit 架構文件
 
 ## 專案概述
 
-純前端 HTML/CSS/JS 的線上測驗平台。題庫由 Obsidian 管理的 Markdown 檔案組成，資料持久化至 Supabase（雲端 PostgreSQL），部署於 GitHub Pages（靜態網頁）。
+Tickit 是純前端 HTML/CSS/JS 的線上測驗練習平台。題庫由 Obsidian 管理的 Markdown 檔案組成，資料持久化至 Supabase（雲端 PostgreSQL），部署於 GitHub Pages（靜態網頁）。
 
 ---
 
