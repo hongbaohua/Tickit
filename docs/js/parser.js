@@ -199,6 +199,16 @@ function shuffleOptions(questions) {
     const origValues = letters.map(l => q.options[l]);
     const correctOrigText = q.options[q.answer];
 
+    // 若答案無法對應單一選項（如 C/D 多選題），僅清除句號，不打亂順序
+    if (correctOrigText === undefined) {
+      const newOptions = {};
+      letters.forEach(l => {
+        const v = q.options[l];
+        newOptions[l] = v.endsWith("。") ? v.slice(0, -1) : v;
+      });
+      return { ...q, options: newOptions };
+    }
+
     // Fisher-Yates shuffle of values
     const shuffled = [...origValues];
     for (let i = shuffled.length - 1; i > 0; i--) {
