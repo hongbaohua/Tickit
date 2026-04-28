@@ -643,7 +643,8 @@ tr:last-child td { border-bottom: none; }
   .nav-link { padding: 0.4rem 0.65rem; font-size: 0.78rem; }
 
   /* .main 不讓子內容橫向撐破整頁（防止 navbar 一起滑動） */
-  .main { padding: 1rem; min-height: auto; overflow-x: hidden; }
+  /* width: 100% 確保在 column flex + align-items:flex-start 下仍填滿橫向 */
+  .main { padding: 1rem; min-height: auto; overflow-x: hidden; width: 100%; }
   /* 考生管理頁內容很長，不設最低高度 */
   .main-wide { min-height: auto; }
   .main > *, .main-wide > * { max-width: 100%; }
@@ -660,6 +661,10 @@ tr:last-child td { border-bottom: none; }
     width: 100%;
     max-width: 360px;
   }
+
+  /* Quiz 進度卡 badge 防止長主題名稱 overflow */
+  #q-badges { flex-wrap: wrap; justify-content: flex-end; max-width: 55%; }
+  #q-badges span { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Dashboard 響應式格線 */
   .metrics-grid { grid-template-columns: repeat(2,1fr); }
