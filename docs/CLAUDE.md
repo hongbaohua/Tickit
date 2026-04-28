@@ -47,6 +47,8 @@ Tickit/
 
 每次開始測驗時，題目順序與選項順序皆隨機打亂（`sampleQuestions` + `shuffleOptions`）；選項末尾句號會自動刪除。
 
+`shuffleOptions` 容錯：若答案字母無法對應任一選項（如題庫誤寫 `C/D`），該題選項不打亂、僅清除句號，不拋出例外。**題庫不應有多選答案，發現時需比對參考資料修正為單一字母。**
+
 ---
 
 ## sessionStorage 格式（quizSession）
