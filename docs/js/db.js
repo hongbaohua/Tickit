@@ -116,10 +116,9 @@ async function getAllUsers() {
   return res.json();
 }
 
-// 回傳用戶在指定主題 + 單元中，歷史上答錯過的 question_id Set
+// 回傳用戶在指定主題中，歷史上答錯過的 question_id Set
+// 單元篩選由呼叫端透過 loadQuestions 已限定，此處只過濾主題
 async function getWrongQuestionIds(userId, topic, units) {
-  const unitSet = new Set(units);
-
   const sessRes = await fetch(
     `${_url("quiz_sessions")}?user_id=eq.${userId}&topic=eq.${encodeURIComponent(topic)}&select=id`,
     { headers: _headers() }
@@ -130,10 +129,10 @@ async function getWrongQuestionIds(userId, topic, units) {
 
   const ids = sessions.map((s) => s.id).join(",");
   const res = await fetch(
-    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id,unit`,
+    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id`,
     { headers: _headers() }
   );
   await _check(res, "讀取錯題 IDs");
   const rows = await res.json();
-  return new Set(rows.filter((r) => unitSet.has(r.unit)).map((r) => r.question_id));
+  return new Set(rows.map((r) => r.question_id));
 }
