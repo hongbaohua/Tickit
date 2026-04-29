@@ -161,6 +161,18 @@
     return unitData.file.replace(/\.md$/i, "");
   }
 
+  // 將 question_results.unit（由檔名衍生）還原為 manifest 的 unit 名稱
+  // 解決 ERP 等非 Day-X 格式主題的單元名稱不一致問題
+  function normalizeUnitName(topicName, rawUnit) {
+    if (!manifestData) return rawUnit;
+    const topicData = manifestData.topics.find(t => t.name === topicName);
+    if (!topicData) return rawUnit;
+    const unitData = topicData.units.find(u =>
+      u.unit === rawUnit || _getUnitName(u.file) === rawUnit
+    );
+    return unitData ? unitData.unit : rawUnit;
+  }
+
   async function init() {
     // 讀取登入狀態
     const savedUser = sessionStorage.getItem("quizUser");
@@ -436,15 +448,16 @@
           }
         }
 
+        // 以重新解析的題目原始答案字母來標示正確選項
+        // （DB 儲存的 correct_answer 是打亂後字母，與原始選項順序不符）
+        const correctLetter = q ? q.answer : r.correct_answer;
         const optHtml = ["A","B","C","D"].map(letter => {
           if (!q || !q.options[letter]) return "";
-          const isUser = letter === r.user_answer;
-          const isCorrect = letter === r.correct_answer;
+          const isCorrect = letter === correctLetter;
           let style = "font-size:0.79rem;padding:0.1rem 0;";
-          if (isCorrect)      style += "color:#10B981;font-weight:700;";
-          else if (isUser)    style += "color:#EF4444;text-decoration:line-through;opacity:0.8;";
-          else                style += "color:#6B7280;";
-          return `<div style="${style}">(${letter}) ${q.options[letter]}</div>`;
+          if (isCorrect) style += "color:#10B981;font-weight:700;";
+          else           style += "color:#6B7280;";
+          return `<div style="${style}">(${letter}) ${q.options[letter]}${isCorrect ? " ✓" : ""}</div>`;
         }).join("");
 
         const qText  = q ? `${q.number}. ${q.question}` : `（找不到題目內容，ID：${r.question_id}）`;
@@ -513,7 +526,7 @@
           datasets: [{
             data: reversed.map(s => s.total_questions > 0 ? +(s.correct_count / s.total_questions * 100).toFixed(1) : 0),
             borderColor: color,
-            backgroundColor: color.replace(")", ",0.08)").replace("rgb", "rgba"),
+            backgroundColor: color + "14",
             pointBackgroundColor: color,
             pointRadius: 4, borderWidth: 2.5, tension: 0.3, fill: true,
           }],
@@ -560,8 +573,9 @@
       const topicResults = byTopic[topic];
       const unitCorrect = {}, unitTotal = {};
       topicResults.forEach(r => {
-        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
-        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+        const unitKey = normalizeUnitName(r.topic, r.unit);
+        unitTotal[unitKey] = (unitTotal[unitKey] || 0) + 1;
+        if (r.is_correct) unitCorrect[unitKey] = (unitCorrect[unitKey] || 0) + 1;
       });
 
       const unitAcc = {};
@@ -622,8 +636,9 @@
       const topicResults = byTopic[topic];
       const unitCorrect = {}, unitTotal = {};
       topicResults.forEach(r => {
-        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
-        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+        const unitKey = normalizeUnitName(r.topic, r.unit);
+        unitTotal[unitKey] = (unitTotal[unitKey] || 0) + 1;
+        if (r.is_correct) unitCorrect[unitKey] = (unitCorrect[unitKey] || 0) + 1;
       });
       const unitCount = Object.keys(unitTotal).length;
       const chartH = Math.max(180, unitCount * 36);
@@ -641,8 +656,9 @@
       const topicResults = byTopic[topic];
       const unitCorrect = {}, unitTotal = {};
       topicResults.forEach(r => {
-        unitTotal[r.unit] = (unitTotal[r.unit] || 0) + 1;
-        if (r.is_correct) unitCorrect[r.unit] = (unitCorrect[r.unit] || 0) + 1;
+        const unitKey = normalizeUnitName(r.topic, r.unit);
+        unitTotal[unitKey] = (unitTotal[unitKey] || 0) + 1;
+        if (r.is_correct) unitCorrect[unitKey] = (unitCorrect[unitKey] || 0) + 1;
       });
       const sorted = Object.keys(unitTotal)
         .map(k => ({ k, acc: +((unitCorrect[k] || 0) / unitTotal[k] * 100).toFixed(1) }))
