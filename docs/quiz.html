@@ -251,7 +251,7 @@
   } else {
     const { questions, topic, units, userId, userName, sessionId, mode } = JSON.parse(raw);
     if (mode === "mastery" || mode === "marked") {
-      runMastery(questions, topic, units, userId, userName, sessionId);
+      runMastery(questions, topic, units, userId, userName, sessionId, mode);
     } else {
       runQuiz(questions, topic, units, userId, userName, sessionId);
     }
@@ -531,7 +531,7 @@
   // ════════════════════════════════════════
   //  攻克模式（Mastery Drill）
   // ════════════════════════════════════════
-  function runMastery(questions, topic, units, userId, userName, sessionId) {
+  function runMastery(questions, topic, units, userId, userName, sessionId, mode) {
     const totalQ = questions.length;
     // 工作佇列（可動態插入重練題）
     const queue = questions.map(q => ({ ...q }));
