@@ -70,8 +70,12 @@
           <div style="background:#4F46E5;color:white;border-radius:3px;
                       padding:3px 8px;font-size:0.7rem;font-weight:700;
                       flex-shrink:0;margin-top:3px;" id="q-badge-inline">Q1</div>
-          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;"
+          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;flex:1;"
              id="question-text"></p>
+          <button id="btn-bookmark"
+                  style="flex-shrink:0;border:none;background:transparent;cursor:pointer;
+                         font-size:1.3rem;padding:0 2px;line-height:1;color:#D1D5DB;
+                         margin-top:1px;" title="標記此題">☆</button>
         </div>
       </div>
 
@@ -151,7 +155,8 @@
       <div class="card" style="padding:0.9rem 1.2rem 0.8rem;margin-bottom:1.1rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
           <div style="display:flex;align-items:center;gap:0.5rem;">
-            <div style="background:#EF4444;color:white;border-radius:3px;
+            <div id="mastery-mode-badge"
+                 style="background:#EF4444;color:white;border-radius:3px;
                         padding:1px 7px;font-size:0.68rem;font-weight:700;letter-spacing:0.5px;">攻克模式</div>
             <span style="font-size:0.82rem;font-weight:700;color:#111827;" id="mastery-counter">已攻克 0 / 0</span>
           </div>
@@ -182,8 +187,12 @@
           <div style="background:#EF4444;color:white;border-radius:3px;
                       padding:3px 8px;font-size:0.7rem;font-weight:700;
                       flex-shrink:0;margin-top:3px;" id="mastery-q-badge">Q1</div>
-          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;"
+          <p style="font-size:0.96rem;font-weight:600;color:#111827;line-height:1.7;margin:0;flex:1;"
              id="mastery-question-text"></p>
+          <button id="mastery-btn-bookmark"
+                  style="flex-shrink:0;border:none;background:transparent;cursor:pointer;
+                         font-size:1.3rem;padding:0 2px;line-height:1;color:#D1D5DB;
+                         margin-top:1px;" title="標記此題">☆</button>
         </div>
       </div>
 
@@ -205,7 +214,7 @@
     <div id="view-mastery-complete" style="display:none;">
       <div class="card score-card">
         <div style="font-size:2.8rem;margin-bottom:0.6rem;">🎉</div>
-        <div style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:0.25rem;">全部攻克！</div>
+        <div id="mastery-complete-title" style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:0.25rem;">全部攻克！</div>
         <div style="font-size:0.84rem;color:#6B7280;margin-bottom:1.4rem;" id="mastery-subtitle"></div>
         <div class="score-stats">
           <div class="score-stat">
@@ -241,7 +250,7 @@
     document.getElementById("view-no-session").style.display = "block";
   } else {
     const { questions, topic, units, userId, userName, sessionId, mode } = JSON.parse(raw);
-    if (mode === "mastery") {
+    if (mode === "mastery" || mode === "marked") {
       runMastery(questions, topic, units, userId, userName, sessionId);
     } else {
       runQuiz(questions, topic, units, userId, userName, sessionId);
@@ -255,12 +264,34 @@
     setTimeout(() => t.classList.remove("show"), 2500);
   }
 
+  // ── 標記題目（localStorage，不寫 DB）──
+  function loadBookmarks(userId) {
+    try { return new Set(JSON.parse(localStorage.getItem(`bookmarks_${userId}`) || "[]")); }
+    catch(e) { return new Set(); }
+  }
+  function saveBookmarks(userId, set) {
+    localStorage.setItem(`bookmarks_${userId}`, JSON.stringify([...set]));
+  }
+  function applyBookmarkBtn(btn, qId, bookmarks, userId) {
+    const on = bookmarks.has(qId);
+    btn.textContent = on ? "★" : "☆";
+    btn.style.color  = on ? "#F59E0B" : "#D1D5DB";
+    btn.title        = on ? "取消標記" : "標記此題";
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      if (bookmarks.has(qId)) bookmarks.delete(qId); else bookmarks.add(qId);
+      saveBookmarks(userId, bookmarks);
+      applyBookmarkBtn(btn, qId, bookmarks, userId);
+    };
+  }
+
   function runQuiz(questions, topic, units, userId, userName, sessionId) {
     const total = questions.length;
     let idx = 0;
     const answers = {};
     let submitted = false;
     let saved = false;
+    const bookmarks = loadBookmarks(userId);
 
     // ── 中斷恢復 ──
     const progressKey = sessionId ? `quiz_progress_${sessionId}` : null;
@@ -355,6 +386,9 @@
       // Answered count
       document.getElementById("answered-count").textContent =
         `已作答 ${Object.keys(answers).length} / ${total} 題`;
+
+      // Bookmark
+      applyBookmarkBtn(document.getElementById("btn-bookmark"), q.id, bookmarks, userId);
     }
 
     async function showResults() {
@@ -509,8 +543,20 @@
     let phase = "select";   // "select" | "reveal"
     let currentSelected = null;
     let saved = false;
+    const bookmarks = loadBookmarks(userId);
+    const isMarkedMode = mode === "marked";
 
     document.getElementById("view-mastery").style.display = "block";
+
+    if (isMarkedMode) {
+      const badge = document.getElementById("mastery-mode-badge");
+      badge.textContent = "標記練習";
+      badge.style.background = "#F59E0B";
+      document.getElementById("mastery-q-badge").style.background = "#F59E0B";
+      document.getElementById("mastery-fill").style.background =
+        "linear-gradient(90deg,#F59E0B,#FCD34D)";
+    }
+
     renderMastery();
 
     // ── 點陣 ──
@@ -575,6 +621,9 @@
       btn.textContent = "確認答案";
       btn.disabled = true;
       btn.onclick = confirmAnswer;
+
+      // Bookmark
+      applyBookmarkBtn(document.getElementById("mastery-btn-bookmark"), q.id, bookmarks, userId);
     }
 
     // ── 選項渲染 ──
@@ -667,6 +716,11 @@
     async function showMasteryComplete() {
       document.getElementById("view-mastery").style.display = "none";
       document.getElementById("view-mastery-complete").style.display = "block";
+
+      if (isMarkedMode) {
+        document.getElementById("mastery-complete-title").textContent = "標記題目全部完成！";
+        document.getElementById("mc-total").style.color = "#F59E0B";
+      }
 
       const retryCount = totalAttempts - totalQ; // 超出 totalQ 的作答次數 = 重練次數
       const firstCorrect = Object.values(firstRecord).filter(r => r.is_correct).length;

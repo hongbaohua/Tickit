@@ -122,6 +122,9 @@
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
             <input type="radio" name="mode" value="mastery" style="accent-color:#DC2626;" /> 攻克模式
           </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.875rem;">
+            <input type="radio" name="mode" value="marked" style="accent-color:#F59E0B;" /> ★ 反覆練習標記題目
+          </label>
         </div>
         <div id="random-input" style="display:none;">
           <input type="number" id="input-n" min="1" max="200" value="10" style="width:100px;" />
@@ -159,6 +162,12 @@
     state.userId = id;
     state.userName = name;
     showSetup();
+  }
+
+  // ── 標記題目（localStorage）──
+  function loadBookmarks(userId) {
+    try { return new Set(JSON.parse(localStorage.getItem(`bookmarks_${userId}`) || "[]")); }
+    catch(e) { return new Set(); }
   }
 
   // ── Toast ──
@@ -390,13 +399,14 @@
   const modeHints = {
     "wrong-only": "從本帳號歷史紀錄篩選曾答錯過的題目，一次性完整測驗。",
     "mastery": "循環練習錯題，答錯自動排回佇列，直到每一題都攻克為止。",
+    "marked": "反覆練習你手動標記（★）的題目，直到每題都攻克為止。可在任何模式的答題過程中標記題目。",
   };
   document.querySelectorAll("input[name=mode]").forEach((r) => {
     r.addEventListener("change", () => {
       document.getElementById("random-input").style.display =
         r.value === "random" && r.checked ? "block" : "none";
       const hintEl = document.getElementById("mode-hint");
-      if ((r.value === "wrong-only" || r.value === "mastery") && r.checked) {
+      if ((r.value === "wrong-only" || r.value === "mastery" || r.value === "marked") && r.checked) {
         hintEl.textContent = modeHints[r.value];
         hintEl.style.display = "block";
       } else {
@@ -429,6 +439,14 @@
         questions = questions.filter((q) => wrongIds.has(q.id));
         if (!questions.length) {
           showToast("找不到對應的錯題（題庫可能已更新），換個模式試試");
+          btn.disabled = false; btn.textContent = "開始測驗 →"; return;
+        }
+        questions = sampleQuestions(questions, questions.length);
+      } else if (mode === "marked") {
+        const bookmarks = loadBookmarks(state.userId);
+        questions = questions.filter((q) => bookmarks.has(q.id));
+        if (!questions.length) {
+          showToast("這些單元中沒有標記的題目，請先在答題過程中點擊 ☆ 標記");
           btn.disabled = false; btn.textContent = "開始測驗 →"; return;
         }
         questions = sampleQuestions(questions, questions.length);
