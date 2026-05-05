@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tickit</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tickit" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -98,6 +107,7 @@
           <span class="step-badge">02</span>單元
         </div>
         <div class="select-all-row">
+          <button class="btn btn-ghost btn-sm" id="btn-view-toggle" style="display:none;" onclick="toggleUnitView()">⊞ 縮圖</button>
           <button class="btn btn-ghost btn-sm" id="btn-select-all">全選</button>
         </div>
         <div class="checkbox-group" id="units-list"></div>
@@ -154,6 +164,7 @@
     selectedUnits: new Set(),
   };
   let unitQuestionCounts = {};
+  let unitViewMode = "list"; // "list" | "grid"
 
   // ── Restore session ──
   const saved = sessionStorage.getItem("quizUser");
@@ -318,7 +329,7 @@
         <div class="unit-info-wrapper">
           <span class="unit-tag">${u.unit}</span>
           <span class="unit-title">${title}</span>
-          <span id="uqc-${idx}" style="margin-left:auto;font-size:0.72rem;color:#9CA3AF;
+          <span class="unit-count-badge" id="uqc-${idx}" style="margin-left:auto;font-size:0.72rem;color:#9CA3AF;
                 white-space:nowrap;padding-left:0.5rem;">…</span>
         </div>
       `;
@@ -329,6 +340,18 @@
     cardUnits.style.display = "block";
     cardCount.style.display = "block";
     updateUnitCount();
+
+    // 5 個以上單元時顯示縮圖切換按鈕，並重置為清單模式
+    unitViewMode = "list";
+    const toggleBtn = document.getElementById("btn-view-toggle");
+    const unitsList = document.getElementById("units-list");
+    unitsList.classList.remove("grid-mode");
+    if (topic.units.length >= 5) {
+      toggleBtn.style.display = "inline-flex";
+      toggleBtn.textContent = "⊞ 縮圖";
+    } else {
+      toggleBtn.style.display = "none";
+    }
 
     // 非同步載入各單元題目數
     topic.units.forEach(async (u, idx) => {
@@ -393,6 +416,21 @@
     const hint = document.getElementById("start-hint");
     btn.disabled = state.selectedUnits.size === 0;
     hint.style.display = state.selectedUnits.size === 0 ? "block" : "none";
+  }
+
+  // ── Unit view toggle ──
+  function toggleUnitView() {
+    const unitsList = document.getElementById("units-list");
+    const toggleBtn = document.getElementById("btn-view-toggle");
+    if (unitViewMode === "list") {
+      unitViewMode = "grid";
+      unitsList.classList.add("grid-mode");
+      toggleBtn.textContent = "☰ 清單";
+    } else {
+      unitViewMode = "list";
+      unitsList.classList.remove("grid-mode");
+      toggleBtn.textContent = "⊞ 縮圖";
+    }
   }
 
   // ── Mode toggle ──

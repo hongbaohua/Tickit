@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tickit — 考生管理</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tickit" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -137,6 +146,12 @@
 <script src="js/db.js"></script>
 <script src="js/parser.js"></script>
 <script>
+  // 舊主題名稱對應新名稱（同一份題庫改名後的別名合併）
+  const TOPIC_ALIASES = {
+    "品牌企劃師初級備考": "iPAS 品牌企劃師初級",
+  };
+  function normalizeTopic(t) { return TOPIC_ALIASES[t] || t; }
+
   let chartInstances = {};
   let allResults = [];
   let allSessions = [];
@@ -144,6 +159,8 @@
   let manifestData = null;
   let userNameToId = {};
   let currentTopic = null;
+  let sessionPage = 0;
+  const SESSION_PAGE_SIZE = 10;
 
   async function getManifest() {
     if (!manifestData) {
@@ -259,13 +276,15 @@
       getUserQuestionResults(userId),
       getManifest(),
     ]);
-    allSessions = sessions;
-    allResults = results;
+    // 合併舊主題名稱（同一題庫改名前的資料）
+    allSessions = sessions.map(s => ({ ...s, topic: normalizeTopic(s.topic) }));
+    allResults = results.map(r => ({ ...r, topic: normalizeTopic(r.topic) }));
     sessionLookup = {};
-    sessions.forEach(s => { sessionLookup[s.id] = s; });
+    allSessions.forEach(s => { sessionLookup[s.id] = s; });
 
-    // 測驗紀錄：全部主題，不過濾
-    renderSessions(sessions, manifest);
+    // 測驗紀錄：全部主題，不過濾，從第一頁開始
+    sessionPage = 0;
+    renderSessions(allSessions, manifest, 0);
 
     // 主題 tabs
     const topics = [...new Set(sessions.map(s => s.topic))];
@@ -347,7 +366,7 @@
     `).join("");
   }
 
-  function renderSessions(sessions, manifest) {
+  function renderSessions(sessions, manifest, page = 0) {
     const el = document.getElementById("sessions-content");
     if (!sessions.length) {
       el.innerHTML = `<div class="empty-state"><p>此用戶尚無測驗紀錄。</p></div>`;
@@ -359,7 +378,11 @@
       if (!r.is_correct) wrongCountMap[r.session_id] = (wrongCountMap[r.session_id] || 0) + 1;
     });
 
-    const rows = sessions.map((s) => {
+    const totalPages = Math.ceil(sessions.length / SESSION_PAGE_SIZE);
+    const pageStart = page * SESSION_PAGE_SIZE;
+    const pageSessions = sessions.slice(pageStart, pageStart + SESSION_PAGE_SIZE);
+
+    const rows = pageSessions.map((s) => {
       const acc = s.total_questions > 0 ? (s.correct_count / s.total_questions * 100) : 0;
       const badgeCls = acc >= 80 ? "badge-green" : acc >= 60 ? "badge-yellow" : "badge-red";
 
@@ -395,10 +418,24 @@
         </tr>`;
     }).join("");
 
+    const pagination = totalPages > 1 ? `
+      <div class="session-pagination">
+        <button class="btn btn-ghost btn-sm" ${page === 0 ? 'disabled' : ''}
+                onclick="goToSessionPage(${page - 1})">← 較新</button>
+        <span style="font-size:0.74rem;color:#6B7280;">第 ${page + 1} / ${totalPages} 頁，共 ${sessions.length} 筆</span>
+        <button class="btn btn-ghost btn-sm" ${page >= totalPages - 1 ? 'disabled' : ''}
+                onclick="goToSessionPage(${page + 1})">較舊 →</button>
+      </div>` : "";
+
     el.innerHTML = `<table>
       <thead><tr><th>日期</th><th>主題</th><th>單元</th><th>答對</th><th>答對率</th><th>回顧</th></tr></thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>${pagination}`;
+  }
+
+  function goToSessionPage(page) {
+    sessionPage = page;
+    renderSessions(allSessions, manifestData, page);
   }
 
   async function toggleReview(sessionId, btn) {

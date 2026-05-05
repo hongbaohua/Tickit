@@ -1,0 +1,28 @@
+{
+  "name": "Tickit — 備考刷題",
+  "short_name": "Tickit",
+  "description": "輕量級備考刷題 App，支援多考科題庫與錯題追蹤。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F1F5F9",
+  "theme_color": "#4F46E5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
