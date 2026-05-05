@@ -240,7 +240,7 @@ input::placeholder { color: #9CA3AF; }
 }
 
 .select-all-row {
-  display: flex; justify-content: flex-end;
+  display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem;
   margin-bottom: 0.5rem;
 }
 .unit-count { font-size: 0.74rem; color: #6B7280; margin-top: 0.4rem; }
@@ -620,6 +620,41 @@ tr:last-child td { border-bottom: none; }
 }
 #sessions-content { overflow-x: auto; }
 
+/* ── Units compact grid mode ── */
+#units-list.grid-mode {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+}
+#units-list.grid-mode .checkbox-item {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.3rem;
+  text-align: center;
+  min-height: 60px;
+}
+#units-list.grid-mode .checkbox-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+#units-list.grid-mode .unit-info-wrapper {
+  align-items: center;
+  gap: 0.15rem;
+}
+#units-list.grid-mode .unit-title { display: none; }
+#units-list.grid-mode .unit-count-badge { margin-left: 0 !important; padding-left: 0 !important; }
+
+/* ── Session pagination ── */
+.session-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem 0.1rem;
+  border-top: 1px solid #F3F4F6;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .layout { flex-direction: column; }
@@ -669,4 +704,17 @@ tr:last-child td { border-bottom: none; }
   /* Dashboard 響應式格線 */
   .metrics-grid { grid-template-columns: repeat(2,1fr); }
   .weakness-cols { grid-template-columns: 1fr; }
+}
+
+/* ================================================
+   PWA 獨立模式（Standalone）
+   ================================================ */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sidebar {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
 }
