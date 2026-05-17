@@ -319,8 +319,8 @@
     list.innerHTML = "";
     unitQuestionCounts = {};
     topic.units.forEach((u, idx) => {
-      // 提取檔名中除去「Day X：」與「.md」的部分作為標題
-      const title = u.file.replace(/^Day\s*\d+\s*[：:]\s*/i, "").replace(/\.md$/i, "");
+      // 提取檔名中除去「Day X：」或「樣題 X：」與「.md」的部分作為標題
+      const title = u.file.replace(/^[\u200b\s]*(Day|樣題)\s*\d+\s*[：:]\s*/i, "").replace(/\.md$/i, "");
 
       const label = document.createElement("label");
       label.className = "checkbox-item";
