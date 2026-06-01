@@ -199,7 +199,11 @@
     const { id, name } = JSON.parse(saved);
     state.userId = id;
     state.userName = name;
-    showSetup();
+    if (typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name)) {
+      window.location.href = "admin.html";
+    } else {
+      showSetup();
+    }
   }
 
   // ── 標記題目（localStorage）──
@@ -284,6 +288,10 @@
     state.userId = id;
     state.userName = name;
     sessionStorage.setItem("quizUser", JSON.stringify({ id, name }));
+    if (typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name)) {
+      window.location.href = "admin.html";
+      return;
+    }
     applyAdminNav();
     showSetup();
   }
