@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tickit — 管理者</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tickit" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-icon"></div>
+      <span class="sidebar-title">Tickit</span>
+    </div>
+    <nav>
+      <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
+      <a href="admin.html" class="nav-link active" id="nav-admin"><span class="nav-dot"></span>管理者</a>
+    </nav>
+  </aside>
+
+  <main class="main main-wide">
+
+    <!-- Header banner -->
+    <div style="background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#334155 100%);
+                border-radius:14px;padding:1.5rem 1.8rem;margin-bottom:1.5rem;
+                border:1px solid #334155;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:1.15rem;font-weight:800;color:white;
+                      margin-bottom:0.2rem;letter-spacing:-0.3px;">管理者介面</div>
+          <div style="color:#64748B;font-size:0.78rem;">考生帳號管理、備註與系統概覽</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.15);border-radius:10px;
+                    padding:0.5rem 1rem;border:1px solid rgba(239,68,68,0.3);">
+          <div style="color:#FCA5A5;font-size:0.72rem;font-weight:600;
+                      letter-spacing:0.5px;text-transform:uppercase;">Admin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 未授權 -->
+    <div id="view-unauthorized" style="display:none;">
+      <div class="card" style="text-align:center;padding:2.8rem 2rem;margin-top:2rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🔒</div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:0.4rem;">無權限存取</div>
+        <div style="color:#6B7280;font-size:0.86rem;margin-bottom:1.5rem;">
+          此頁面僅限管理者帳號使用。請先登入管理者帳號。
+        </div>
+        <a href="index.html" class="btn btn-primary">回首頁</a>
+      </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div id="view-admin" style="display:none;">
+
+      <div id="loading-admin" class="loading">載入中…</div>
+
+      <div id="admin-content" style="display:none;">
+
+        <!-- 統計摘要 -->
+        <div id="admin-metrics" class="metrics-grid" style="margin-bottom:1.5rem;"></div>
+
+        <!-- 考生帳號列表 -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="section-header">
+            <div class="section-bar"></div>
+            <span class="section-title">考生帳號管理</span>
+          </div>
+
+          <div style="margin-bottom:0.75rem;">
+            <input type="text" id="search-users" placeholder="搜尋用戶代號…" autocomplete="off"
+                   style="max-width:280px;" oninput="filterUsers(this.value)" />
+          </div>
+
+          <div id="users-table-wrap"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- 備註 Modal -->
+<div id="note-modal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+            z-index:9999;display:none;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:14px;padding:1.5rem;width:min(480px,90vw);
+              box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+    <div style="font-size:0.96rem;font-weight:700;color:#111827;margin-bottom:0.2rem;"
+         id="note-modal-title">備註</div>
+    <div style="font-size:0.78rem;color:#9CA3AF;margin-bottom:1rem;" id="note-modal-sub"></div>
+    <textarea id="note-textarea" rows="4"
+              style="width:100%;border:1px solid #E5E7EB;border-radius:8px;
+                     padding:0.65rem 0.75rem;font-size:0.85rem;
+                     font-family:inherit;resize:vertical;color:#111827;"
+              placeholder="在此輸入備註（僅管理者可見）"></textarea>
+    <div style="display:flex;gap:0.5rem;margin-top:0.85rem;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" id="note-cancel">取消</button>
+      <button class="btn btn-primary btn-sm" id="note-save">儲存備註</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script>
+
+  // ── 授權檢查 ──
+  const savedUser = sessionStorage.getItem("quizUser");
+  const currentUser = savedUser ? JSON.parse(savedUser) : null;
+  const isAdmin = currentUser && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(currentUser.name);
+
+  if (!isAdmin) {
+    document.getElementById("view-unauthorized").style.display = "block";
+  } else {
+    document.getElementById("view-admin").style.display = "block";
+    initAdmin();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+
+  // ── 備註（localStorage）──
+  function getNotes() {
+    try { return JSON.parse(localStorage.getItem("admin_notes") || "{}"); }
+    catch(e) { return {}; }
+  }
+  function saveNotes(notes) {
+    localStorage.setItem("admin_notes", JSON.stringify(notes));
+  }
+
+  let allUsersData = [];
+  let sessionCountMap = {};
+
+  async function initAdmin() {
+    try {
+      const users = await getAllUsers();
+      allUsersData = users;
+
+      // 取得每位用戶的 session 數
+      const counts = await Promise.all(users.map(u =>
+        fetch(`${_url("quiz_sessions")}?user_id=eq.${u.id}&select=id`, { headers: _headers() })
+          .then(r => r.json())
+          .then(rows => ({ id: u.id, count: rows.length }))
+          .catch(() => ({ id: u.id, count: 0 }))
+      ));
+      counts.forEach(c => { sessionCountMap[c.id] = c.count; });
+
+      document.getElementById("loading-admin").style.display = "none";
+      document.getElementById("admin-content").style.display = "block";
+
+      renderMetrics(users);
+      renderUsersTable(users);
+    } catch(e) {
+      document.getElementById("loading-admin").textContent = `載入失敗：${e.message}`;
+    }
+  }
+
+  function renderMetrics(users) {
+    const total = users.length;
+    const active = users.filter(u => (sessionCountMap[u.id] || 0) > 0).length;
+    const unused = total - active;
+    const el = document.getElementById("admin-metrics");
+    el.innerHTML = [
+      { label: "帳號總數", value: `${total}` },
+      { label: "有測驗紀錄", value: `${active}` },
+      { label: "從未使用", value: `${unused}` },
+    ].map(m => `
+      <div class="card" style="margin-bottom:0;text-align:center;padding:1rem;">
+        <div style="font-size:1.3rem;font-weight:800;color:#111827;">${m.value}</div>
+        <div style="font-size:0.72rem;color:#6B7280;margin-top:0.25rem;">${m.label}</div>
+      </div>
+    `).join("");
+  }
+
+  function filterUsers(query) {
+    const q = query.trim().toLowerCase();
+    const filtered = q ? allUsersData.filter(u => u.name.toLowerCase().includes(q)) : allUsersData;
+    renderUsersTable(filtered);
+  }
+
+  function renderUsersTable(users) {
+    const el = document.getElementById("users-table-wrap");
+    if (!users.length) {
+      el.innerHTML = `<div class="empty-state"><p>無符合條件的帳號。</p></div>`;
+      return;
+    }
+
+    const notes = getNotes();
+
+    const rows = users.map(u => {
+      const sc = sessionCountMap[u.id] || 0;
+      const note = notes[u.id] || "";
+      const isAdminAcc = typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(u.name);
+      const createdAt = u.created_at ? u.created_at.slice(0, 10) : "—";
+
+      const deleteBtnHtml = isAdminAcc
+        ? `<span style="font-size:0.72rem;color:#9CA3AF;">管理者帳號</span>`
+        : `<button onclick="confirmDelete(${u.id}, '${u.name.replace(/'/g,"\\'")}', ${sc})"
+                  style="font-size:0.73rem;padding:0.25rem 0.55rem;border-radius:5px;cursor:pointer;
+                         border:1px solid #FECACA;background:#FEF2F2;color:#DC2626;font-weight:600;">
+             刪除
+           </button>`;
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:600;font-size:0.84rem;color:#111827;">${u.name}</div>
+            ${isAdminAcc ? `<span style="font-size:0.68rem;background:#EEF2FF;color:#4F46E5;
+                                        border-radius:3px;padding:1px 5px;">管理者</span>` : ""}
+          </td>
+          <td style="font-size:0.8rem;color:#6B7280;">${createdAt}</td>
+          <td style="text-align:center;">
+            ${sc > 0
+              ? `<a href="dashboard.html" onclick="sessionStorage.setItem('adminViewUser','${u.name.replace(/'/g,"\\'")}');return true;"
+                    style="font-size:0.78rem;color:#4F46E5;text-decoration:underline;">${sc} 次</a>`
+              : `<span style="font-size:0.78rem;color:#9CA3AF;">0</span>`}
+          </td>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <span id="note-preview-${u.id}"
+                    style="font-size:0.76rem;color:#6B7280;max-width:160px;
+                           overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                ${note || "—"}
+              </span>
+              <button onclick="openNoteModal(${u.id}, '${u.name.replace(/'/g,"\\'")}')"
+                      style="flex-shrink:0;border:none;background:transparent;cursor:pointer;
+                             font-size:0.78rem;color:#9CA3AF;padding:0;" title="編輯備註">✏</button>
+            </div>
+          </td>
+          <td>${deleteBtnHtml}</td>
+        </tr>`;
+    }).join("");
+
+    el.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>用戶代號</th>
+            <th>建立日期</th>
+            <th style="text-align:center;">測驗次數</th>
+            <th>備註（管理者可見）</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // ── 刪除帳號 ──
+  function confirmDelete(userId, userName, sessionCount) {
+    const msg = sessionCount > 0
+      ? `確定要刪除「${userName}」嗎？\n\n此帳號有 ${sessionCount} 筆測驗紀錄，刪除後將一併移除，此操作無法復原。`
+      : `確定要刪除「${userName}」嗎？此操作無法復原。`;
+    if (!confirm(msg)) return;
+    doDeleteUser(userId, userName);
+  }
+
+  async function doDeleteUser(userId, userName) {
+    try {
+      await deleteUser(userId);
+      // 移除備註
+      const notes = getNotes();
+      delete notes[userId];
+      saveNotes(notes);
+      allUsersData = allUsersData.filter(u => u.id !== userId);
+      delete sessionCountMap[userId];
+      renderMetrics(allUsersData);
+      renderUsersTable(allUsersData);
+      showToast(`已刪除帳號「${userName}」`);
+    } catch(e) {
+      showToast(`刪除失敗：${e.message}`);
+    }
+  }
+
+  // ── 備註 Modal ──
+  let noteTargetId = null;
+
+  function openNoteModal(userId, userName) {
+    noteTargetId = userId;
+    const notes = getNotes();
+    document.getElementById("note-modal-title").textContent = `備註 — ${userName}`;
+    document.getElementById("note-modal-sub").textContent = "此備註僅管理者可見，不會顯示給考生。";
+    document.getElementById("note-textarea").value = notes[userId] || "";
+    document.getElementById("note-modal").style.display = "flex";
+    document.getElementById("note-textarea").focus();
+  }
+
+  document.getElementById("note-cancel").addEventListener("click", () => {
+    document.getElementById("note-modal").style.display = "none";
+    noteTargetId = null;
+  });
+
+  document.getElementById("note-save").addEventListener("click", () => {
+    if (noteTargetId === null) return;
+    const text = document.getElementById("note-textarea").value.trim();
+    const notes = getNotes();
+    if (text) notes[noteTargetId] = text;
+    else delete notes[noteTargetId];
+    saveNotes(notes);
+
+    const preview = document.getElementById(`note-preview-${noteTargetId}`);
+    if (preview) preview.textContent = text || "—";
+
+    document.getElementById("note-modal").style.display = "none";
+    noteTargetId = null;
+    showToast("備註已儲存");
+  });
+
+  // 點背景關閉 modal
+  document.getElementById("note-modal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.style.display = "none";
+      noteTargetId = null;
+    }
+  });
+
+  // ── dashboard 跳轉：若管理者點擊查看某考生，帶入預填名稱 ──
+  // （dashboard.html 需在 init() 中讀取 adminViewUser 並預填）
+
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

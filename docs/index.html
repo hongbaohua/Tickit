@@ -27,6 +27,7 @@
     <nav>
       <a href="index.html" class="nav-link active"><span class="nav-dot"></span>首頁</a>
       <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
+      <a href="admin.html" class="nav-link" id="nav-admin" style="display:none;"><span class="nav-dot"></span>管理者</a>
     </nav>
   </aside>
 
@@ -83,12 +84,30 @@
         <div class="user-info">
           <div class="user-avatar" id="avatar-letter">U</div>
           <div>
-            <div class="user-name" id="display-name">—</div>
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <div class="user-name" id="display-name">—</div>
+              <button id="btn-rename-open"
+                      style="border:none;background:transparent;cursor:pointer;
+                             font-size:0.78rem;color:#9CA3AF;padding:0;line-height:1;"
+                      title="修改名稱">✏</button>
+            </div>
             <div class="user-label">用戶代號</div>
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" id="btn-logout"
                 style="color:#6B7280;font-size:0.75rem;">登出</button>
+      </div>
+
+      <!-- Inline rename form (hidden by default) -->
+      <div id="rename-form" class="card" style="display:none;margin-bottom:0.75rem;padding:1rem 1.2rem;">
+        <div style="font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:0.6rem;">修改用戶代號</div>
+        <input type="text" id="rename-input" placeholder="輸入新代號" autocomplete="off"
+               style="margin-bottom:0.5rem;" />
+        <div id="rename-error" style="color:#EF4444;font-size:0.78rem;margin-bottom:0.5rem;display:none;"></div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-primary btn-sm" id="btn-rename-confirm" style="flex:1;">確認修改</button>
+          <button class="btn btn-ghost btn-sm" id="btn-rename-cancel" style="flex:1;">取消</button>
+        </div>
       </div>
 
       <!-- Step 01: Topic -->
@@ -165,6 +184,14 @@
   };
   let unitQuestionCounts = {};
   let unitViewMode = "list"; // "list" | "grid"
+
+  // ── 管理者側欄連結 ──
+  function applyAdminNav() {
+    const name = (sessionStorage.getItem("quizUser") ? JSON.parse(sessionStorage.getItem("quizUser")).name : null);
+    const link = document.getElementById("nav-admin");
+    if (link) link.style.display = (name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name)) ? "flex" : "none";
+  }
+  applyAdminNav();
 
   // ── Restore session ──
   const saved = sessionStorage.getItem("quizUser");
@@ -257,6 +284,7 @@
     state.userId = id;
     state.userName = name;
     sessionStorage.setItem("quizUser", JSON.stringify({ id, name }));
+    applyAdminNav();
     showSetup();
   }
 
@@ -452,6 +480,56 @@
       }
     });
   });
+
+  // ── Rename user ──
+  document.getElementById("btn-rename-open").addEventListener("click", () => {
+    const form = document.getElementById("rename-form");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+    document.getElementById("rename-input").value = state.userName;
+    document.getElementById("rename-error").style.display = "none";
+    if (form.style.display !== "none") document.getElementById("rename-input").focus();
+  });
+
+  document.getElementById("btn-rename-cancel").addEventListener("click", () => {
+    document.getElementById("rename-form").style.display = "none";
+  });
+
+  document.getElementById("btn-rename-confirm").addEventListener("click", doRename);
+  document.getElementById("rename-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doRename();
+  });
+
+  async function doRename() {
+    const newName = document.getElementById("rename-input").value.trim();
+    const errEl = document.getElementById("rename-error");
+    errEl.style.display = "none";
+    if (!newName) { errEl.textContent = "名稱不可為空。"; errEl.style.display = "block"; return; }
+    if (newName === state.userName) { document.getElementById("rename-form").style.display = "none"; return; }
+
+    const btn = document.getElementById("btn-rename-confirm");
+    btn.disabled = true; btn.textContent = "確認中…";
+    try {
+      const existing = await getUserByName(newName);
+      if (existing) {
+        errEl.textContent = `「${newName}」已被使用，請換一個代號。`;
+        errEl.style.display = "block";
+        return;
+      }
+      await updateUserName(state.userId, newName);
+      state.userName = newName;
+      sessionStorage.setItem("quizUser", JSON.stringify({ id: state.userId, name: newName }));
+      document.getElementById("display-name").textContent = newName;
+      document.getElementById("avatar-letter").textContent = newName[0].toUpperCase();
+      document.getElementById("rename-form").style.display = "none";
+      showToast("用戶代號已更新");
+      applyAdminNav();
+    } catch (e) {
+      errEl.textContent = "更新失敗，請稍後再試。";
+      errEl.style.display = "block";
+    } finally {
+      btn.disabled = false; btn.textContent = "確認修改";
+    }
+  }
 
   // ── Start quiz ──
   document.getElementById("btn-start").addEventListener("click", async () => {

@@ -27,6 +27,7 @@
     <nav>
       <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
       <a href="dashboard.html" class="nav-link active"><span class="nav-dot"></span>考生管理</a>
+      <a href="admin.html" class="nav-link" id="nav-admin" style="display:none;"><span class="nav-dot"></span>管理者</a>
     </nav>
   </aside>
 
@@ -146,6 +147,15 @@
 <script src="js/db.js"></script>
 <script src="js/parser.js"></script>
 <script>
+  // ── 管理者側欄連結 ──
+  (function() {
+    const saved = sessionStorage.getItem("quizUser");
+    const name = saved ? JSON.parse(saved).name : null;
+    const link = document.getElementById("nav-admin");
+    if (link && name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name))
+      link.style.display = "flex";
+  })();
+
   // 舊主題名稱對應新名稱（同一份題庫改名後的別名合併）
   const TOPIC_ALIASES = {
     "品牌企劃師初級備考": "iPAS 品牌企劃師初級",
@@ -215,7 +225,18 @@
 
     const input = document.getElementById("user-input");
 
-    if (loggedInUser && userNameToId[loggedInUser.name]) {
+    // 管理者從 admin.html 跳轉並指定用戶
+    const adminViewUser = sessionStorage.getItem("adminViewUser");
+    if (adminViewUser) {
+      sessionStorage.removeItem("adminViewUser");
+      if (userNameToId[adminViewUser]) {
+        input.value = adminViewUser;
+        loadUser(userNameToId[adminViewUser]);
+      } else {
+        document.getElementById("no-selection").style.display = "block";
+        hideAnalytics();
+      }
+    } else if (loggedInUser && userNameToId[loggedInUser.name]) {
       // 已登入 → 預填並自動載入
       input.value = loggedInUser.name;
       loadUser(userNameToId[loggedInUser.name]);
