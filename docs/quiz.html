@@ -254,10 +254,14 @@
 <script src="js/config.js"></script>
 <script src="js/db.js"></script>
 <script>
-  // ── 管理者側欄連結 ──
+  // ── 管理者防誤入：直接跳回 admin ──
   (function() {
     const saved = sessionStorage.getItem("quizUser");
     const name = saved ? JSON.parse(saved).name : null;
+    if (name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name)) {
+      window.location.href = "admin.html";
+      return;
+    }
     const link = document.getElementById("nav-admin");
     if (link && name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name))
       link.style.display = "flex";
