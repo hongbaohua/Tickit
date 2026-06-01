@@ -116,6 +116,46 @@ async function getAllUsers() {
   return res.json();
 }
 
+async function updateUserName(userId, newName) {
+  const res = await fetch(`${_url("users")}?id=eq.${userId}`, {
+    method: "PATCH",
+    headers: _headers(),
+    body: JSON.stringify({ name: newName }),
+  });
+  await _check(res, "更新使用者名稱");
+  return res.json();
+}
+
+// 刪除使用者及其所有相關紀錄（question_results → quiz_sessions → users）
+async function deleteUser(userId) {
+  const sessRes = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&select=id`, {
+    headers: _headers(),
+  });
+  await _check(sessRes, "查詢待刪除 sessions");
+  const sessions = await sessRes.json();
+
+  if (sessions.length > 0) {
+    const ids = sessions.map(s => s.id).join(",");
+    const delQR = await fetch(`${_url("question_results")}?session_id=in.(${ids})`, {
+      method: "DELETE",
+      headers: { ..._headers(), "Prefer": "return=minimal" },
+    });
+    await _check(delQR, "刪除題目結果");
+
+    const delS = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}`, {
+      method: "DELETE",
+      headers: { ..._headers(), "Prefer": "return=minimal" },
+    });
+    await _check(delS, "刪除測驗紀錄");
+  }
+
+  const delU = await fetch(`${_url("users")}?id=eq.${userId}`, {
+    method: "DELETE",
+    headers: { ..._headers(), "Prefer": "return=minimal" },
+  });
+  await _check(delU, "刪除使用者");
+}
+
 // 回傳用戶在指定主題中，歷史上答錯過的 question_id Set
 // 單元篩選由呼叫端透過 loadQuestions 已限定，此處只過濾主題
 async function getWrongQuestionIds(userId, topic, units) {

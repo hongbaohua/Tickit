@@ -1,2 +1,5 @@
 const SUPABASE_URL = "https://svuqajwngmqseqobrkgk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2dXFhanduZ21xc2Vxb2Jya2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzQxNTMsImV4cCI6MjA5MTgxMDE1M30.LwBtUl_ObHFCKGhohZinbRzqTMqqz8W25Smr7oos3l8";
+
+// 管理者帳號名稱列表（與 SUPABASE_KEY 同等機密，請勿加入 git）
+const ADMIN_USERS = ["admin"];

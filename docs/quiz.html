@@ -26,6 +26,7 @@
     <nav>
       <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
       <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
+      <a href="admin.html" class="nav-link" id="nav-admin" style="display:none;"><span class="nav-dot"></span>管理者</a>
     </nav>
   </aside>
 
@@ -253,6 +254,15 @@
 <script src="js/config.js"></script>
 <script src="js/db.js"></script>
 <script>
+  // ── 管理者側欄連結 ──
+  (function() {
+    const saved = sessionStorage.getItem("quizUser");
+    const name = saved ? JSON.parse(saved).name : null;
+    const link = document.getElementById("nav-admin");
+    if (link && name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name))
+      link.style.display = "flex";
+  })();
+
   // ── Load session ──
   const raw = sessionStorage.getItem("quizSession");
   if (!raw) {
