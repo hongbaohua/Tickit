@@ -97,6 +97,33 @@
   </main>
 </div>
 
+<!-- 刪除確認 Modal -->
+<div id="delete-modal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+            z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:14px;padding:1.5rem;width:min(420px,90vw);
+              box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.75rem;">
+      <div style="width:34px;height:34px;background:#FEF2F2;border-radius:8px;flex-shrink:0;
+                  display:flex;align-items:center;justify-content:center;font-size:1rem;">⚠</div>
+      <div style="font-size:0.96rem;font-weight:700;color:#111827;">確認刪除帳號</div>
+    </div>
+    <div style="font-size:0.82rem;color:#6B7280;margin-bottom:1rem;line-height:1.65;"
+         id="delete-modal-desc"></div>
+    <div style="font-size:0.82rem;color:#374151;margin-bottom:0.45rem;">
+      請輸入 <strong id="delete-modal-name-hint" style="color:#DC2626;"></strong> 以確認：
+    </div>
+    <input type="text" id="delete-confirm-input" placeholder="輸入用戶代號" autocomplete="off"
+           style="margin-bottom:0.85rem;" oninput="checkDeleteInput()" />
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" id="delete-cancel">取消</button>
+      <button class="btn btn-sm" id="delete-confirm-btn" disabled
+              style="background:#DC2626;color:white;opacity:0.35;cursor:not-allowed;
+                     transition:opacity 0.15s;">確認刪除</button>
+    </div>
+  </div>
+</div>
+
 <!-- 備註 Modal -->
 <div id="note-modal"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
@@ -180,13 +207,18 @@
     }
   }
 
+  function isAdminAcc(name) {
+    return typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name);
+  }
+
   function renderMetrics(users) {
-    const total = users.length;
-    const active = users.filter(u => (sessionCountMap[u.id] || 0) > 0).length;
+    const regular = users.filter(u => !isAdminAcc(u.name));
+    const total = regular.length;
+    const active = regular.filter(u => (sessionCountMap[u.id] || 0) > 0).length;
     const unused = total - active;
     const el = document.getElementById("admin-metrics");
     el.innerHTML = [
-      { label: "帳號總數", value: `${total}` },
+      { label: "考生帳號數", value: `${total}` },
       { label: "有測驗紀錄", value: `${active}` },
       { label: "從未使用", value: `${unused}` },
     ].map(m => `
@@ -205,58 +237,79 @@
 
   function renderUsersTable(users) {
     const el = document.getElementById("users-table-wrap");
-    if (!users.length) {
-      el.innerHTML = `<div class="empty-state"><p>無符合條件的帳號。</p></div>`;
+    const notes = getNotes();
+
+    const adminAccs  = users.filter(u =>  isAdminAcc(u.name));
+    const regularAccs = users.filter(u => !isAdminAcc(u.name));
+
+    // ── 管理者帳號獨立區塊（唯讀） ──
+    const adminSection = adminAccs.length ? `
+      <div style="background:#F0F4FF;border-radius:10px;padding:0.85rem 1rem;
+                  margin-bottom:1rem;border:1px solid #E0E7FF;">
+        <div style="font-size:0.72rem;font-weight:700;color:#4F46E5;margin-bottom:0.5rem;
+                    letter-spacing:0.4px;text-transform:uppercase;">管理者帳號</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          ${adminAccs.map(u => `
+            <span style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:6px;
+                         padding:0.25rem 0.75rem;font-size:0.82rem;font-weight:600;color:#3730A3;">
+              ${u.name}
+            </span>`).join("")}
+        </div>
+      </div>` : "";
+
+    if (!regularAccs.length) {
+      el.innerHTML = adminSection + `<div class="empty-state"><p>無一般考生帳號。</p></div>`;
       return;
     }
 
-    const notes = getNotes();
-
-    const rows = users.map(u => {
+    const rows = regularAccs.map(u => {
       const sc = sessionCountMap[u.id] || 0;
       const note = notes[u.id] || "";
-      const isAdminAcc = typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(u.name);
       const createdAt = u.created_at ? u.created_at.slice(0, 10) : "—";
+      const safeName = u.name.replace(/'/g, "\\'");
 
-      const deleteBtnHtml = isAdminAcc
-        ? `<span style="font-size:0.72rem;color:#9CA3AF;">管理者帳號</span>`
-        : `<button onclick="confirmDelete(${u.id}, '${u.name.replace(/'/g,"\\'")}', ${sc})"
-                  style="font-size:0.73rem;padding:0.25rem 0.55rem;border-radius:5px;cursor:pointer;
-                         border:1px solid #FECACA;background:#FEF2F2;color:#DC2626;font-weight:600;">
-             刪除
-           </button>`;
+      // 名稱：有紀錄才可點擊跳轉
+      const nameCell = sc > 0
+        ? `<a href="dashboard.html"
+               onclick="sessionStorage.setItem('adminViewUser','${safeName}');return true;"
+               style="font-weight:600;font-size:0.84rem;color:#4F46E5;text-decoration:none;"
+               onmouseover="this.style.textDecoration='underline'"
+               onmouseout="this.style.textDecoration='none'"
+               title="查看測驗紀錄與分析">${u.name}</a>`
+        : `<span style="font-weight:600;font-size:0.84rem;color:#111827;">${u.name}</span>`;
+
+      const scCell = sc > 0
+        ? `<span style="font-size:0.78rem;color:#4F46E5;font-weight:600;">${sc} 次</span>`
+        : `<span style="font-size:0.78rem;color:#9CA3AF;">0</span>`;
 
       return `
         <tr>
-          <td>
-            <div style="font-weight:600;font-size:0.84rem;color:#111827;">${u.name}</div>
-            ${isAdminAcc ? `<span style="font-size:0.68rem;background:#EEF2FF;color:#4F46E5;
-                                        border-radius:3px;padding:1px 5px;">管理者</span>` : ""}
-          </td>
+          <td>${nameCell}</td>
           <td style="font-size:0.8rem;color:#6B7280;">${createdAt}</td>
-          <td style="text-align:center;">
-            ${sc > 0
-              ? `<a href="dashboard.html" onclick="sessionStorage.setItem('adminViewUser','${u.name.replace(/'/g,"\\'")}');return true;"
-                    style="font-size:0.78rem;color:#4F46E5;text-decoration:underline;">${sc} 次</a>`
-              : `<span style="font-size:0.78rem;color:#9CA3AF;">0</span>`}
-          </td>
+          <td style="text-align:center;">${scCell}</td>
           <td>
             <div style="display:flex;align-items:center;gap:0.4rem;">
               <span id="note-preview-${u.id}"
-                    style="font-size:0.76rem;color:#6B7280;max-width:160px;
+                    style="font-size:0.76rem;color:#6B7280;max-width:150px;
                            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                 ${note || "—"}
               </span>
-              <button onclick="openNoteModal(${u.id}, '${u.name.replace(/'/g,"\\'")}')"
+              <button onclick="openNoteModal(${u.id}, '${safeName}')"
                       style="flex-shrink:0;border:none;background:transparent;cursor:pointer;
                              font-size:0.78rem;color:#9CA3AF;padding:0;" title="編輯備註">✏</button>
             </div>
           </td>
-          <td>${deleteBtnHtml}</td>
+          <td>
+            <button onclick="confirmDelete(${u.id}, '${safeName}', ${sc})"
+                    style="font-size:0.73rem;padding:0.25rem 0.55rem;border-radius:5px;cursor:pointer;
+                           border:1px solid #FECACA;background:#FEF2F2;color:#DC2626;font-weight:600;">
+              刪除
+            </button>
+          </td>
         </tr>`;
     }).join("");
 
-    el.innerHTML = `
+    el.innerHTML = adminSection + `
       <table>
         <thead>
           <tr>
@@ -272,13 +325,55 @@
   }
 
   // ── 刪除帳號 ──
+  let deleteTargetId = null;
+  let deleteTargetName = null;
+
   function confirmDelete(userId, userName, sessionCount) {
-    const msg = sessionCount > 0
-      ? `確定要刪除「${userName}」嗎？\n\n此帳號有 ${sessionCount} 筆測驗紀錄，刪除後將一併移除，此操作無法復原。`
-      : `確定要刪除「${userName}」嗎？此操作無法復原。`;
-    if (!confirm(msg)) return;
-    doDeleteUser(userId, userName);
+    deleteTargetId = userId;
+    deleteTargetName = userName;
+    const desc = sessionCount > 0
+      ? `此帳號有 <strong style="color:#DC2626;">${sessionCount} 筆</strong>測驗紀錄，刪除後將一併移除。<br>此操作無法復原。`
+      : `此帳號尚無測驗紀錄。刪除後無法復原。`;
+    document.getElementById("delete-modal-desc").innerHTML = desc;
+    document.getElementById("delete-modal-name-hint").textContent = userName;
+    document.getElementById("delete-confirm-input").value = "";
+    const btn = document.getElementById("delete-confirm-btn");
+    btn.disabled = true; btn.style.opacity = "0.35"; btn.style.cursor = "not-allowed";
+    document.getElementById("delete-modal").style.display = "flex";
+    setTimeout(() => document.getElementById("delete-confirm-input").focus(), 50);
   }
+
+  function checkDeleteInput() {
+    const match = document.getElementById("delete-confirm-input").value === deleteTargetName;
+    const btn = document.getElementById("delete-confirm-btn");
+    btn.disabled = !match;
+    btn.style.opacity = match ? "1" : "0.35";
+    btn.style.cursor = match ? "pointer" : "not-allowed";
+  }
+
+  document.getElementById("delete-cancel").addEventListener("click", () => {
+    document.getElementById("delete-modal").style.display = "none";
+    deleteTargetId = null; deleteTargetName = null;
+  });
+  document.getElementById("delete-confirm-btn").addEventListener("click", async () => {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId; const name = deleteTargetName;
+    document.getElementById("delete-modal").style.display = "none";
+    deleteTargetId = null; deleteTargetName = null;
+    await doDeleteUser(id, name);
+  });
+  document.getElementById("delete-confirm-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !document.getElementById("delete-confirm-btn").disabled)
+      document.getElementById("delete-confirm-btn").click();
+    else if (e.key === "Escape")
+      document.getElementById("delete-cancel").click();
+  });
+  document.getElementById("delete-modal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.style.display = "none";
+      deleteTargetId = null; deleteTargetName = null;
+    }
+  });
 
   async function doDeleteUser(userId, userName) {
     try {
