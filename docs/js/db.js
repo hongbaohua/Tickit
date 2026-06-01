@@ -16,6 +16,30 @@ async function _check(res, context = "") {
   return res;
 }
 
+// 分頁抓取：每次取 1000 筆，自動合併所有分頁
+// 繞過 Supabase max_rows 伺服器上限（客戶端 limit 參數無法超過 max_rows，但 offset 分頁可以）
+const _PAGE = 1000;
+async function _fetchAll(url, context) {
+  const readHeaders = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": `Bearer ${SUPABASE_KEY}`,
+  };
+  let all = [], offset = 0;
+  while (true) {
+    const sep = url.includes("?") ? "&" : "?";
+    const res = await fetch(`${url}${sep}limit=${_PAGE}&offset=${offset}`, { headers: readHeaders });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: res.statusText }));
+      throw new Error(`Supabase 錯誤 [${context}] (${res.status}): ${err.message || res.statusText}`);
+    }
+    const data = await res.json();
+    all = all.concat(data);
+    if (data.length < _PAGE) break;
+    offset += _PAGE;
+  }
+  return all;
+}
+
 // 只查詢，不建立；找不到回傳 null
 async function getUserByName(name) {
   const res = await fetch(`${_url("users")}?name=eq.${encodeURIComponent(name)}&select=id,name`, {
@@ -81,11 +105,10 @@ async function saveSession(userId, topic, units, total, correct, answers) {
 }
 
 async function getUserSessions(userId) {
-  const res = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&order=taken_at.desc&limit=10000`, {
-    headers: _headers(),
-  });
-  await _check(res, "讀取測驗紀錄");
-  const rows = await res.json();
+  const rows = await _fetchAll(
+    `${_url("quiz_sessions")}?user_id=eq.${userId}&order=taken_at.desc`,
+    "讀取測驗紀錄"
+  );
   return rows.map((r) => ({
     ...r,
     units: typeof r.units === "string" ? JSON.parse(r.units) : r.units,
@@ -93,19 +116,17 @@ async function getUserSessions(userId) {
 }
 
 async function getUserQuestionResults(userId) {
-  const sessRes = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&select=id&limit=10000`, {
-    headers: _headers(),
-  });
-  await _check(sessRes, "讀取 session IDs");
-  const sessions = await sessRes.json();
+  const sessions = await _fetchAll(
+    `${_url("quiz_sessions")}?user_id=eq.${userId}&select=id`,
+    "讀取 session IDs"
+  );
   if (sessions.length === 0) return [];
 
   const ids = sessions.map((s) => s.id).join(",");
-  const res = await fetch(`${_url("question_results")}?session_id=in.(${ids})&limit=100000`, {
-    headers: _headers(),
-  });
-  await _check(res, "讀取題目結果");
-  return res.json();
+  return _fetchAll(
+    `${_url("question_results")}?session_id=in.(${ids})`,
+    "讀取題目結果"
+  );
 }
 
 async function getAllUsers() {
@@ -159,20 +180,16 @@ async function deleteUser(userId) {
 // 回傳用戶在指定主題中，歷史上答錯過的 question_id Set
 // 單元篩選由呼叫端透過 loadQuestions 已限定，此處只過濾主題
 async function getWrongQuestionIds(userId, topic, units) {
-  const sessRes = await fetch(
+  const sessions = await _fetchAll(
     `${_url("quiz_sessions")}?user_id=eq.${userId}&topic=eq.${encodeURIComponent(topic)}&select=id`,
-    { headers: _headers() }
+    "讀取 session IDs（錯題）"
   );
-  await _check(sessRes, "讀取 session IDs（錯題）");
-  const sessions = await sessRes.json();
   if (!sessions.length) return new Set();
 
   const ids = sessions.map((s) => s.id).join(",");
-  const res = await fetch(
-    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id&limit=100000`,
-    { headers: _headers() }
+  const rows = await _fetchAll(
+    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id`,
+    "讀取錯題 IDs"
   );
-  await _check(res, "讀取錯題 IDs");
-  const rows = await res.json();
   return new Set(rows.map((r) => r.question_id));
 }
