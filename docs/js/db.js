@@ -81,7 +81,7 @@ async function saveSession(userId, topic, units, total, correct, answers) {
 }
 
 async function getUserSessions(userId) {
-  const res = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&order=taken_at.desc`, {
+  const res = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&order=taken_at.desc&limit=10000`, {
     headers: _headers(),
   });
   await _check(res, "讀取測驗紀錄");
@@ -93,7 +93,7 @@ async function getUserSessions(userId) {
 }
 
 async function getUserQuestionResults(userId) {
-  const sessRes = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&select=id`, {
+  const sessRes = await fetch(`${_url("quiz_sessions")}?user_id=eq.${userId}&select=id&limit=10000`, {
     headers: _headers(),
   });
   await _check(sessRes, "讀取 session IDs");
@@ -101,7 +101,7 @@ async function getUserQuestionResults(userId) {
   if (sessions.length === 0) return [];
 
   const ids = sessions.map((s) => s.id).join(",");
-  const res = await fetch(`${_url("question_results")}?session_id=in.(${ids})`, {
+  const res = await fetch(`${_url("question_results")}?session_id=in.(${ids})&limit=100000`, {
     headers: _headers(),
   });
   await _check(res, "讀取題目結果");
@@ -169,7 +169,7 @@ async function getWrongQuestionIds(userId, topic, units) {
 
   const ids = sessions.map((s) => s.id).join(",");
   const res = await fetch(
-    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id`,
+    `${_url("question_results")}?session_id=in.(${ids})&is_correct=eq.false&select=question_id&limit=100000`,
     { headers: _headers() }
   );
   await _check(res, "讀取錯題 IDs");
