@@ -417,9 +417,24 @@
 
       const units = Array.isArray(s.units) ? s.units : [s.units];
       const unitNames = units.map(u => getUnitFullName(s.topic, u, manifest));
-      const unitsHtml = unitNames.map(n =>
+      const SHOW = 2;
+      const visibleHtml = unitNames.slice(0, SHOW).map(n =>
         `<span style="display:block;font-size:0.75rem;color:#374151;line-height:1.55;">${n}</span>`
       ).join("");
+      const hiddenHtml = unitNames.length > SHOW
+        ? unitNames.slice(SHOW).map(n =>
+            `<span style="display:block;font-size:0.75rem;color:#374151;line-height:1.55;">${n}</span>`
+          ).join("")
+        : "";
+      const unitsHtml = unitNames.length > SHOW
+        ? `${visibleHtml}
+           <span id="units-extra-${s.id}" style="display:none;">${hiddenHtml}</span>
+           <button onclick="toggleUnits(${s.id}, this)"
+                   style="margin-top:2px;font-size:0.7rem;color:#6366F1;background:none;
+                          border:none;cursor:pointer;padding:0;line-height:1.4;">
+             + ${unitNames.length - SHOW} 個單元 ▾
+           </button>`
+        : visibleHtml;
 
       const wrongCount = wrongCountMap[s.id] || 0;
       const btnStyle = wrongCount > 0
@@ -465,6 +480,16 @@
   function goToSessionPage(page) {
     sessionPage = page;
     renderSessions(allSessions, manifestData, page);
+  }
+
+  function toggleUnits(sessionId, btn) {
+    const extra = document.getElementById(`units-extra-${sessionId}`);
+    if (!extra) return;
+    const hidden = extra.style.display === "none";
+    extra.style.display = hidden ? "" : "none";
+    btn.textContent = hidden
+      ? "收起 ▴"
+      : `+ ${extra.children.length} 個單元 ▾`;
   }
 
   async function toggleReview(sessionId, btn) {
