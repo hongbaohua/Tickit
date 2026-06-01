@@ -147,13 +147,19 @@
 <script src="js/db.js"></script>
 <script src="js/parser.js"></script>
 <script>
-  // ── 管理者側欄連結 ──
+  // ── 側欄：管理者換為 admin nav ──
   (function() {
     const saved = sessionStorage.getItem("quizUser");
     const name = saved ? JSON.parse(saved).name : null;
-    const link = document.getElementById("nav-admin");
-    if (link && name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name))
-      link.style.display = "flex";
+    if (name && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(name)) {
+      document.querySelector("aside.sidebar nav").innerHTML = `
+        <a href="admin.html" class="nav-link"><span class="nav-dot"></span>帳號管理</a>
+        <a href="dashboard.html" class="nav-link active"><span class="nav-dot"></span>考生分析</a>
+        <a href="#" class="nav-link"
+           onclick="sessionStorage.removeItem('quizUser');window.location.href='index.html';return false;">
+          <span class="nav-dot"></span>登出
+        </a>`;
+    }
   })();
 
   // 舊主題名稱對應新名稱（同一份題庫改名後的別名合併）
@@ -227,6 +233,8 @@
 
     // 管理者從 admin.html 跳轉並指定用戶
     const adminViewUser = sessionStorage.getItem("adminViewUser");
+    const isAdminSession = loggedInUser && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(loggedInUser.name);
+
     if (adminViewUser) {
       sessionStorage.removeItem("adminViewUser");
       if (userNameToId[adminViewUser]) {
@@ -236,12 +244,12 @@
         document.getElementById("no-selection").style.display = "block";
         hideAnalytics();
       }
-    } else if (loggedInUser && userNameToId[loggedInUser.name]) {
-      // 已登入 → 預填並自動載入
+    } else if (loggedInUser && userNameToId[loggedInUser.name] && !isAdminSession) {
+      // 一般用戶已登入 → 預填並自動載入
       input.value = loggedInUser.name;
       loadUser(userNameToId[loggedInUser.name]);
     } else {
-      // 未登入 → 顯示佔位提示，等待主動查詢
+      // 管理者直接進入 or 未登入 → 顯示搜尋提示
       document.getElementById("no-selection").style.display = "block";
       hideAnalytics();
     }
