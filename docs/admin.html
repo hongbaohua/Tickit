@@ -24,9 +24,13 @@
       <span class="sidebar-title">Tickit</span>
     </div>
     <nav>
-      <a href="index.html" class="nav-link"><span class="nav-dot"></span>首頁</a>
-      <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
-      <a href="admin.html" class="nav-link active" id="nav-admin"><span class="nav-dot"></span>管理者</a>
+      <a href="admin.html" class="nav-link active"><span class="nav-dot"></span>帳號管理</a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生分析</a>
+      <a href="#" class="nav-link" id="btn-admin-logout"
+         style="margin-top:auto;"
+         onclick="sessionStorage.removeItem('quizUser');window.location.href='index.html';return false;">
+        <span class="nav-dot"></span>登出
+      </a>
     </nav>
   </aside>
 
@@ -126,7 +130,8 @@
   const isAdmin = currentUser && typeof ADMIN_USERS !== "undefined" && ADMIN_USERS.includes(currentUser.name);
 
   if (!isAdmin) {
-    document.getElementById("view-unauthorized").style.display = "block";
+    // 未登入或非管理者 → 回首頁（避免看到測驗設定，由 index.html 的 session restore 攔截）
+    window.location.href = "index.html";
   } else {
     document.getElementById("view-admin").style.display = "block";
     initAdmin();
