@@ -100,6 +100,13 @@ async function saveSession(userId, topic, units, total, correct, answers) {
     headers: _headers(),
     body: JSON.stringify(records),
   });
+  if (!res2.ok) {
+    // 題目結果寫入失敗 → 刪掉剛建立的測驗紀錄，避免留下沒有明細的空殼紀錄
+    await fetch(`${_url("quiz_sessions")}?id=eq.${sessionId}`, {
+      method: "DELETE",
+      headers: { ..._headers(), "Prefer": "return=minimal" },
+    }).catch(() => {});
+  }
   await _check(res2, "儲存題目結果");
   return sessionId;
 }

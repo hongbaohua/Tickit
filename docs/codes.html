@@ -517,10 +517,18 @@
     const wrong = answered.filter((q) => !Q.first.get(q.id).ok);
     Q.lastWrong = wrong;
 
-    document.getElementById("r-title").textContent = Q.loop ? `首答成績（重練 ${Q.retries} 次後全部攻克）` : "成績";
-    if (Q.loop && Q.queue.length) document.getElementById("r-title").textContent = "首答成績（中途結束）";
-    document.getElementById("r-score").textContent = `${correct} / ${total}`;
+    const titleEl = document.getElementById("r-title");
     const pct = total ? Math.round((correct / total) * 100) : 0;
+    if (Q.loop && !Q.queue.length) {
+      titleEl.innerHTML = `<div style="font-size:1.25rem;font-weight:800;color:#059669;margin-bottom:0.5rem;">🎉 ${Q.questions.length} 題全部攻克！</div>`
+        + `第一次作答就答對的（重練 ${Q.retries} 次）：`;
+    } else if (Q.loop) {
+      titleEl.innerHTML = `<div style="font-size:1.05rem;font-weight:800;color:#D97706;margin-bottom:0.5rem;">中途結束：已攻克 ${Q.mastered.size} / ${Q.questions.length} 題</div>`
+        + `第一次作答就答對的：`;
+    } else {
+      titleEl.textContent = "成績";
+    }
+    document.getElementById("r-score").textContent = `${correct} / ${total}`;
     const pctEl = document.getElementById("r-pct");
     pctEl.textContent = `${pct}%`;
     pctEl.style.color = pct >= 90 ? "#059669" : pct >= 70 ? "#D97706" : "#DC2626";
@@ -551,7 +559,7 @@
           topic: CODES_TOPIC,
           unit: q.unit,
           is_correct: f.ok,
-          user_answer: f.answer ? f.answer.slice(0, 200) : null,
+          user_answer: f.answer ? f.answer.slice(0, 200) : "（不會，看答案）",  // 欄位為 NOT NULL
           correct_answer: codeAnswerText(q),
         };
       }));
