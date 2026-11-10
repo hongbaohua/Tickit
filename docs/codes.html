@@ -258,6 +258,7 @@
     if (name === "flash") document.getElementById("flash-actions").style.display = "none";
     window.scrollTo(0, 0);
   }
+  const EXTRA_CAT = "產品線補充"; // 考試題庫外、依公司產品補充的代碼，預設不勾
   const focusOnly = () => document.getElementById("focus-only").checked;
   const srcBank = () => (focusOnly() ? bank.filter((b) => b.product) : bank);
   const prodTag = (q) => {
@@ -280,8 +281,8 @@
     const cats = [...new Set(bank.map((b) => b.category))];
     document.getElementById("cat-list").innerHTML = cats.map((c) => `
       <label class="cat-item">
-        <input type="checkbox" value="${esc(c)}" checked />
-        <span>${esc(c)}</span>
+        <input type="checkbox" value="${esc(c)}" ${c === EXTRA_CAT ? "" : "checked"} />
+        <span>${esc(c)}${c === EXTRA_CAT ? '<div style="font-size:0.66rem;color:#B45309;">考試範圍外</div>' : ""}</span>
         <span class="wrong" data-wrong="${esc(c)}"></span>
         <span class="cnt">${bank.filter((b) => b.category === c).length}</span>
       </label>`).join("");
