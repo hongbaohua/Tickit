@@ -17,7 +17,7 @@
       font-size:0.85rem; padding:0.45rem 0.8rem; border:1.5px solid #E5E7EB;
       border-radius:8px; background:white; transition:border-color .15s, background .15s;
     }
-    .seg label:has(input:checked) { border-color:#6366F1; background:#EEF2FF; color:#3730A3; font-weight:600; }
+    .seg label.on { border-color:#6366F1; background:#EEF2FF; color:#3730A3; font-weight:600; }
     .seg input { accent-color:#4F46E5; }
     .mode-desc { font-size:0.76rem; color:#6B7280; margin-top:0.55rem; line-height:1.6; }
 
@@ -26,7 +26,7 @@
       display:flex; align-items:center; gap:0.45rem; padding:0.55rem 0.7rem;
       border:1.5px solid #E5E7EB; border-radius:8px; cursor:pointer; font-size:0.84rem; background:white;
     }
-    .cat-item:has(input:checked) { border-color:#6366F1; background:#EEF2FF; }
+    .cat-item.on { border-color:#6366F1; background:#EEF2FF; }
     .cat-item input { accent-color:#4F46E5; }
     .cat-item .cnt { margin-left:auto; font-size:0.72rem; color:#9CA3AF; }
     .cat-item .wrong { font-size:0.68rem; color:#DC2626; font-weight:700; }
@@ -72,7 +72,7 @@
       display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; padding:0.6rem 0.8rem;
       border:1.5px dashed #FCD34D; border-radius:8px; background:#FFFBEB; cursor:pointer; font-size:0.84rem; color:#92400E;
     }
-    .focus-toggle:has(input:checked) { border-style:solid; border-color:#F59E0B; background:#FEF3C7; font-weight:600; }
+    .focus-toggle.on { border-style:solid; border-color:#F59E0B; background:#FEF3C7; font-weight:600; }
     .focus-toggle input { accent-color:#D97706; }
     .prod-tag { display:inline-block; background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; font-size:0.72rem; font-weight:600; border-radius:5px; padding:1px 7px; margin-top:0.35rem; }
     .wrong-pill { display:inline-block; background:#FEF2F2; color:#DC2626; font-size:0.66rem; font-weight:700; border-radius:4px; padding:0 5px; margin-left:4px; }
@@ -259,11 +259,19 @@
     window.scrollTo(0, 0);
   }
   const EXTRA_CAT = "產品線補充"; // 考試題庫外、依公司產品補充的代碼，預設不勾
+  // 選取狀態的外框：用 class 切換（部分手機瀏覽器的 :has() 不會即時更新）
+  function syncChecked() {
+    document.querySelectorAll(".seg label, .cat-item, .focus-toggle").forEach((l) => {
+      const i = l.querySelector("input");
+      if (i) l.classList.toggle("on", i.checked);
+    });
+  }
+  document.addEventListener("change", syncChecked);
   const focusOnly = () => document.getElementById("focus-only").checked;
-  const srcBank = () => (focusOnly() ? bank.filter((b) => b.product) : bank);
+  const srcBank = () => (focusOnly() ? bank.filter((b) => b.company) : bank);
   const prodTag = (q) => {
     const ps = [...new Set(q.items.map((it) => it.product).filter(Boolean))];
-    return ps.length ? `<div><span class="prod-tag">★ 公司產品：${esc(ps.join("；"))}</span></div>` : "";
+    return ps.length ? `<div><span class="prod-tag">★ 公司產品線：${esc(ps.join("；"))}</span></div>` : "";
   };
   const selectedCats = () => [...document.querySelectorAll("#cat-list input:checked")].map((c) => c.value);
   const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
@@ -290,6 +298,7 @@
     document.getElementById("focus-only").addEventListener("change", updateSetup);
     updateSetup();
     updateModeDesc();
+    syncChecked();
     refreshWrongCounts();
   })();
 
@@ -316,7 +325,7 @@
   function updateSetup() {
     const cats = selectedCats();
     const n = srcBank().filter((b) => cats.includes(b.category)).length;
-    document.getElementById("focus-n").textContent = `（共 ${bank.filter((b) => b.product).length} 個）`;
+    document.getElementById("focus-n").textContent = `（共 ${bank.filter((b) => b.company).length} 個）`;
     document.getElementById("cat-count").textContent = cats.length
       ? `已選 ${cats.length} 類，共 ${n} 個代碼${focusOnly() ? "（只含產品線相關）" : ""}` : "";
     document.getElementById("btn-start").disabled = !cats.length || !n;
@@ -331,6 +340,7 @@
     const all = boxes.every((b) => b.checked);
     boxes.forEach((b) => (b.checked = !all));
     updateSetup();
+    syncChecked();
   });
   function updateModeDesc() {
     const m = radio("mode");
@@ -350,7 +360,7 @@
         <thead><tr><th>代碼</th><th>中文</th><th>記憶法</th></tr></thead>
         <tbody>${srcBank().filter((b) => b.category === c).map((b) => `
           <tr><td class="code">${esc(b.code)}</td>
-              <td>${b.product ? '<span title="公司產品線" style="color:#D97706;">★</span> ' : ""}${esc(b.zh)}${wrongNums.has(b.id) ? '<span class="wrong-pill">錯過</span>' : ""}${b.product ? `<div style="font-size:0.7rem;color:#B45309;">${esc(b.product)}</div>` : ""}</td>
+              <td>${b.company ? '<span title="公司產品線" style="color:#D97706;">★</span> ' : ""}${esc(b.zh)}${wrongNums.has(b.id) ? '<span class="wrong-pill">錯過</span>' : ""}${b.product ? `<div style="font-size:0.7rem;color:#B45309;">${esc(b.product)}</div>` : ""}</td>
               <td class="mn">${esc(b.mnemonic)}${b.note ? `<br><span style="color:#B45309;">※ ${esc(b.note)}</span>` : ""}</td></tr>`).join("")}
         </tbody>
       </table>`).join("");
@@ -421,7 +431,7 @@
     const isC2Z = q.dir === "c2z";
     document.getElementById("q-dir").textContent = isC2Z ? "看代碼 → 寫中文" : "看中文 → 寫代碼";
     const catLabel = q.unit === "特殊需求" ? "特殊需求（餐點／輪椅）" : q.unit;
-    const isProd = q.items.some((it) => it.product);
+    const isProd = q.items.some((it) => it.company);
     document.getElementById("q-cat").textContent = catLabel + (isProd ? "　★ 產品線" : "") + (Q.first.has(q.id) ? "　↩ 再練" : "");
     const p = document.getElementById("q-prompt");
     p.textContent = q.prompt;
@@ -669,7 +679,7 @@
     F.flipped = false;
     const q = F.cur;
     document.getElementById("f-dir").textContent = q.dir === "c2z" ? "代碼 → 中文" : "中文 → 代碼";
-    document.getElementById("f-cat").textContent = q.unit + (q.items.some((it) => it.product) ? "　★ 產品線" : "");
+    document.getElementById("f-cat").textContent = q.unit + (q.items.some((it) => it.company) ? "　★ 產品線" : "");
     const front = document.getElementById("f-front");
     front.textContent = q.prompt;
     front.className = "prompt-main" + (q.dir === "c2z" ? "" : " zh");
