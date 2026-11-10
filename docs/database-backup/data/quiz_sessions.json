@@ -1,0 +1,389 @@
+﻿[
+    {
+        "id":  2,
+        "user_id":  3,
+        "topic":  "品牌企劃師初級備考",
+        "units":  "[\"Day 1\", \"Day 2\", \"Day 3\", \"Day 4\"]",
+        "total_questions":  10,
+        "correct_count":  9,
+        "taken_at":  "2026-04-15T20:06:46.096616+00:00"
+    },
+    {
+        "id":  3,
+        "user_id":  3,
+        "topic":  "品牌企劃師初級備考",
+        "units":  "[\"Day 2\"]",
+        "total_questions":  10,
+        "correct_count":  10,
+        "taken_at":  "2026-04-18T20:50:11.077+00:00"
+    },
+    {
+        "id":  4,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"Day 1\"]",
+        "total_questions":  38,
+        "correct_count":  18,
+        "taken_at":  "2026-04-20T03:45:50.313+00:00"
+    },
+    {
+        "id":  5,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\"]",
+        "total_questions":  38,
+        "correct_count":  19,
+        "taken_at":  "2026-04-27T03:43:02.794+00:00"
+    },
+    {
+        "id":  6,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元三\"]",
+        "total_questions":  24,
+        "correct_count":  11,
+        "taken_at":  "2026-04-27T03:56:57.67+00:00"
+    },
+    {
+        "id":  7,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元三\"]",
+        "total_questions":  24,
+        "correct_count":  23,
+        "taken_at":  "2026-04-27T10:40:15.936+00:00"
+    },
+    {
+        "id":  8,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\"]",
+        "total_questions":  38,
+        "correct_count":  25,
+        "taken_at":  "2026-04-28T04:46:47.598+00:00"
+    },
+    {
+        "id":  9,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\"]",
+        "total_questions":  22,
+        "correct_count":  13,
+        "taken_at":  "2026-04-29T10:15:02.587+00:00"
+    },
+    {
+        "id":  10,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\"]",
+        "total_questions":  38,
+        "correct_count":  33,
+        "taken_at":  "2026-04-29T10:41:08.386+00:00"
+    },
+    {
+        "id":  11,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元二\"]",
+        "total_questions":  38,
+        "correct_count":  24,
+        "taken_at":  "2026-04-29T10:51:35.507+00:00"
+    },
+    {
+        "id":  12,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元三\"]",
+        "total_questions":  24,
+        "correct_count":  20,
+        "taken_at":  "2026-04-29T11:07:10.058+00:00"
+    },
+    {
+        "id":  13,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\",\"單元三\"]",
+        "total_questions":  38,
+        "correct_count":  35,
+        "taken_at":  "2026-04-29T11:16:56.657+00:00"
+    },
+    {
+        "id":  14,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元二\"]",
+        "total_questions":  14,
+        "correct_count":  12,
+        "taken_at":  "2026-04-29T11:26:38.632+00:00"
+    },
+    {
+        "id":  15,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元二\"]",
+        "total_questions":  38,
+        "correct_count":  36,
+        "taken_at":  "2026-04-29T11:31:32.346+00:00"
+    },
+    {
+        "id":  16,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\",\"單元二\",\"單元三\"]",
+        "total_questions":  100,
+        "correct_count":  98,
+        "taken_at":  "2026-04-29T14:37:19.07+00:00"
+    },
+    {
+        "id":  17,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\",\"單元二\",\"單元三\"]",
+        "total_questions":  29,
+        "correct_count":  27,
+        "taken_at":  "2026-04-29T15:24:08.476+00:00"
+    },
+    {
+        "id":  18,
+        "user_id":  3,
+        "topic":  "ERP軟體應用師_配銷模組_S4HANA",
+        "units":  "[\"單元一\",\"單元二\",\"單元三\"]",
+        "total_questions":  30,
+        "correct_count":  29,
+        "taken_at":  "2026-04-30T01:22:55.446+00:00"
+    },
+    {
+        "id":  19,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 1\"]",
+        "total_questions":  50,
+        "correct_count":  43,
+        "taken_at":  "2026-05-04T20:24:48.422+00:00"
+    },
+    {
+        "id":  20,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 2\"]",
+        "total_questions":  50,
+        "correct_count":  45,
+        "taken_at":  "2026-05-13T05:51:30.861+00:00"
+    },
+    {
+        "id":  21,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 13\"]",
+        "total_questions":  50,
+        "correct_count":  49,
+        "taken_at":  "2026-05-19T14:29:02.108+00:00"
+    },
+    {
+        "id":  22,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 14\"]",
+        "total_questions":  50,
+        "correct_count":  48,
+        "taken_at":  "2026-05-19T14:51:04.965+00:00"
+    },
+    {
+        "id":  23,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 15\"]",
+        "total_questions":  50,
+        "correct_count":  44,
+        "taken_at":  "2026-05-19T16:30:42.607+00:00"
+    },
+    {
+        "id":  24,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 16\"]",
+        "total_questions":  50,
+        "correct_count":  34,
+        "taken_at":  "2026-05-20T12:34:13.132+00:00"
+    },
+    {
+        "id":  25,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 17\"]",
+        "total_questions":  50,
+        "correct_count":  43,
+        "taken_at":  "2026-05-20T12:51:15.233+00:00"
+    },
+    {
+        "id":  26,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 18\"]",
+        "total_questions":  50,
+        "correct_count":  41,
+        "taken_at":  "2026-05-20T13:11:01.282+00:00"
+    },
+    {
+        "id":  27,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 19\"]",
+        "total_questions":  50,
+        "correct_count":  47,
+        "taken_at":  "2026-05-20T13:31:25.54+00:00"
+    },
+    {
+        "id":  28,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 20\"]",
+        "total_questions":  50,
+        "correct_count":  44,
+        "taken_at":  "2026-05-20T14:04:00.404+00:00"
+    },
+    {
+        "id":  29,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 21\"]",
+        "total_questions":  50,
+        "correct_count":  47,
+        "taken_at":  "2026-05-20T14:25:39.071+00:00"
+    },
+    {
+        "id":  30,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 4\"]",
+        "total_questions":  50,
+        "correct_count":  50,
+        "taken_at":  "2026-05-22T00:52:07.239+00:00"
+    },
+    {
+        "id":  31,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"樣題 1\"]",
+        "total_questions":  45,
+        "correct_count":  34,
+        "taken_at":  "2026-05-22T02:02:30.128+00:00"
+    },
+    {
+        "id":  32,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 21\"]",
+        "total_questions":  50,
+        "correct_count":  50,
+        "taken_at":  "2026-05-22T12:07:10.152+00:00"
+    },
+    {
+        "id":  33,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 22\"]",
+        "total_questions":  50,
+        "correct_count":  46,
+        "taken_at":  "2026-05-22T12:16:22.854+00:00"
+    },
+    {
+        "id":  34,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"樣題 1\"]",
+        "total_questions":  45,
+        "correct_count":  30,
+        "taken_at":  "2026-05-22T12:32:17.977+00:00"
+    },
+    {
+        "id":  35,
+        "user_id":  5,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"樣題 2\"]",
+        "total_questions":  48,
+        "correct_count":  40,
+        "taken_at":  "2026-05-22T12:49:36.392+00:00"
+    },
+    {
+        "id":  36,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"樣題 2\"]",
+        "total_questions":  48,
+        "correct_count":  34,
+        "taken_at":  "2026-05-22T17:01:37.021+00:00"
+    },
+    {
+        "id":  37,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 7\"]",
+        "total_questions":  50,
+        "correct_count":  48,
+        "taken_at":  "2026-05-22T17:22:37.957+00:00"
+    },
+    {
+        "id":  38,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 12\"]",
+        "total_questions":  50,
+        "correct_count":  49,
+        "taken_at":  "2026-05-22T19:44:35.997+00:00"
+    },
+    {
+        "id":  39,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 11\",\"Day 10\",\"Day 9\",\"Day 8\",\"Day 6\",\"Day 5\",\"Day 4\",\"Day 3\",\"Day 2\",\"Day 1\"]",
+        "total_questions":  50,
+        "correct_count":  47,
+        "taken_at":  "2026-05-22T19:58:20.392+00:00"
+    },
+    {
+        "id":  40,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"樣題 2\",\"樣題 1\"]",
+        "total_questions":  22,
+        "correct_count":  18,
+        "taken_at":  "2026-05-22T20:04:17.55+00:00"
+    },
+    {
+        "id":  41,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 12\",\"Day 11\",\"Day 10\",\"Day 9\",\"Day 8\",\"Day 7\",\"Day 6\",\"Day 5\",\"Day 4\",\"Day 3\",\"Day 2\",\"Day 1\"]",
+        "total_questions":  31,
+        "correct_count":  30,
+        "taken_at":  "2026-05-22T20:10:36.456+00:00"
+    },
+    {
+        "id":  42,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 13\"]",
+        "total_questions":  50,
+        "correct_count":  49,
+        "taken_at":  "2026-05-22T20:27:14.745+00:00"
+    },
+    {
+        "id":  43,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 14\"]",
+        "total_questions":  50,
+        "correct_count":  48,
+        "taken_at":  "2026-05-23T03:43:14.148+00:00"
+    },
+    {
+        "id":  44,
+        "user_id":  3,
+        "topic":  "iPAS 品牌企劃師初級",
+        "units":  "[\"Day 15\"]",
+        "total_questions":  50,
+        "correct_count":  45,
+        "taken_at":  "2026-05-23T04:22:21.196+00:00"
+    }
+]

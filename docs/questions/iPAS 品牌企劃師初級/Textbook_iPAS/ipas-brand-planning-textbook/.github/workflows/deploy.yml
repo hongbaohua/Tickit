@@ -21,17 +21,13 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: './ipas-brand-planning-textbook/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Install dependencies
-        run: |
-          cd ipas-brand-planning-textbook
-          npm install
+        run: npm install
 
       - name: Build
-        run: |
-          cd ipas-brand-planning-textbook
-          npm run build
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -39,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './ipas-brand-planning-textbook/dist'
+          path: './dist'
 
   deploy:
     environment:

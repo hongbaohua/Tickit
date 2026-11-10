@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(git commit -m 'fix: 修正 runMastery 無法讀取 mode 變數導致標記練習模式崩潰 *)",
+      "Bash(ls:*)",
+      "Bash(python -c \"import json; d=json.load\\(open\\(''docs/questions/manifest.json'', encoding=''utf-8''\\)\\); brand=[t for t in d[''topics''] if ''iPAS'' in t[''name'']][0]; [print\\(u[''unit''], u[''file''][:30]\\) for u in brand[''units''][-5:]]\")",
+      "Bash(python -c \"import json; d=json.load\\(open\\(''docs/questions/manifest.json'', encoding=''utf-8''\\)\\); brand=[t for t in d[''topics''] if ''iPAS'' in t[''name'']][0]; units=brand[''units'']; print\\(len\\(units\\), ''units''\\); print\\([u[''unit''] for u in units[-4:]]\\)\")",
+      "Bash(SUPA_URL=\"https://svuqajwngmqseqobrkgk.supabase.co\" SUPA_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2dXFhanduZ21xc2Vxb2Jya2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzQxNTMsImV4cCI6MjA5MTgxMDE1M30.LwBtUl_ObHFCKGhohZinbRzqTMqqz8W25Smr7oos3l8\" __NEW_LINE_3e1c337e3e8a7725__ echo \"=== users ===\")",
+      "Bash(curl -s \"$SUPA_URL/rest/v1/users?select=*&limit=1000\" -H \"apikey: $SUPA_KEY\" -H \"Authorization: Bearer $SUPA_KEY\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''共 {len\\(d\\)} 筆''''\\)\" __NEW_LINE_3e1c337e3e8a7725__ echo \"=== quiz_sessions ===\")",
+      "Bash(curl -s \"$SUPA_URL/rest/v1/quiz_sessions?select=*&limit=1000\" -H \"apikey: $SUPA_KEY\" -H \"Authorization: Bearer $SUPA_KEY\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''共 {len\\(d\\)} 筆''''\\)\" __NEW_LINE_3e1c337e3e8a7725__ echo \"=== question_results ===\")",
+      "Bash(curl -s \"$SUPA_URL/rest/v1/question_results?select=*&limit=1000\" -H \"apikey: $SUPA_KEY\" -H \"Authorization: Bearer $SUPA_KEY\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''共 {len\\(d\\)} 筆''''\\)\")",
+      "Bash(curl -s \"https://svuqajwngmqseqobrkgk.supabase.co/rest/v1/users?select=*&limit=100\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2dXFhanduZ21xc2Vxb2Jya2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzQxNTMsImV4cCI6MjA5MTgxMDE1M30.LwBtUl_ObHFCKGhohZinbRzqTMqqz8W25Smr7oos3l8\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2dXFhanduZ21xc2Vxb2Jya2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzQxNTMsImV4cCI6MjA5MTgxMDE1M30.LwBtUl_ObHFCKGhohZinbRzqTMqqz8W25Smr7oos3l8\")",
+      "Bash(python3:*)",
+      "Bash(powershell.exe -Command \"ls 'C:\\\\Users\\\\Master\\\\Projects\\\\Tickit\\\\docs\\\\database-backup\\\\data\\\\'\" 2>&1)",
+      "Bash(powershell.exe -Command \"\nGet-ChildItem 'C:\\\\Users\\\\Master\\\\Projects\\\\Tickit\\\\docs\\\\database-backup' -Recurse | Select-Object FullName, Length\n\" 2>&1)"
+    ]
+  }
+}
