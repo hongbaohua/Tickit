@@ -1,0 +1,1510 @@
+[
+ {
+  "id": "001",
+  "category": "歐洲",
+  "code": "AMS",
+  "zh": "阿姆斯特丹",
+  "accept": [
+   "阿姆斯特丹"
+  ],
+  "mnemonic": "AMS＝AMSterdam 前三字母。",
+  "note": "原表寫作「AMS/S」，依指示簡化為 AMS"
+ },
+ {
+  "id": "002",
+  "category": "歐洲",
+  "code": "ATH",
+  "zh": "雅典（希臘）",
+  "accept": [
+   "雅典"
+  ],
+  "mnemonic": "ATH＝ATHens 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "003",
+  "category": "歐洲",
+  "code": "BCN",
+  "zh": "巴塞隆納（西班牙）",
+  "accept": [
+   "巴塞隆納"
+  ],
+  "mnemonic": "BarCeloNa 取三個重音子音 B‧C‧N。",
+  "note": ""
+ },
+ {
+  "id": "004",
+  "category": "歐洲",
+  "code": "BER/T",
+  "zh": "柏林（德國）",
+  "accept": [
+   "柏林"
+  ],
+  "mnemonic": "BER＝BERlin 前三字母。",
+  "note": "原表寫作「BER/T」，「/T」的含義表上沒有說明，作答依原表"
+ },
+ {
+  "id": "005",
+  "category": "歐洲",
+  "code": "PSA",
+  "zh": "比薩（義大利）",
+  "accept": [
+   "比薩"
+  ],
+  "mnemonic": "PiSA → P‧S‧A，比薩斜塔的 Pisa 去掉 i。",
+  "note": "原表寫作 BFS，依指示改為 PSA"
+ },
+ {
+  "id": "006",
+  "category": "歐洲",
+  "code": "MAD",
+  "zh": "馬德里（西班牙）",
+  "accept": [
+   "馬德里"
+  ],
+  "mnemonic": "MAD＝MADrid 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "007",
+  "category": "歐洲",
+  "code": "MOW",
+  "zh": "莫斯科（蘇聯）",
+  "accept": [
+   "莫斯科"
+  ],
+  "mnemonic": "MOscoW：頭兩字母＋最後一字母。",
+  "note": "國家依原表寫作「蘇聯」"
+ },
+ {
+  "id": "008",
+  "category": "歐洲",
+  "code": "MUC",
+  "zh": "慕尼黑（德國）",
+  "accept": [
+   "慕尼黑",
+   "幕尼黑"
+  ],
+  "mnemonic": "德文名 München → M‧Ü(U)‧Ch(C)。",
+  "note": "原表寫作「幕尼黑」，且列了兩次，此處合併為一題"
+ },
+ {
+  "id": "009",
+  "category": "歐洲",
+  "code": "BRS",
+  "zh": "布理斯托（英國）",
+  "accept": [
+   "布理斯托",
+   "布里斯托"
+  ],
+  "mnemonic": "BRiStol → B‧R‧S。",
+  "note": ""
+ },
+ {
+  "id": "010",
+  "category": "歐洲",
+  "code": "BRU",
+  "zh": "布魯塞爾（比利時）",
+  "accept": [
+   "布魯塞爾"
+  ],
+  "mnemonic": "BRUssels 前三字母；中文「布魯」也正好對 BRU。",
+  "note": ""
+ },
+ {
+  "id": "011",
+  "category": "歐洲",
+  "code": "BUH",
+  "zh": "布加勒斯特（羅馬尼亞）",
+  "accept": [
+   "布加勒斯"
+  ],
+  "mnemonic": "BUcHarest → BU＋H。",
+  "note": "原表寫作「布加勒斯(羅馬尼」，字有截斷"
+ },
+ {
+  "id": "012",
+  "category": "歐洲",
+  "code": "BUD",
+  "zh": "布達佩斯（匈牙利）",
+  "accept": [
+   "布達佩斯"
+  ],
+  "mnemonic": "BUDapest 前三字母；中文「布達」＝BUD。",
+  "note": ""
+ },
+ {
+  "id": "013",
+  "category": "歐洲",
+  "code": "CGN",
+  "zh": "科隆（德國）",
+  "accept": [
+   "科隆"
+  ],
+  "mnemonic": "ColoGNe → C＋尾音 GN。",
+  "note": ""
+ },
+ {
+  "id": "014",
+  "category": "歐洲",
+  "code": "CPH",
+  "zh": "哥本哈根（丹麥）",
+  "accept": [
+   "哥本哈根"
+  ],
+  "mnemonic": "CoPenHagen → C‧P‧H。",
+  "note": ""
+ },
+ {
+  "id": "015",
+  "category": "歐洲",
+  "code": "EDI",
+  "zh": "愛丁堡（英國）",
+  "accept": [
+   "愛丁堡"
+  ],
+  "mnemonic": "EDInburgh 前三字母；中文「愛丁」≈ EDI。",
+  "note": ""
+ },
+ {
+  "id": "016",
+  "category": "歐洲",
+  "code": "VCE",
+  "zh": "威尼斯（義大利）",
+  "accept": [
+   "威尼斯"
+  ],
+  "mnemonic": "VeniCE → V＋結尾 CE。",
+  "note": ""
+ },
+ {
+  "id": "017",
+  "category": "歐洲",
+  "code": "VIE",
+  "zh": "維也納（奧地利）",
+  "accept": [
+   "維也納"
+  ],
+  "mnemonic": "VIEnna 前三字母；中文「維」≈ VIE。",
+  "note": ""
+ },
+ {
+  "id": "018",
+  "category": "歐洲",
+  "code": "WAW",
+  "zh": "華沙（波蘭）",
+  "accept": [
+   "華沙"
+  ],
+  "mnemonic": "WArsaW：頭兩字母＋尾字母，念成「哇～哇」。",
+  "note": ""
+ },
+ {
+  "id": "019",
+  "category": "歐洲",
+  "code": "FLR",
+  "zh": "佛羅倫斯（義大利）",
+  "accept": [
+   "佛羅倫斯"
+  ],
+  "mnemonic": "FLoRence → F‧L‧R。",
+  "note": ""
+ },
+ {
+  "id": "020",
+  "category": "歐洲",
+  "code": "FRA",
+  "zh": "法蘭克福（德國）",
+  "accept": [
+   "法蘭克福"
+  ],
+  "mnemonic": "FRAnkfurt 前三字母；中文「法」＝FRA。",
+  "note": ""
+ },
+ {
+  "id": "021",
+  "category": "歐洲",
+  "code": "GVA",
+  "zh": "日內瓦（瑞士）",
+  "accept": [
+   "日內瓦"
+  ],
+  "mnemonic": "GeneVA → G＋結尾 VA。",
+  "note": ""
+ },
+ {
+  "id": "022",
+  "category": "歐洲",
+  "code": "HAM",
+  "zh": "漢堡（德國）",
+  "accept": [
+   "漢堡"
+  ],
+  "mnemonic": "HAMburg → HAM＝火腿，漢堡夾火腿。",
+  "note": ""
+ },
+ {
+  "id": "023",
+  "category": "東南亞",
+  "code": "DAD",
+  "zh": "峴港（越南）",
+  "accept": [
+   "峴港"
+  ],
+  "mnemonic": "爸爸（DAD）帶全家去峴港。",
+  "note": ""
+ },
+ {
+  "id": "024",
+  "category": "東南亞",
+  "code": "BKK",
+  "zh": "曼谷（泰國）",
+  "accept": [
+   "曼谷"
+  ],
+  "mnemonic": "BangKoK → B＋K＋K。",
+  "note": ""
+ },
+ {
+  "id": "025",
+  "category": "東南亞",
+  "code": "HKT",
+  "zh": "普吉島（泰國）",
+  "accept": [
+   "普吉"
+  ],
+  "mnemonic": "PHuKeT 去掉開頭 P，剩 H‧K‧T。",
+  "note": ""
+ },
+ {
+  "id": "026",
+  "category": "東南亞",
+  "code": "BOM",
+  "zh": "孟買（印度）",
+  "accept": [
+   "孟買"
+  ],
+  "mnemonic": "孟買舊名 BOMbay 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "027",
+  "category": "東南亞",
+  "code": "BWN",
+  "zh": "汶萊（斯里巴灣）",
+  "accept": [
+   "汶萊",
+   "斯里巴"
+  ],
+  "mnemonic": "汶萊首都 Bandar Seri BegaWaN → B＋WN。",
+  "note": "括號內依原表寫作「斯里巴灣」"
+ },
+ {
+  "id": "028",
+  "category": "東南亞",
+  "code": "HAN",
+  "zh": "河內（越南）",
+  "accept": [
+   "河內"
+  ],
+  "mnemonic": "HANoi 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "029",
+  "category": "東南亞",
+  "code": "KTM",
+  "zh": "加德滿都（尼泊爾）",
+  "accept": [
+   "加德滿都"
+  ],
+  "mnemonic": "KaThManDu → K‧T‧M。",
+  "note": ""
+ },
+ {
+  "id": "030",
+  "category": "東南亞",
+  "code": "KUL",
+  "zh": "吉隆坡（馬來西亞）",
+  "accept": [
+   "吉隆坡"
+  ],
+  "mnemonic": "Kuala Lumpur → KU＋L。",
+  "note": ""
+ },
+ {
+  "id": "031",
+  "category": "東南亞",
+  "code": "CGK",
+  "zh": "雅加達（印尼）",
+  "accept": [
+   "雅加達"
+  ],
+  "mnemonic": "和 Jakarta 拼字無關，用諧音硬記：雅加達「吃(C)個(G)烤(K)」。",
+  "note": ""
+ },
+ {
+  "id": "032",
+  "category": "東南亞",
+  "code": "SIN",
+  "zh": "新加坡",
+  "accept": [
+   "新加坡"
+  ],
+  "mnemonic": "SINgapore 前三字母；中文「新」＝SIN。",
+  "note": ""
+ },
+ {
+  "id": "033",
+  "category": "東南亞",
+  "code": "CNX",
+  "zh": "清邁（泰國）",
+  "accept": [
+   "清邁"
+  ],
+  "mnemonic": "Chiang Mai → C＋N＋X（X 當成神祕叉叉）。",
+  "note": ""
+ },
+ {
+  "id": "034",
+  "category": "東北亞",
+  "code": "CTS",
+  "zh": "札幌",
+  "accept": [
+   "札幌"
+  ],
+  "mnemonic": "札幌主要機場「新千歲」ChiToSe → C‧T‧S。",
+  "note": "札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名"
+ },
+ {
+  "id": "035",
+  "category": "東北亞",
+  "code": "OKD",
+  "zh": "札幌",
+  "accept": [
+   "札幌"
+  ],
+  "mnemonic": "札幌丘珠機場 OKaDama → O‧K‧D。",
+  "note": "札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名"
+ },
+ {
+  "id": "036",
+  "category": "東北亞",
+  "code": "SPK",
+  "zh": "札幌",
+  "accept": [
+   "札幌"
+  ],
+  "mnemonic": "SaPporo → S‧P＋K。",
+  "note": "札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名"
+ },
+ {
+  "id": "037",
+  "category": "東北亞",
+  "code": "HKD",
+  "zh": "函館",
+  "accept": [
+   "函館"
+  ],
+  "mnemonic": "HaKoDate → H‧K‧D。",
+  "note": ""
+ },
+ {
+  "id": "038",
+  "category": "東北亞",
+  "code": "HND",
+  "zh": "東京（羽田）",
+  "accept": [
+   "東京",
+   "羽田"
+  ],
+  "mnemonic": "羽田 HaNeDa → H‧N‧D。",
+  "note": "東京在原表有 HND／NRT／TYO 三個代碼"
+ },
+ {
+  "id": "039",
+  "category": "東北亞",
+  "code": "NRT",
+  "zh": "東京（成田）",
+  "accept": [
+   "東京",
+   "成田"
+  ],
+  "mnemonic": "成田 NaRiTa → N‧R‧T。",
+  "note": "東京在原表有 HND／NRT／TYO 三個代碼"
+ },
+ {
+  "id": "040",
+  "category": "東北亞",
+  "code": "TYO",
+  "zh": "東京",
+  "accept": [
+   "東京"
+  ],
+  "mnemonic": "TokYO → T＋YO。",
+  "note": "東京在原表有 HND／NRT／TYO 三個代碼"
+ },
+ {
+  "id": "041",
+  "category": "東北亞",
+  "code": "NGO",
+  "zh": "名古屋",
+  "accept": [
+   "名古屋"
+  ],
+  "mnemonic": "NaGOya → N＋GO。",
+  "note": ""
+ },
+ {
+  "id": "042",
+  "category": "東北亞",
+  "code": "SDJ",
+  "zh": "仙台",
+  "accept": [
+   "仙台"
+  ],
+  "mnemonic": "SenDai → S‧D＋J（Japan）。",
+  "note": ""
+ },
+ {
+  "id": "043",
+  "category": "東北亞",
+  "code": "HIJ",
+  "zh": "廣島",
+  "accept": [
+   "廣島"
+  ],
+  "mnemonic": "HIroshima → HI＋J（Japan）。和仙台 SDJ 一樣結尾 J。",
+  "note": ""
+ },
+ {
+  "id": "044",
+  "category": "東北亞",
+  "code": "FUK",
+  "zh": "福岡",
+  "accept": [
+   "福岡"
+  ],
+  "mnemonic": "FUKuoka 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "045",
+  "category": "東北亞",
+  "code": "OSA",
+  "zh": "大阪",
+  "accept": [
+   "大阪"
+  ],
+  "mnemonic": "OSAka 前三字母。",
+  "note": "大阪在原表有 OSA／KIX 兩個代碼"
+ },
+ {
+  "id": "046",
+  "category": "東北亞",
+  "code": "KIX",
+  "zh": "大阪（關西）",
+  "accept": [
+   "大阪",
+   "關西"
+  ],
+  "mnemonic": "關西 KansaI ＋ X → K‧I‧X。",
+  "note": "大阪在原表有 OSA／KIX 兩個代碼"
+ },
+ {
+  "id": "047",
+  "category": "東北亞",
+  "code": "OKA",
+  "zh": "沖繩（琉球）",
+  "accept": [
+   "沖繩",
+   "琉球"
+  ],
+  "mnemonic": "OKinAwa → O‧K‧A。",
+  "note": ""
+ },
+ {
+  "id": "048",
+  "category": "東北亞",
+  "code": "PUS",
+  "zh": "釜山",
+  "accept": [
+   "釜山"
+  ],
+  "mnemonic": "釜山舊拼 PUSan 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "049",
+  "category": "東北亞",
+  "code": "SEL",
+  "zh": "漢城",
+  "accept": [
+   "漢城",
+   "首爾"
+  ],
+  "mnemonic": "SEouL → SE＋L。",
+  "note": "原表寫作「漢城」（今稱首爾）"
+ },
+ {
+  "id": "050",
+  "category": "東北亞",
+  "code": "CJU",
+  "zh": "濟州島",
+  "accept": [
+   "濟州"
+  ],
+  "mnemonic": "CheJU → C＋JU。",
+  "note": ""
+ },
+ {
+  "id": "051",
+  "category": "航空公司",
+  "code": "JX",
+  "zh": "星宇航空",
+  "accept": [
+   "星宇"
+  ],
+  "mnemonic": "STARLUX 結尾的 X，前面配 J；「JX」念成「傑星」→ 星宇。",
+  "note": ""
+ },
+ {
+  "id": "052",
+  "category": "航空公司",
+  "code": "IT",
+  "zh": "虎航",
+  "accept": [
+   "虎航"
+  ],
+  "mnemonic": "Tiger 開頭 TI 倒過來就是 IT。",
+  "note": ""
+ },
+ {
+  "id": "053",
+  "category": "航空公司",
+  "code": "NX",
+  "zh": "澳門航空",
+  "accept": [
+   "澳門"
+  ],
+  "mnemonic": "澳門賭場喊「Next！下一把」→ N‧X。",
+  "note": ""
+ },
+ {
+  "id": "054",
+  "category": "航空公司",
+  "code": "ZH",
+  "zh": "深圳航空",
+  "accept": [
+   "深圳"
+  ],
+  "mnemonic": "ShenZHen 中間的 ZH。",
+  "note": ""
+ },
+ {
+  "id": "055",
+  "category": "航空公司",
+  "code": "HB",
+  "zh": "大灣區航空",
+  "accept": [
+   "大灣區"
+  ],
+  "mnemonic": "港（Harbour）灣（Bay）→ H‧B。",
+  "note": ""
+ },
+ {
+  "id": "056",
+  "category": "航空公司",
+  "code": "JL",
+  "zh": "日本航空",
+  "accept": [
+   "日本",
+   "日航"
+  ],
+  "mnemonic": "Japan airLines → J‧L。",
+  "note": ""
+ },
+ {
+  "id": "057",
+  "category": "航空公司",
+  "code": "CA",
+  "zh": "中國國際航空",
+  "accept": [
+   "中國國際",
+   "國航"
+  ],
+  "mnemonic": "Air China 倒過來 China Air → C‧A。",
+  "note": ""
+ },
+ {
+  "id": "058",
+  "category": "航空公司",
+  "code": "MU",
+  "zh": "東方航空",
+  "accept": [
+   "東方",
+   "東航"
+  ],
+  "mnemonic": "五行「東方屬木」→ 木＝MU。",
+  "note": ""
+ },
+ {
+  "id": "059",
+  "category": "航空公司",
+  "code": "CZ",
+  "zh": "南方航空",
+  "accept": [
+   "南方",
+   "南航"
+  ],
+  "mnemonic": "China ＋ 總部廣州 GuangZhou 的 Z → C‧Z。",
+  "note": ""
+ },
+ {
+  "id": "060",
+  "category": "航空公司",
+  "code": "SC",
+  "zh": "山東航空",
+  "accept": [
+   "山東"
+  ],
+  "mnemonic": "Shandong ＋ China → S‧C。",
+  "note": ""
+ },
+ {
+  "id": "061",
+  "category": "航空公司",
+  "code": "3U",
+  "zh": "四川航空",
+  "accept": [
+   "四川",
+   "川航"
+  ],
+  "mnemonic": "「川」字三豎 → 3，四川航空＝3U。",
+  "note": ""
+ },
+ {
+  "id": "062",
+  "category": "航空公司",
+  "code": "MF",
+  "zh": "廈門航空",
+  "accept": [
+   "廈門"
+  ],
+  "mnemonic": "廈門 XiaMen 的 M ＋ 福建 Fujian 的 F。",
+  "note": ""
+ },
+ {
+  "id": "063",
+  "category": "航空公司",
+  "code": "CI",
+  "zh": "中華航空",
+  "accept": [
+   "中華",
+   "華航"
+  ],
+  "mnemonic": "China airlInes → C‧I。",
+  "note": ""
+ },
+ {
+  "id": "064",
+  "category": "航空公司",
+  "code": "BR",
+  "zh": "長榮航空",
+  "accept": [
+   "長榮"
+  ],
+  "mnemonic": "長「榮」＝ BRight 光榮 → BR。",
+  "note": ""
+ },
+ {
+  "id": "065",
+  "category": "航空公司",
+  "code": "AE",
+  "zh": "華信航空",
+  "accept": [
+   "華信"
+  ],
+  "mnemonic": "AE 念「ㄞ」→「愛」華信。",
+  "note": ""
+ },
+ {
+  "id": "066",
+  "category": "航空公司",
+  "code": "B7",
+  "zh": "立榮航空",
+  "accept": [
+   "立榮"
+  ],
+  "mnemonic": "「立」正站好像數字 7 → B7（和 3U 一樣是字母＋數字型）。",
+  "note": ""
+ },
+ {
+  "id": "067",
+  "category": "航空公司",
+  "code": "HX",
+  "zh": "香港航空",
+  "accept": [
+   "香港"
+  ],
+  "mnemonic": "Hong Kong 的 H ＋ X（香港叉燒）。",
+  "note": ""
+ },
+ {
+  "id": "068",
+  "category": "航空公司",
+  "code": "HU",
+  "zh": "海南航空",
+  "accept": [
+   "海南",
+   "海航"
+  ],
+  "mnemonic": "Hainan 的 H，海南島四面環海 →「呼（HU）～海風」。",
+  "note": ""
+ },
+ {
+  "id": "069",
+  "category": "航空公司",
+  "code": "CX",
+  "zh": "國泰航空",
+  "accept": [
+   "國泰"
+  ],
+  "mnemonic": "Cathay 的 C ＋ X。",
+  "note": ""
+ },
+ {
+  "id": "070",
+  "category": "大陸地區",
+  "code": "PEK",
+  "zh": "北京",
+  "accept": [
+   "北京"
+  ],
+  "mnemonic": "北京舊拼 PEKing 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "071",
+  "category": "大陸地區",
+  "code": "SHA",
+  "zh": "上海（虹橋）",
+  "accept": [
+   "虹橋"
+  ],
+  "mnemonic": "SHAnghai 前三字母，老機場虹橋用最直白的 SHA。",
+  "note": "上海有 SHA／PVG 兩個代碼，作答需寫出虹橋或浦東"
+ },
+ {
+  "id": "072",
+  "category": "大陸地區",
+  "code": "PVG",
+  "zh": "上海（浦東）",
+  "accept": [
+   "浦東"
+  ],
+  "mnemonic": "PudonG → P…G，中間夾一個 V。",
+  "note": "上海有 SHA／PVG 兩個代碼，作答需寫出虹橋或浦東"
+ },
+ {
+  "id": "073",
+  "category": "大陸地區",
+  "code": "TSN",
+  "zh": "天津",
+  "accept": [
+   "天津"
+  ],
+  "mnemonic": "天津舊拼 TienTSiN → T‧S‧N。",
+  "note": ""
+ },
+ {
+  "id": "074",
+  "category": "大陸地區",
+  "code": "SIA",
+  "zh": "西安",
+  "accept": [
+   "西安"
+  ],
+  "mnemonic": "西安 Xi'an 諧音「SI-A」。",
+  "note": "原表左右欄各列一次，此處合併"
+ },
+ {
+  "id": "075",
+  "category": "大陸地區",
+  "code": "HGH",
+  "zh": "杭州",
+  "accept": [
+   "杭州"
+  ],
+  "mnemonic": "HanGzHou → H‧G‧H，頭尾都是 H。",
+  "note": ""
+ },
+ {
+  "id": "076",
+  "category": "大陸地區",
+  "code": "DLC",
+  "zh": "大連",
+  "accept": [
+   "大連"
+  ],
+  "mnemonic": "DaLian → D‧L ＋ C（City）。注意和大理 DLU 區分。",
+  "note": ""
+ },
+ {
+  "id": "077",
+  "category": "大陸地區",
+  "code": "TAO",
+  "zh": "青島",
+  "accept": [
+   "青島",
+   "山東"
+  ],
+  "mnemonic": "青島啤酒 TsingTAO 的後三字母。",
+  "note": "原表「山東」也是 TAO"
+ },
+ {
+  "id": "078",
+  "category": "大陸地區",
+  "code": "FOC",
+  "zh": "福州",
+  "accept": [
+   "福州"
+  ],
+  "mnemonic": "福州舊稱 FOoChow → F‧O‧C。",
+  "note": ""
+ },
+ {
+  "id": "079",
+  "category": "大陸地區",
+  "code": "XMN",
+  "zh": "廈門",
+  "accept": [
+   "廈門"
+  ],
+  "mnemonic": "XiaMeN → X‧M‧N。",
+  "note": ""
+ },
+ {
+  "id": "080",
+  "category": "大陸地區",
+  "code": "KMG",
+  "zh": "昆明",
+  "accept": [
+   "昆明"
+  ],
+  "mnemonic": "KunMinG → K‧M‧G。",
+  "note": ""
+ },
+ {
+  "id": "081",
+  "category": "大陸地區",
+  "code": "NKG",
+  "zh": "南京",
+  "accept": [
+   "南京"
+  ],
+  "mnemonic": "南京舊拼 NanKinG → N‧K‧G。",
+  "note": ""
+ },
+ {
+  "id": "082",
+  "category": "大陸地區",
+  "code": "SWA",
+  "zh": "汕頭",
+  "accept": [
+   "汕頭"
+  ],
+  "mnemonic": "汕頭舊稱 SWAtow 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "083",
+  "category": "大陸地區",
+  "code": "KWL",
+  "zh": "桂林",
+  "accept": [
+   "桂林"
+  ],
+  "mnemonic": "桂林舊拼 KWeiLin → K‧W‧L。",
+  "note": ""
+ },
+ {
+  "id": "084",
+  "category": "大陸地區",
+  "code": "TFU",
+  "zh": "成都（天府）",
+  "accept": [
+   "成都",
+   "天府"
+  ],
+  "mnemonic": "天府 TianFU → T＋FU。",
+  "note": ""
+ },
+ {
+  "id": "085",
+  "category": "大陸地區",
+  "code": "CAN",
+  "zh": "廣州",
+  "accept": [
+   "廣州"
+  ],
+  "mnemonic": "廣州舊稱 CANton 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "086",
+  "category": "大陸地區",
+  "code": "HAK",
+  "zh": "海口",
+  "accept": [
+   "海口"
+  ],
+  "mnemonic": "HAiKou → HA＋K。",
+  "note": ""
+ },
+ {
+  "id": "087",
+  "category": "大陸地區",
+  "code": "CSX",
+  "zh": "長沙",
+  "accept": [
+   "長沙"
+  ],
+  "mnemonic": "ChangSha → C‧S ＋ X。",
+  "note": ""
+ },
+ {
+  "id": "088",
+  "category": "大陸地區",
+  "code": "YNT",
+  "zh": "煙台",
+  "accept": [
+   "煙台"
+  ],
+  "mnemonic": "YaNTai → Y‧N‧T。",
+  "note": "原表左右欄各列一次，此處合併"
+ },
+ {
+  "id": "089",
+  "category": "大陸地區",
+  "code": "CKG",
+  "zh": "重慶",
+  "accept": [
+   "重慶"
+  ],
+  "mnemonic": "重慶舊拼 ChungKinG → C‧K‧G。",
+  "note": ""
+ },
+ {
+  "id": "090",
+  "category": "大陸地區",
+  "code": "WNZ",
+  "zh": "溫州",
+  "accept": [
+   "溫州"
+  ],
+  "mnemonic": "WeNZhou → W‧N‧Z。",
+  "note": ""
+ },
+ {
+  "id": "091",
+  "category": "大陸地區",
+  "code": "SYX",
+  "zh": "三亞",
+  "accept": [
+   "三亞"
+  ],
+  "mnemonic": "SanYa → S‧Y ＋ X。",
+  "note": "原表左右欄各列一次，此處合併"
+ },
+ {
+  "id": "092",
+  "category": "大陸地區",
+  "code": "HRB",
+  "zh": "哈爾濱",
+  "accept": [
+   "哈爾濱"
+  ],
+  "mnemonic": "HaRBin → H‧R‧B。",
+  "note": ""
+ },
+ {
+  "id": "093",
+  "category": "大陸地區",
+  "code": "SZX",
+  "zh": "深圳",
+  "accept": [
+   "深圳"
+  ],
+  "mnemonic": "ShenZhen → S‧Z ＋ X。別和深圳航空 ZH 搞混。",
+  "note": ""
+ },
+ {
+  "id": "094",
+  "category": "大陸地區",
+  "code": "KHN",
+  "zh": "南昌",
+  "accept": [
+   "南昌"
+  ],
+  "mnemonic": "用諧音硬記：「看(K)好(H)南(N)昌」。",
+  "note": ""
+ },
+ {
+  "id": "095",
+  "category": "大陸地區",
+  "code": "DYG",
+  "zh": "張家界",
+  "accept": [
+   "張家界"
+  ],
+  "mnemonic": "張家界舊名「大庸」DaYonG → D‧Y‧G。",
+  "note": ""
+ },
+ {
+  "id": "096",
+  "category": "大陸地區",
+  "code": "NGB",
+  "zh": "寧波",
+  "accept": [
+   "寧波"
+  ],
+  "mnemonic": "NinGBo → N‧G‧B。",
+  "note": ""
+ },
+ {
+  "id": "097",
+  "category": "大陸地區",
+  "code": "HLD",
+  "zh": "海拉爾",
+  "accept": [
+   "海拉爾"
+  ],
+  "mnemonic": "HaiLaer → H‧L ＋ D，念成「Hai La Da」。",
+  "note": ""
+ },
+ {
+  "id": "098",
+  "category": "大陸地區",
+  "code": "LXA",
+  "zh": "拉薩",
+  "accept": [
+   "拉薩"
+  ],
+  "mnemonic": "LhasA → L…A，中間夾一個 X。",
+  "note": ""
+ },
+ {
+  "id": "099",
+  "category": "大陸地區",
+  "code": "KHG",
+  "zh": "新疆喀什",
+  "accept": [
+   "喀什"
+  ],
+  "mnemonic": "喀什舊稱 KasHGar → K‧H‧G。",
+  "note": ""
+ },
+ {
+  "id": "100",
+  "category": "大陸地區",
+  "code": "TAO",
+  "zh": "山東",
+  "accept": [
+   "山東",
+   "青島"
+  ],
+  "mnemonic": "青島在山東，所以跟青島一樣是 TAO。",
+  "note": "與青島同代碼"
+ },
+ {
+  "id": "101",
+  "category": "大陸地區",
+  "code": "KWE",
+  "zh": "貴陽",
+  "accept": [
+   "貴陽"
+  ],
+  "mnemonic": "貴陽舊拼 KWEiyang 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "102",
+  "category": "大陸地區",
+  "code": "CGO",
+  "zh": "鄭州",
+  "accept": [
+   "鄭州"
+  ],
+  "mnemonic": "鄭州舊拼 ChenGchOw → C‧G‧O。",
+  "note": ""
+ },
+ {
+  "id": "103",
+  "category": "大陸地區",
+  "code": "TYN",
+  "zh": "太原",
+  "accept": [
+   "太原"
+  ],
+  "mnemonic": "TaiYuaN → T‧Y‧N。",
+  "note": ""
+ },
+ {
+  "id": "104",
+  "category": "大陸地區",
+  "code": "LJG",
+  "zh": "麗江",
+  "accept": [
+   "麗江"
+  ],
+  "mnemonic": "LiJianG → L‧J‧G。",
+  "note": ""
+ },
+ {
+  "id": "105",
+  "category": "大陸地區",
+  "code": "CGQ",
+  "zh": "長春",
+  "accept": [
+   "長春"
+  ],
+  "mnemonic": "Chang 取 C‧G，「春」硬記成 Q → CGQ。",
+  "note": ""
+ },
+ {
+  "id": "106",
+  "category": "大陸地區",
+  "code": "JIL",
+  "zh": "吉林",
+  "accept": [
+   "吉林"
+  ],
+  "mnemonic": "JILin 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "107",
+  "category": "大陸地區",
+  "code": "HFE",
+  "zh": "合肥",
+  "accept": [
+   "合肥"
+  ],
+  "mnemonic": "HeFEi → H＋FE。",
+  "note": ""
+ },
+ {
+  "id": "108",
+  "category": "大陸地區",
+  "code": "HEK",
+  "zh": "黑河",
+  "accept": [
+   "黑河"
+  ],
+  "mnemonic": "HEiHe → HE ＋ K。",
+  "note": ""
+ },
+ {
+  "id": "109",
+  "category": "大陸地區",
+  "code": "HET",
+  "zh": "呼和浩特",
+  "accept": [
+   "呼和浩特"
+  ],
+  "mnemonic": "Hu-HE-hao-Te → HE ＋ T。",
+  "note": ""
+ },
+ {
+  "id": "110",
+  "category": "大陸地區",
+  "code": "XNN",
+  "zh": "西寧",
+  "accept": [
+   "西寧"
+  ],
+  "mnemonic": "XiNiNg → X‧N‧N。",
+  "note": ""
+ },
+ {
+  "id": "111",
+  "category": "大陸地區",
+  "code": "INC",
+  "zh": "銀川",
+  "accept": [
+   "銀川"
+  ],
+  "mnemonic": "YINChuan 去掉 Y → INC。",
+  "note": ""
+ },
+ {
+  "id": "112",
+  "category": "大陸地區",
+  "code": "TNA",
+  "zh": "濟南",
+  "accept": [
+   "濟南"
+  ],
+  "mnemonic": "濟南舊拼 TsiNAn → T ＋ NA。",
+  "note": ""
+ },
+ {
+  "id": "113",
+  "category": "大陸地區",
+  "code": "WEH",
+  "zh": "威海",
+  "accept": [
+   "威海"
+  ],
+  "mnemonic": "WEiHai → WE＋H。",
+  "note": ""
+ },
+ {
+  "id": "114",
+  "category": "大陸地區",
+  "code": "WUH",
+  "zh": "武漢",
+  "accept": [
+   "武漢"
+  ],
+  "mnemonic": "WUHan 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "115",
+  "category": "大陸地區",
+  "code": "DLU",
+  "zh": "大理",
+  "accept": [
+   "大理"
+  ],
+  "mnemonic": "DaLi → D‧L ＋ U。注意和大連 DLC 區分。",
+  "note": ""
+ },
+ {
+  "id": "116",
+  "category": "大陸地區",
+  "code": "TXN",
+  "zh": "黃山",
+  "accept": [
+   "黃山"
+  ],
+  "mnemonic": "黃山機場位於屯溪 TunXi → T‧X‧N。",
+  "note": ""
+ },
+ {
+  "id": "117",
+  "category": "大陸地區",
+  "code": "LHW",
+  "zh": "蘭州",
+  "accept": [
+   "蘭州"
+  ],
+  "mnemonic": "LanzHou → L‧H ＋ W。",
+  "note": ""
+ },
+ {
+  "id": "118",
+  "category": "大陸地區",
+  "code": "HKG",
+  "zh": "香港",
+  "accept": [
+   "香港"
+  ],
+  "mnemonic": "Hong KonG → H‧K‧G。",
+  "note": ""
+ },
+ {
+  "id": "119",
+  "category": "大陸地區",
+  "code": "MFM",
+  "zh": "澳門",
+  "accept": [
+   "澳門"
+  ],
+  "mnemonic": "諧音硬記：Macau Fun Macau（澳門好好玩）。",
+  "note": ""
+ },
+ {
+  "id": "120",
+  "category": "大陸地區",
+  "code": "NNG",
+  "zh": "南寧",
+  "accept": [
+   "南寧"
+  ],
+  "mnemonic": "NanNinG → N‧N‧G。",
+  "note": ""
+ },
+ {
+  "id": "121",
+  "category": "大陸地區",
+  "code": "SHE",
+  "zh": "瀋陽",
+  "accept": [
+   "瀋陽"
+  ],
+  "mnemonic": "SHEnyang 前三字母。",
+  "note": ""
+ },
+ {
+  "id": "122",
+  "category": "大陸地區",
+  "code": "URC",
+  "zh": "烏魯木齊",
+  "accept": [
+   "烏魯木齊"
+  ],
+  "mnemonic": "烏魯木齊舊拼 URumChi → U‧R‧C。",
+  "note": ""
+ },
+ {
+  "id": "123",
+  "category": "特殊需求",
+  "code": "VGML",
+  "zh": "素食（全素）",
+  "accept": [
+   "全素",
+   "素食"
+  ],
+  "mnemonic": "VeGan Meal → VG ＋ ML。所有餐點代碼都以 ML（Meal）結尾。",
+  "note": ""
+ },
+ {
+  "id": "124",
+  "category": "特殊需求",
+  "code": "VLML",
+  "zh": "蛋奶素",
+  "accept": [
+   "蛋奶"
+  ],
+  "mnemonic": "Vegetarian Lacto-ovo Meal → V ＋ L（Lacto 奶）＋ ML。",
+  "note": ""
+ },
+ {
+  "id": "125",
+  "category": "特殊需求",
+  "code": "BBML",
+  "zh": "嬰兒餐",
+  "accept": [
+   "嬰兒"
+  ],
+  "mnemonic": "BaBy Meal → BB ＋ ML。",
+  "note": ""
+ },
+ {
+  "id": "126",
+  "category": "特殊需求",
+  "code": "CHML",
+  "zh": "兒童餐",
+  "accept": [
+   "兒童"
+  ],
+  "mnemonic": "CHild Meal → CH ＋ ML。",
+  "note": ""
+ },
+ {
+  "id": "127",
+  "category": "特殊需求",
+  "code": "FPML",
+  "zh": "水果餐",
+  "accept": [
+   "水果"
+  ],
+  "mnemonic": "Fruit Platter Meal → FP ＋ ML。",
+  "note": ""
+ },
+ {
+  "id": "128",
+  "category": "特殊需求",
+  "code": "SFML",
+  "zh": "海鮮餐",
+  "accept": [
+   "海鮮"
+  ],
+  "mnemonic": "SeaFood Meal → SF ＋ ML。",
+  "note": ""
+ },
+ {
+  "id": "129",
+  "category": "特殊需求",
+  "code": "WCHC",
+  "zh": "輪椅－須由人攙扶",
+  "accept": [
+   "攙扶"
+  ],
+  "mnemonic": "WCH＝WheelCHair；C＝Cabin，連到機艙座位都要人協助（最需要幫忙）。",
+  "note": "三種輪椅代碼作答需寫出各自的說明"
+ },
+ {
+  "id": "130",
+  "category": "特殊需求",
+  "code": "WCHR",
+  "zh": "輪椅－可自行上下階梯",
+  "accept": [
+   "階梯",
+   "樓梯"
+  ],
+  "mnemonic": "R＝Ramp，只需協助走坡道遠距離，階梯能自己上下（最不需要幫忙）。",
+  "note": "三種輪椅代碼作答需寫出各自的說明"
+ },
+ {
+  "id": "131",
+  "category": "特殊需求",
+  "code": "WCHS",
+  "zh": "輪椅－可自行走到機位",
+  "accept": [
+   "機位",
+   "座位"
+  ],
+  "mnemonic": "S＝Steps，上下階梯要協助，但能自己走到座位。",
+  "note": "三種輪椅代碼作答需寫出各自的說明"
+ },
+ {
+  "id": "132",
+  "category": "台灣",
+  "code": "KHH",
+  "zh": "高雄",
+  "accept": [
+   "高雄"
+  ],
+  "mnemonic": "KaoHsiung → K ＋ H ＋ H。",
+  "note": ""
+ },
+ {
+  "id": "133",
+  "category": "台灣",
+  "code": "TSA",
+  "zh": "松山",
+  "accept": [
+   "松山"
+  ],
+  "mnemonic": "Taipei SongShan Airport → T‧S‧A。",
+  "note": ""
+ },
+ {
+  "id": "134",
+  "category": "台灣",
+  "code": "TPE",
+  "zh": "桃園中正機場",
+  "accept": [
+   "桃園",
+   "中正"
+  ],
+  "mnemonic": "TaiPEi → T‧P‧E。",
+  "note": ""
+ },
+ {
+  "id": "135",
+  "category": "台灣",
+  "code": "RMQ",
+  "zh": "台中",
+  "accept": [
+   "台中",
+   "臺中"
+  ],
+  "mnemonic": "「Remember Me, Q」→ 記住台中是 RMQ，不是舊的 TXG。",
+  "note": "原表 TXG 已劃掉，手寫改為 RMQ"
+ }
+]

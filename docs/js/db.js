@@ -193,3 +193,21 @@ async function getWrongQuestionIds(userId, topic, units) {
   );
   return new Set(rows.map((r) => r.question_id));
 }
+
+// 代碼題庫用：回傳「最近一次作答仍是錯的」question_id Set
+// （曾錯過但後來答對的就不再算錯題，方便兩天內把錯題清空）
+async function getCurrentWrongCodeIds(userId) {
+  const sessions = await _fetchAll(
+    `${_url("quiz_sessions")}?user_id=eq.${userId}&topic=eq.${encodeURIComponent(CODES_TOPIC)}&select=id`,
+    "讀取 session IDs（代碼錯題）"
+  );
+  if (!sessions.length) return new Set();
+  const ids = sessions.map((s) => s.id).join(",");
+  const rows = await _fetchAll(
+    `${_url("question_results")}?session_id=in.(${ids})&select=id,question_id,is_correct&order=id.asc`,
+    "讀取代碼作答紀錄"
+  );
+  const latest = new Map();
+  for (const r of rows) latest.set(r.question_id, r.is_correct);
+  return new Set([...latest].filter(([, ok]) => !ok).map(([id]) => id));
+}

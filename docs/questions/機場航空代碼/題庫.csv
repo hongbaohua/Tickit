@@ -1,0 +1,136 @@
+﻿編號,分類,代碼,中文,判定關鍵字,記憶法,備註
+001,歐洲,AMS,阿姆斯特丹,阿姆斯特丹,AMS＝AMSterdam 前三字母。,原表寫作「AMS/S」，依指示簡化為 AMS
+002,歐洲,ATH,雅典（希臘）,雅典,ATH＝ATHens 前三字母。,
+003,歐洲,BCN,巴塞隆納（西班牙）,巴塞隆納,BarCeloNa 取三個重音子音 B‧C‧N。,
+004,歐洲,BER/T,柏林（德國）,柏林,BER＝BERlin 前三字母。,原表寫作「BER/T」，「/T」的含義表上沒有說明，作答依原表
+005,歐洲,PSA,比薩（義大利）,比薩,PiSA → P‧S‧A，比薩斜塔的 Pisa 去掉 i。,原表寫作 BFS，依指示改為 PSA
+006,歐洲,MAD,馬德里（西班牙）,馬德里,MAD＝MADrid 前三字母。,
+007,歐洲,MOW,莫斯科（蘇聯）,莫斯科,MOscoW：頭兩字母＋最後一字母。,國家依原表寫作「蘇聯」
+008,歐洲,MUC,慕尼黑（德國）,慕尼黑|幕尼黑,德文名 München → M‧Ü(U)‧Ch(C)。,原表寫作「幕尼黑」，且列了兩次，此處合併為一題
+009,歐洲,BRS,布理斯托（英國）,布理斯托|布里斯托,BRiStol → B‧R‧S。,
+010,歐洲,BRU,布魯塞爾（比利時）,布魯塞爾,BRUssels 前三字母；中文「布魯」也正好對 BRU。,
+011,歐洲,BUH,布加勒斯特（羅馬尼亞）,布加勒斯,BUcHarest → BU＋H。,原表寫作「布加勒斯(羅馬尼」，字有截斷
+012,歐洲,BUD,布達佩斯（匈牙利）,布達佩斯,BUDapest 前三字母；中文「布達」＝BUD。,
+013,歐洲,CGN,科隆（德國）,科隆,ColoGNe → C＋尾音 GN。,
+014,歐洲,CPH,哥本哈根（丹麥）,哥本哈根,CoPenHagen → C‧P‧H。,
+015,歐洲,EDI,愛丁堡（英國）,愛丁堡,EDInburgh 前三字母；中文「愛丁」≈ EDI。,
+016,歐洲,VCE,威尼斯（義大利）,威尼斯,VeniCE → V＋結尾 CE。,
+017,歐洲,VIE,維也納（奧地利）,維也納,VIEnna 前三字母；中文「維」≈ VIE。,
+018,歐洲,WAW,華沙（波蘭）,華沙,WArsaW：頭兩字母＋尾字母，念成「哇～哇」。,
+019,歐洲,FLR,佛羅倫斯（義大利）,佛羅倫斯,FLoRence → F‧L‧R。,
+020,歐洲,FRA,法蘭克福（德國）,法蘭克福,FRAnkfurt 前三字母；中文「法」＝FRA。,
+021,歐洲,GVA,日內瓦（瑞士）,日內瓦,GeneVA → G＋結尾 VA。,
+022,歐洲,HAM,漢堡（德國）,漢堡,HAMburg → HAM＝火腿，漢堡夾火腿。,
+023,東南亞,DAD,峴港（越南）,峴港,爸爸（DAD）帶全家去峴港。,
+024,東南亞,BKK,曼谷（泰國）,曼谷,BangKoK → B＋K＋K。,
+025,東南亞,HKT,普吉島（泰國）,普吉,PHuKeT 去掉開頭 P，剩 H‧K‧T。,
+026,東南亞,BOM,孟買（印度）,孟買,孟買舊名 BOMbay 前三字母。,
+027,東南亞,BWN,汶萊（斯里巴灣）,汶萊|斯里巴,汶萊首都 Bandar Seri BegaWaN → B＋WN。,括號內依原表寫作「斯里巴灣」
+028,東南亞,HAN,河內（越南）,河內,HANoi 前三字母。,
+029,東南亞,KTM,加德滿都（尼泊爾）,加德滿都,KaThManDu → K‧T‧M。,
+030,東南亞,KUL,吉隆坡（馬來西亞）,吉隆坡,Kuala Lumpur → KU＋L。,
+031,東南亞,CGK,雅加達（印尼）,雅加達,和 Jakarta 拼字無關，用諧音硬記：雅加達「吃(C)個(G)烤(K)」。,
+032,東南亞,SIN,新加坡,新加坡,SINgapore 前三字母；中文「新」＝SIN。,
+033,東南亞,CNX,清邁（泰國）,清邁,Chiang Mai → C＋N＋X（X 當成神祕叉叉）。,
+034,東北亞,CTS,札幌,札幌,札幌主要機場「新千歲」ChiToSe → C‧T‧S。,札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名
+035,東北亞,OKD,札幌,札幌,札幌丘珠機場 OKaDama → O‧K‧D。,札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名
+036,東北亞,SPK,札幌,札幌,SaPporo → S‧P＋K。,札幌在原表有 CTS／OKD／SPK 三個代碼，表上未分別註明機場名
+037,東北亞,HKD,函館,函館,HaKoDate → H‧K‧D。,
+038,東北亞,HND,東京（羽田）,東京|羽田,羽田 HaNeDa → H‧N‧D。,東京在原表有 HND／NRT／TYO 三個代碼
+039,東北亞,NRT,東京（成田）,東京|成田,成田 NaRiTa → N‧R‧T。,東京在原表有 HND／NRT／TYO 三個代碼
+040,東北亞,TYO,東京,東京,TokYO → T＋YO。,東京在原表有 HND／NRT／TYO 三個代碼
+041,東北亞,NGO,名古屋,名古屋,NaGOya → N＋GO。,
+042,東北亞,SDJ,仙台,仙台,SenDai → S‧D＋J（Japan）。,
+043,東北亞,HIJ,廣島,廣島,HIroshima → HI＋J（Japan）。和仙台 SDJ 一樣結尾 J。,
+044,東北亞,FUK,福岡,福岡,FUKuoka 前三字母。,
+045,東北亞,OSA,大阪,大阪,OSAka 前三字母。,大阪在原表有 OSA／KIX 兩個代碼
+046,東北亞,KIX,大阪（關西）,大阪|關西,關西 KansaI ＋ X → K‧I‧X。,大阪在原表有 OSA／KIX 兩個代碼
+047,東北亞,OKA,沖繩（琉球）,沖繩|琉球,OKinAwa → O‧K‧A。,
+048,東北亞,PUS,釜山,釜山,釜山舊拼 PUSan 前三字母。,
+049,東北亞,SEL,漢城,漢城|首爾,SEouL → SE＋L。,原表寫作「漢城」（今稱首爾）
+050,東北亞,CJU,濟州島,濟州,CheJU → C＋JU。,
+051,航空公司,JX,星宇航空,星宇,STARLUX 結尾的 X，前面配 J；「JX」念成「傑星」→ 星宇。,
+052,航空公司,IT,虎航,虎航,Tiger 開頭 TI 倒過來就是 IT。,
+053,航空公司,NX,澳門航空,澳門,澳門賭場喊「Next！下一把」→ N‧X。,
+054,航空公司,ZH,深圳航空,深圳,ShenZHen 中間的 ZH。,
+055,航空公司,HB,大灣區航空,大灣區,港（Harbour）灣（Bay）→ H‧B。,
+056,航空公司,JL,日本航空,日本|日航,Japan airLines → J‧L。,
+057,航空公司,CA,中國國際航空,中國國際|國航,Air China 倒過來 China Air → C‧A。,
+058,航空公司,MU,東方航空,東方|東航,五行「東方屬木」→ 木＝MU。,
+059,航空公司,CZ,南方航空,南方|南航,China ＋ 總部廣州 GuangZhou 的 Z → C‧Z。,
+060,航空公司,SC,山東航空,山東,Shandong ＋ China → S‧C。,
+061,航空公司,3U,四川航空,四川|川航,「川」字三豎 → 3，四川航空＝3U。,
+062,航空公司,MF,廈門航空,廈門,廈門 XiaMen 的 M ＋ 福建 Fujian 的 F。,
+063,航空公司,CI,中華航空,中華|華航,China airlInes → C‧I。,
+064,航空公司,BR,長榮航空,長榮,長「榮」＝ BRight 光榮 → BR。,
+065,航空公司,AE,華信航空,華信,AE 念「ㄞ」→「愛」華信。,
+066,航空公司,B7,立榮航空,立榮,「立」正站好像數字 7 → B7（和 3U 一樣是字母＋數字型）。,
+067,航空公司,HX,香港航空,香港,Hong Kong 的 H ＋ X（香港叉燒）。,
+068,航空公司,HU,海南航空,海南|海航,Hainan 的 H，海南島四面環海 →「呼（HU）～海風」。,
+069,航空公司,CX,國泰航空,國泰,Cathay 的 C ＋ X。,
+070,大陸地區,PEK,北京,北京,北京舊拼 PEKing 前三字母。,
+071,大陸地區,SHA,上海（虹橋）,虹橋,SHAnghai 前三字母，老機場虹橋用最直白的 SHA。,上海有 SHA／PVG 兩個代碼，作答需寫出虹橋或浦東
+072,大陸地區,PVG,上海（浦東）,浦東,PudonG → P…G，中間夾一個 V。,上海有 SHA／PVG 兩個代碼，作答需寫出虹橋或浦東
+073,大陸地區,TSN,天津,天津,天津舊拼 TienTSiN → T‧S‧N。,
+074,大陸地區,SIA,西安,西安,西安 Xi'an 諧音「SI-A」。,原表左右欄各列一次，此處合併
+075,大陸地區,HGH,杭州,杭州,HanGzHou → H‧G‧H，頭尾都是 H。,
+076,大陸地區,DLC,大連,大連,DaLian → D‧L ＋ C（City）。注意和大理 DLU 區分。,
+077,大陸地區,TAO,青島,青島|山東,青島啤酒 TsingTAO 的後三字母。,原表「山東」也是 TAO
+078,大陸地區,FOC,福州,福州,福州舊稱 FOoChow → F‧O‧C。,
+079,大陸地區,XMN,廈門,廈門,XiaMeN → X‧M‧N。,
+080,大陸地區,KMG,昆明,昆明,KunMinG → K‧M‧G。,
+081,大陸地區,NKG,南京,南京,南京舊拼 NanKinG → N‧K‧G。,
+082,大陸地區,SWA,汕頭,汕頭,汕頭舊稱 SWAtow 前三字母。,
+083,大陸地區,KWL,桂林,桂林,桂林舊拼 KWeiLin → K‧W‧L。,
+084,大陸地區,TFU,成都（天府）,成都|天府,天府 TianFU → T＋FU。,
+085,大陸地區,CAN,廣州,廣州,廣州舊稱 CANton 前三字母。,
+086,大陸地區,HAK,海口,海口,HAiKou → HA＋K。,
+087,大陸地區,CSX,長沙,長沙,ChangSha → C‧S ＋ X。,
+088,大陸地區,YNT,煙台,煙台,YaNTai → Y‧N‧T。,原表左右欄各列一次，此處合併
+089,大陸地區,CKG,重慶,重慶,重慶舊拼 ChungKinG → C‧K‧G。,
+090,大陸地區,WNZ,溫州,溫州,WeNZhou → W‧N‧Z。,
+091,大陸地區,SYX,三亞,三亞,SanYa → S‧Y ＋ X。,原表左右欄各列一次，此處合併
+092,大陸地區,HRB,哈爾濱,哈爾濱,HaRBin → H‧R‧B。,
+093,大陸地區,SZX,深圳,深圳,ShenZhen → S‧Z ＋ X。別和深圳航空 ZH 搞混。,
+094,大陸地區,KHN,南昌,南昌,用諧音硬記：「看(K)好(H)南(N)昌」。,
+095,大陸地區,DYG,張家界,張家界,張家界舊名「大庸」DaYonG → D‧Y‧G。,
+096,大陸地區,NGB,寧波,寧波,NinGBo → N‧G‧B。,
+097,大陸地區,HLD,海拉爾,海拉爾,HaiLaer → H‧L ＋ D，念成「Hai La Da」。,
+098,大陸地區,LXA,拉薩,拉薩,LhasA → L…A，中間夾一個 X。,
+099,大陸地區,KHG,新疆喀什,喀什,喀什舊稱 KasHGar → K‧H‧G。,
+100,大陸地區,TAO,山東,山東|青島,青島在山東，所以跟青島一樣是 TAO。,與青島同代碼
+101,大陸地區,KWE,貴陽,貴陽,貴陽舊拼 KWEiyang 前三字母。,
+102,大陸地區,CGO,鄭州,鄭州,鄭州舊拼 ChenGchOw → C‧G‧O。,
+103,大陸地區,TYN,太原,太原,TaiYuaN → T‧Y‧N。,
+104,大陸地區,LJG,麗江,麗江,LiJianG → L‧J‧G。,
+105,大陸地區,CGQ,長春,長春,Chang 取 C‧G，「春」硬記成 Q → CGQ。,
+106,大陸地區,JIL,吉林,吉林,JILin 前三字母。,
+107,大陸地區,HFE,合肥,合肥,HeFEi → H＋FE。,
+108,大陸地區,HEK,黑河,黑河,HEiHe → HE ＋ K。,
+109,大陸地區,HET,呼和浩特,呼和浩特,Hu-HE-hao-Te → HE ＋ T。,
+110,大陸地區,XNN,西寧,西寧,XiNiNg → X‧N‧N。,
+111,大陸地區,INC,銀川,銀川,YINChuan 去掉 Y → INC。,
+112,大陸地區,TNA,濟南,濟南,濟南舊拼 TsiNAn → T ＋ NA。,
+113,大陸地區,WEH,威海,威海,WEiHai → WE＋H。,
+114,大陸地區,WUH,武漢,武漢,WUHan 前三字母。,
+115,大陸地區,DLU,大理,大理,DaLi → D‧L ＋ U。注意和大連 DLC 區分。,
+116,大陸地區,TXN,黃山,黃山,黃山機場位於屯溪 TunXi → T‧X‧N。,
+117,大陸地區,LHW,蘭州,蘭州,LanzHou → L‧H ＋ W。,
+118,大陸地區,HKG,香港,香港,Hong KonG → H‧K‧G。,
+119,大陸地區,MFM,澳門,澳門,諧音硬記：Macau Fun Macau（澳門好好玩）。,
+120,大陸地區,NNG,南寧,南寧,NanNinG → N‧N‧G。,
+121,大陸地區,SHE,瀋陽,瀋陽,SHEnyang 前三字母。,
+122,大陸地區,URC,烏魯木齊,烏魯木齊,烏魯木齊舊拼 URumChi → U‧R‧C。,
+123,特殊需求,VGML,素食（全素）,全素|素食,VeGan Meal → VG ＋ ML。所有餐點代碼都以 ML（Meal）結尾。,
+124,特殊需求,VLML,蛋奶素,蛋奶,Vegetarian Lacto-ovo Meal → V ＋ L（Lacto 奶）＋ ML。,
+125,特殊需求,BBML,嬰兒餐,嬰兒,BaBy Meal → BB ＋ ML。,
+126,特殊需求,CHML,兒童餐,兒童,CHild Meal → CH ＋ ML。,
+127,特殊需求,FPML,水果餐,水果,Fruit Platter Meal → FP ＋ ML。,
+128,特殊需求,SFML,海鮮餐,海鮮,SeaFood Meal → SF ＋ ML。,
+129,特殊需求,WCHC,輪椅－須由人攙扶,攙扶,WCH＝WheelCHair；C＝Cabin，連到機艙座位都要人協助（最需要幫忙）。,三種輪椅代碼作答需寫出各自的說明
+130,特殊需求,WCHR,輪椅－可自行上下階梯,階梯|樓梯,R＝Ramp，只需協助走坡道遠距離，階梯能自己上下（最不需要幫忙）。,三種輪椅代碼作答需寫出各自的說明
+131,特殊需求,WCHS,輪椅－可自行走到機位,機位|座位,S＝Steps，上下階梯要協助，但能自己走到座位。,三種輪椅代碼作答需寫出各自的說明
+132,台灣,KHH,高雄,高雄,KaoHsiung → K ＋ H ＋ H。,
+133,台灣,TSA,松山,松山,Taipei SongShan Airport → T‧S‧A。,
+134,台灣,TPE,桃園中正機場,桃園|中正,TaiPEi → T‧P‧E。,
+135,台灣,RMQ,台中,台中|臺中,"「Remember Me, Q」→ 記住台中是 RMQ，不是舊的 TXG。",原表 TXG 已劃掉，手寫改為 RMQ

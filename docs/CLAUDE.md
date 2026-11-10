@@ -98,6 +98,15 @@ Tickit/
 
 ---
 
+## 代碼練習（codes.html）
+
+- 題庫：`questions/機場航空代碼/題庫.json`（manifest 中 `"type": "codes"`，首頁選此主題會導向 `codes.html`）
+- 判分與出題：`js/codes.js`。寫中文只要包含 `accept` 任一關鍵字即算對（不限格式，簡繁通用）；寫代碼不分大小寫
+- `question_id` 格式：`機場航空代碼__c2z__{編號}`（代碼→中文）／`機場航空代碼__z2c__{編號}`（中文→代碼），**禁止修改**
+- 錯題判定：`getCurrentWrongCodeIds()` 以「最近一次作答仍錯」為準
+
+---
+
 ## 可以自由修改
 
 - `index.html`、`quiz.html`、`dashboard.html` 的 UI/UX、樣式、排版
