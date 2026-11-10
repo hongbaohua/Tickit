@@ -1641,5 +1641,104 @@
   "mnemonic": "「Remember Me, Q」→ 記住台中是 RMQ，不是舊的 TXG。",
   "note": "原表 TXG 已劃掉，手寫改為 RMQ",
   "product": "台中出發（大陸、峴港、神戶）"
+ },
+ {
+  "id": "136",
+  "category": "產品線補充",
+  "code": "UKB",
+  "zh": "神戶（日本）",
+  "accept": [
+   "神戶"
+  ],
+  "mnemonic": "Kobe 取 K‧B，前面加 U：「You 去 Kobe」→ UKB。",
+  "note": "考試題庫外；動態表上有寫到此代碼",
+  "product": "星宇 台中－神戶 日本PAK（JX306 RMQ/UKB）"
+ },
+ {
+  "id": "137",
+  "category": "產品線補充",
+  "code": "VJ",
+  "zh": "越捷航空",
+  "accept": [
+   "越捷"
+  ],
+  "mnemonic": "VietJet → V‧J。",
+  "note": "考試題庫外；動態表上有寫到此代碼",
+  "product": "台中出發 峴港團（VJ8511 台中－峴港）"
+ },
+ {
+  "id": "138",
+  "category": "產品線補充",
+  "code": "PRG",
+  "zh": "布拉格（捷克）",
+  "accept": [
+   "布拉格"
+  ],
+  "mnemonic": "PRaGue → P‧R‧G。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "德捷、奧捷斯匈四國團"
+ },
+ {
+  "id": "139",
+  "category": "產品線補充",
+  "code": "ZRH",
+  "zh": "蘇黎世（瑞士）",
+  "accept": [
+   "蘇黎世",
+   "蘇黎士"
+  ],
+  "mnemonic": "ZuRicH → Z‧R‧H。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "德瑞團"
+ },
+ {
+  "id": "140",
+  "category": "產品線補充",
+  "code": "TOY",
+  "zh": "富山（日本）",
+  "accept": [
+   "富山"
+  ],
+  "mnemonic": "TOYama 前三字母；富山＝玩具（TOY）很多。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "黑部立山團"
+ },
+ {
+  "id": "141",
+  "category": "產品線補充",
+  "code": "KMQ",
+  "zh": "小松（日本，石川）",
+  "accept": [
+   "小松"
+  ],
+  "mnemonic": "KoMatsu → K‧M ＋ Q；和台中 RMQ 一樣 Q 結尾。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "北陸・金澤・合掌村團"
+ },
+ {
+  "id": "142",
+  "category": "產品線補充",
+  "code": "CTU",
+  "zh": "成都（雙流）",
+  "accept": [
+   "雙流",
+   "成都"
+  ],
+  "mnemonic": "成都舊拼 ChengTU → C‧T‧U。成都另有新機場天府 TFU。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "九寨溝・峨嵋山・樂山團（四川）"
+ },
+ {
+  "id": "143",
+  "category": "產品線補充",
+  "code": "JZH",
+  "zh": "九寨溝（九寨黃龍機場）",
+  "accept": [
+   "九寨",
+   "黃龍"
+  ],
+  "mnemonic": "JiuZHai → J‧Z‧H。",
+  "note": "考試題庫外；動態表未寫機場，依行程推測常用",
+  "product": "九寨溝・峨嵋山・樂山團"
  }
 ]
