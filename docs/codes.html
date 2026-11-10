@@ -68,6 +68,13 @@
     table.ref td.mn { color:#6B7280; font-size:0.74rem; }
     .ref-cat { font-size:0.82rem; font-weight:700; color:#111827; margin:1.1rem 0 0.3rem; }
     .ref-cat:first-child { margin-top:0; }
+    .focus-toggle {
+      display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; padding:0.6rem 0.8rem;
+      border:1.5px dashed #FCD34D; border-radius:8px; background:#FFFBEB; cursor:pointer; font-size:0.84rem; color:#92400E;
+    }
+    .focus-toggle:has(input:checked) { border-style:solid; border-color:#F59E0B; background:#FEF3C7; font-weight:600; }
+    .focus-toggle input { accent-color:#D97706; }
+    .prod-tag { display:inline-block; background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; font-size:0.72rem; font-weight:600; border-radius:5px; padding:1px 7px; margin-top:0.35rem; }
     .wrong-pill { display:inline-block; background:#FEF2F2; color:#DC2626; font-size:0.66rem; font-weight:700; border-radius:4px; padding:0 5px; margin-left:4px; }
 
     .result-list .row { display:flex; gap:0.8rem; padding:0.55rem 0; border-bottom:1px solid #F1F5F9; font-size:0.84rem; align-items:baseline; }
@@ -114,6 +121,10 @@
           <button class="btn btn-ghost btn-sm" id="btn-all-cats">全選</button>
         </div>
         <div class="cat-grid" id="cat-list"><div class="loading">載入中…</div></div>
+        <label class="focus-toggle">
+          <input type="checkbox" id="focus-only" />
+          <span>★ 只練公司產品線相關的代碼 <span id="focus-n" style="font-weight:400;"></span></span>
+        </label>
         <div class="unit-count" id="cat-count"></div>
       </div>
 
@@ -247,6 +258,12 @@
     if (name === "flash") document.getElementById("flash-actions").style.display = "none";
     window.scrollTo(0, 0);
   }
+  const focusOnly = () => document.getElementById("focus-only").checked;
+  const srcBank = () => (focusOnly() ? bank.filter((b) => b.product) : bank);
+  const prodTag = (q) => {
+    const ps = [...new Set(q.items.map((it) => it.product).filter(Boolean))];
+    return ps.length ? `<div><span class="prod-tag">★ 公司產品：${esc(ps.join("；"))}</span></div>` : "";
+  };
   const selectedCats = () => [...document.querySelectorAll("#cat-list input:checked")].map((c) => c.value);
   const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
 
@@ -269,6 +286,7 @@
         <span class="cnt">${bank.filter((b) => b.category === c).length}</span>
       </label>`).join("");
     document.querySelectorAll("#cat-list input").forEach((i) => i.addEventListener("change", updateSetup));
+    document.getElementById("focus-only").addEventListener("change", updateSetup);
     updateSetup();
     updateModeDesc();
     refreshWrongCounts();
@@ -296,10 +314,14 @@
 
   function updateSetup() {
     const cats = selectedCats();
-    const n = bank.filter((b) => cats.includes(b.category)).length;
-    document.getElementById("cat-count").textContent = cats.length ? `已選 ${cats.length} 類，共 ${n} 個代碼` : "";
-    document.getElementById("btn-start").disabled = !cats.length;
-    document.getElementById("start-hint").style.display = cats.length ? "none" : "block";
+    const n = srcBank().filter((b) => cats.includes(b.category)).length;
+    document.getElementById("focus-n").textContent = `（共 ${bank.filter((b) => b.product).length} 個）`;
+    document.getElementById("cat-count").textContent = cats.length
+      ? `已選 ${cats.length} 類，共 ${n} 個代碼${focusOnly() ? "（只含產品線相關）" : ""}` : "";
+    document.getElementById("btn-start").disabled = !cats.length || !n;
+    const hint = document.getElementById("start-hint");
+    hint.textContent = !cats.length ? "請至少選一個範圍" : "選取的範圍裡沒有產品線相關的代碼";
+    hint.style.display = cats.length && n ? "none" : "block";
     document.getElementById("btn-all-cats").textContent =
       document.querySelectorAll("#cat-list input:not(:checked)").length ? "全選" : "全不選";
   }
@@ -318,15 +340,16 @@
 
   // ── Reference table ──
   document.getElementById("btn-ref").addEventListener("click", () => {
-    const cats = selectedCats().length ? selectedCats() : [...new Set(bank.map((b) => b.category))];
+    const cats = (selectedCats().length ? selectedCats() : [...new Set(bank.map((b) => b.category))])
+      .filter((c) => srcBank().some((b) => b.category === c));
     const wrongNums = new Set([...wrongIds].map((id) => id.split("__").pop()));
     document.getElementById("ref-body").innerHTML = cats.map((c) => `
       <div class="ref-cat">${esc(c)}</div>
       <table class="ref">
         <thead><tr><th>代碼</th><th>中文</th><th>記憶法</th></tr></thead>
-        <tbody>${bank.filter((b) => b.category === c).map((b) => `
+        <tbody>${srcBank().filter((b) => b.category === c).map((b) => `
           <tr><td class="code">${esc(b.code)}</td>
-              <td>${esc(b.zh)}${wrongNums.has(b.id) ? '<span class="wrong-pill">錯過</span>' : ""}</td>
+              <td>${b.product ? '<span title="公司產品線" style="color:#D97706;">★</span> ' : ""}${esc(b.zh)}${wrongNums.has(b.id) ? '<span class="wrong-pill">錯過</span>' : ""}${b.product ? `<div style="font-size:0.7rem;color:#B45309;">${esc(b.product)}</div>` : ""}</td>
               <td class="mn">${esc(b.mnemonic)}${b.note ? `<br><span style="color:#B45309;">※ ${esc(b.note)}</span>` : ""}</td></tr>`).join("")}
         </tbody>
       </table>`).join("");
@@ -335,9 +358,10 @@
 
   // ── Build question list ──
   function buildQuestions(cats, dir) {
-    if (dir !== "mix") return buildCodeQuestions(bank, cats, dir);
-    const c2z = buildCodeQuestions(bank, cats, "c2z");
-    const z2c = buildCodeQuestions(bank, cats, "z2c");
+    const src = srcBank();
+    if (dir !== "mix") return buildCodeQuestions(src, cats, dir);
+    const c2z = buildCodeQuestions(src, cats, "c2z");
+    const z2c = buildCodeQuestions(src, cats, "z2c");
     const used = new Set();
     const out = [];
     for (const q of c2z) {
@@ -355,7 +379,7 @@
     let qs;
     if (mode === "wrong") {
       await refreshWrongCounts();
-      const all = [...buildCodeQuestions(bank, cats, "c2z"), ...buildCodeQuestions(bank, cats, "z2c")];
+      const all = [...buildCodeQuestions(srcBank(), cats, "c2z"), ...buildCodeQuestions(srcBank(), cats, "z2c")];
       qs = all.filter((q) => wrongIds.has(q.id) && (dir === "mix" || q.dir === dir));
       if (!qs.length) { showToast(dir === "mix" ? "這些範圍目前沒有錯題 🎉" : "這個方向目前沒有錯題，試試「雙向混合」"); return; }
     } else {
@@ -396,7 +420,8 @@
     const isC2Z = q.dir === "c2z";
     document.getElementById("q-dir").textContent = isC2Z ? "看代碼 → 寫中文" : "看中文 → 寫代碼";
     const catLabel = q.unit === "特殊需求" ? "特殊需求（餐點／輪椅）" : q.unit;
-    document.getElementById("q-cat").textContent = catLabel + (Q.first.has(q.id) ? "　↩ 再練" : "");
+    const isProd = q.items.some((it) => it.product);
+    document.getElementById("q-cat").textContent = catLabel + (isProd ? "　★ 產品線" : "") + (Q.first.has(q.id) ? "　↩ 再練" : "");
     const p = document.getElementById("q-prompt");
     p.textContent = q.prompt;
     p.className = "prompt-main" + (isC2Z ? "" : " zh");
@@ -513,6 +538,7 @@
         <div style="font-weight:700;">${head}</div>
         <div>${answerLine}</div>
         <div class="mn">💡 ${mn}</div>
+        ${prodTag(q)}
         ${notes}
         ${override}
       </div>`;
@@ -642,7 +668,7 @@
     F.flipped = false;
     const q = F.cur;
     document.getElementById("f-dir").textContent = q.dir === "c2z" ? "代碼 → 中文" : "中文 → 代碼";
-    document.getElementById("f-cat").textContent = q.unit;
+    document.getElementById("f-cat").textContent = q.unit + (q.items.some((it) => it.product) ? "　★ 產品線" : "");
     const front = document.getElementById("f-front");
     front.textContent = q.prompt;
     front.className = "prompt-main" + (q.dir === "c2z" ? "" : " zh");
@@ -659,7 +685,8 @@
     const q = F.cur;
     const back = document.getElementById("f-back");
     back.innerHTML = `<div class="ans">${esc(codeAnswerText(q))}</div>
-      <div class="mn">💡 ${q.items.map((it) => (q.items.length > 1 ? `<b>${esc(it.code)}</b>：` : "") + esc(it.mnemonic)).join("<br>")}</div>`;
+      <div class="mn">💡 ${q.items.map((it) => (q.items.length > 1 ? `<b>${esc(it.code)}</b>：` : "") + esc(it.mnemonic)).join("<br>")}</div>
+      ${prodTag(q)}`;
     back.style.display = "block";
     document.getElementById("f-tap").style.display = "none";
     document.getElementById("flash-actions").style.display = "flex";
