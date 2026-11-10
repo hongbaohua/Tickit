@@ -273,7 +273,12 @@
     const ps = [...new Set(q.items.map((it) => it.product).filter(Boolean))];
     return ps.length ? `<div><span class="prod-tag">★ 公司產品線：${esc(ps.join("；"))}</span></div>` : "";
   };
-  const selectedCats = () => [...document.querySelectorAll("#cat-list input:checked")].map((c) => c.value);
+  const checkedCats = () => [...document.querySelectorAll("#cat-list input:checked")].map((c) => c.value);
+  // 只勾「★ 只練產品線」、分類全不勾 → 視為全部分類裡的產品線代碼
+  const selectedCats = () => {
+    const c = checkedCats();
+    return c.length || !focusOnly() ? c : [...new Set(bank.map((b) => b.category))];
+  };
   const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
 
   // ── Init ──
@@ -326,11 +331,12 @@
     const cats = selectedCats();
     const n = srcBank().filter((b) => cats.includes(b.category)).length;
     document.getElementById("focus-n").textContent = `（共 ${bank.filter((b) => b.company).length} 個）`;
-    document.getElementById("cat-count").textContent = cats.length
-      ? `已選 ${cats.length} 類，共 ${n} 個代碼${focusOnly() ? "（只含產品線相關）" : ""}` : "";
+    document.getElementById("cat-count").textContent = !cats.length ? ""
+      : !checkedCats().length ? `全部分類的產品線代碼，共 ${n} 個`
+      : `已選 ${cats.length} 類，共 ${n} 個代碼${focusOnly() ? "（只含產品線相關）" : ""}`;
     document.getElementById("btn-start").disabled = !cats.length || !n;
     const hint = document.getElementById("start-hint");
-    hint.textContent = !cats.length ? "請至少選一個範圍" : "選取的範圍裡沒有產品線相關的代碼";
+    hint.textContent = !cats.length ? "請至少選一個範圍，或勾「★ 只練公司產品線」" : "選取的範圍裡沒有產品線相關的代碼";
     hint.style.display = cats.length && n ? "none" : "block";
     document.getElementById("btn-all-cats").textContent =
       document.querySelectorAll("#cat-list input:not(:checked)").length ? "全選" : "全不選";
