@@ -202,8 +202,13 @@
         <div style="font-size:0.95rem;font-weight:700;margin-top:0.2rem;" id="r-pct"></div>
         <div style="font-size:0.76rem;color:#9CA3AF;margin-top:0.6rem;" id="r-save"></div>
       </div>
+      <div class="card" id="r-count-card">
+        <div class="section-title" style="margin-bottom:0.2rem;">每題作答次數</div>
+        <div style="font-size:0.74rem;color:#9CA3AF;margin-bottom:0.5rem;" id="r-count-sub"></div>
+        <table class="ref" id="r-count"></table>
+      </div>
       <div class="card" id="r-wrong-card">
-        <div class="section-title" style="margin-bottom:0.5rem;">需要再加強的</div>
+        <div class="section-title" style="margin-bottom:0.5rem;">填錯答案回顧</div>
         <div class="result-list" id="r-wrong"></div>
       </div>
       <div style="display:flex;gap:0.5rem;">
@@ -372,6 +377,8 @@
       first: new Map(),     // question.id → { ok, answer }
       mastered: new Set(),
       retries: 0,
+      wrongCount: new Map(),   // question.id → 答錯次數
+      wrongAnswers: new Map(), // question.id → 填錯的答案（依序）
       cur: null,
       answered: false,
       lastOk: false,
@@ -452,6 +459,11 @@
     const q = Q.cur;
     if (!Q.first.has(q.id)) Q.first.set(q.id, { ok, answer: raw });
     Q.lastOk = ok;
+    if (!ok) {
+      Q.wrongCount.set(q.id, (Q.wrongCount.get(q.id) || 0) + 1);
+      if (!Q.wrongAnswers.has(q.id)) Q.wrongAnswers.set(q.id, []);
+      Q.wrongAnswers.get(q.id).push(raw.trim() || "（不會，看答案）");
+    }
     if (!Q.loop) return;
     if (ok) Q.mastered.add(q.id);
     else {
@@ -465,6 +477,12 @@
     const q = Q.cur;
     const f = Q.first.get(q.id);
     if (f && !f.ok && f.answer === document.getElementById("answer-input").value) f.ok = true;
+    if (!Q.lastOk) {
+      const n = (Q.wrongCount.get(q.id) || 1) - 1;
+      if (n > 0) Q.wrongCount.set(q.id, n); else Q.wrongCount.delete(q.id);
+      const wa = Q.wrongAnswers.get(q.id);
+      if (wa) { wa.pop(); if (!wa.length) Q.wrongAnswers.delete(q.id); }
+    }
     if (Q.loop && !Q.lastOk) {
       Q.retries--;
       const idx = Q.queue.lastIndexOf(q);
@@ -519,29 +537,56 @@
 
     const titleEl = document.getElementById("r-title");
     const pct = total ? Math.round((correct / total) * 100) : 0;
-    if (Q.loop && !Q.queue.length) {
-      titleEl.innerHTML = `<div style="font-size:1.25rem;font-weight:800;color:#059669;margin-bottom:0.5rem;">🎉 ${Q.questions.length} 題全部攻克！</div>`
-        + `第一次作答就答對的（重練 ${Q.retries} 次）：`;
+    if (Q.loop && Q.queue.length) {
+      titleEl.textContent = `首答成績（中途結束，已攻克 ${Q.mastered.size} / ${Q.questions.length} 題）`;
     } else if (Q.loop) {
-      titleEl.innerHTML = `<div style="font-size:1.05rem;font-weight:800;color:#D97706;margin-bottom:0.5rem;">中途結束：已攻克 ${Q.mastered.size} / ${Q.questions.length} 題</div>`
-        + `第一次作答就答對的：`;
+      titleEl.textContent = `首答成績（共重練 ${Q.retries} 次）`;
     } else {
       titleEl.textContent = "成績";
+    }
+
+    // 每題作答次數（攻克模式）：答錯次數多的排前面
+    const countCard = document.getElementById("r-count-card");
+    countCard.style.display = Q.loop ? "block" : "none";
+    if (Q.loop) {
+      const rows = answered.map((q) => {
+        const wrongN = Q.wrongCount.get(q.id) || 0;
+        const done = Q.mastered.has(q.id);
+        return { q, wrongN, done, tries: wrongN + (done ? 1 : 0) };
+      }).sort((a, b) => b.wrongN - a.wrongN);
+      const oneShot = rows.filter((r) => r.done && r.wrongN === 0).length;
+      document.getElementById("r-count-sub").textContent =
+        `一次就答對 ${oneShot} 題，答錯後重練才答對 ${rows.filter((r) => r.done && r.wrongN > 0).length} 題`
+        + (rows.some((r) => !r.done) ? `，尚未攻克 ${rows.filter((r) => !r.done).length} 題` : "");
+      document.getElementById("r-count").innerHTML = `
+        <thead><tr><th>題目</th><th>答案</th><th style="text-align:right;">作答次數</th></tr></thead>
+        <tbody>${rows.map((r) => `
+          <tr>
+            <td class="code">${esc(r.q.prompt)}</td>
+            <td>${esc(codeAnswerText(r.q))}</td>
+            <td style="text-align:right;white-space:nowrap;">
+              ${r.done ? `${r.tries} 次` : `<span style="color:#9CA3AF;">未攻克</span>`}
+              ${r.wrongN ? `<span class="wrong-pill">錯 ${r.wrongN}</span>` : ""}
+            </td>
+          </tr>`).join("")}
+        </tbody>`;
     }
     document.getElementById("r-score").textContent = `${correct} / ${total}`;
     const pctEl = document.getElementById("r-pct");
     pctEl.textContent = `${pct}%`;
     pctEl.style.color = pct >= 90 ? "#059669" : pct >= 70 ? "#D97706" : "#DC2626";
 
-    document.getElementById("r-wrong-card").style.display = wrong.length ? "block" : "none";
+    const reviewQs = answered.filter((q) => Q.wrongAnswers.has(q.id))
+      .sort((a, b) => (Q.wrongCount.get(b.id) || 0) - (Q.wrongCount.get(a.id) || 0));
+    document.getElementById("r-wrong-card").style.display = reviewQs.length ? "block" : "none";
     document.getElementById("btn-retry-wrong").style.display = wrong.length ? "inline-flex" : "none";
-    document.getElementById("r-wrong").innerHTML = wrong.map((q) => {
-      const you = Q.first.get(q.id).answer;
+    document.getElementById("r-wrong").innerHTML = reviewQs.map((q) => {
+      const yours = Q.wrongAnswers.get(q.id);
       return `<div class="row">
         <div class="q">${esc(q.prompt)}</div>
         <div style="flex:1;">
           <span class="right">${esc(codeAnswerText(q))}</span>
-          ${you ? ` <span class="you">${esc(you)}</span>` : ""}
+          ${yours.map((y) => ` <span class="you">${esc(y)}</span>`).join("")}
           <div class="mn">${esc(q.items.map((it) => it.mnemonic).join("；"))}</div>
         </div></div>`;
     }).join("");
