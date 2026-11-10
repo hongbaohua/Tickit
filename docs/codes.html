@@ -243,10 +243,10 @@
   let wrongIds = new Set();
   const MODE_DESC = {
     flash: "翻卡背誦，看完答案自評「記住了／還不熟」，不熟的會再出現。不寫入紀錄。",
-    mastery: "選取範圍全部循環：答錯的 4 題後會再出現，直到每題都答對。首答結果會存入紀錄。最推薦用來背。",
+    mastery: "選取範圍全部循環：答錯的題目會隨機隔 8～15 題後再出現；題目不夠時會穿插已答對的題目複習，複習答錯也要重練。直到每題都答對。首答結果會存入紀錄。最推薦用來背。",
     all: "全部題目各出一次，即時顯示對錯，結束後存入紀錄。適合檢查背熟程度。",
     random: "隨機抽 N 題，即時顯示對錯，結束後存入紀錄。適合零碎時間快速複習。",
-    wrong: "只出歷史上答錯過的題目，循環到全部答對為止。",
+    wrong: "只出歷史上答錯過的題目，循環到全部答對為止（重練的間隔同攻克模式）。",
   };
 
   function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
@@ -438,7 +438,7 @@
     document.getElementById("q-dir").textContent = isC2Z ? "看代碼 → 寫中文" : "看中文 → 寫代碼";
     const catLabel = q.unit === "特殊需求" ? "特殊需求（餐點／輪椅）" : q.unit;
     const isProd = q.items.some((it) => it.company);
-    document.getElementById("q-cat").textContent = catLabel + (isProd ? "　★ 產品線" : "") + (Q.first.has(q.id) ? "　↩ 再練" : "");
+    document.getElementById("q-cat").textContent = catLabel + (isProd ? "　★ 產品線" : "") + (Q.mastered.has(q.id) ? "　↻ 複習" : Q.first.has(q.id) ? "　↩ 再練" : "");
     const p = document.getElementById("q-prompt");
     p.textContent = q.prompt;
     p.className = "prompt-main" + (isC2Z ? "" : " zh");
@@ -510,8 +510,26 @@
     if (ok) Q.mastered.add(q.id);
     else {
       Q.retries++;
-      Q.queue.splice(Math.min(4, Q.queue.length), 0, q);
+      Q.mastered.delete(q.id); // 複習時又答錯 → 取消攻克，重新排回
+      requeueFar(q);
     }
+  }
+
+  // 答錯的題目隨機排到 RETRY_GAP_MIN～RETRY_GAP_MAX 題之後，避免靠短期記憶答對。
+  // 剩下的題目不夠拉開距離時，從已攻克的題目隨機抽幾題「複習」穿插在中間。
+  const RETRY_GAP_MIN = 8, RETRY_GAP_MAX = 15;
+  function requeueFar(q) {
+    const gap = RETRY_GAP_MIN + Math.floor(Math.random() * (RETRY_GAP_MAX - RETRY_GAP_MIN + 1));
+    if (Q.queue.length < gap) {
+      const inQueue = new Set(Q.queue.map((x) => x.id));
+      const fillers = shuffle(Q.questions.filter((x) =>
+        x.id !== q.id && Q.mastered.has(x.id) && !inQueue.has(x.id)));
+      while (Q.queue.length < gap && fillers.length) {
+        const f = fillers.pop();
+        Q.queue.splice(Math.floor(Math.random() * (Q.queue.length + 1)), 0, f);
+      }
+    }
+    Q.queue.splice(Math.min(gap, Q.queue.length), 0, q);
   }
 
   // 判定有誤 → 改判為正確
