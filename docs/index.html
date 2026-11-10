@@ -26,6 +26,7 @@
     </div>
     <nav>
       <a href="index.html" class="nav-link active"><span class="nav-dot"></span>首頁</a>
+      <a href="codes.html" class="nav-link"><span class="nav-dot"></span>代碼練習</a>
       <a href="dashboard.html" class="nav-link"><span class="nav-dot"></span>考生管理</a>
       <a href="admin.html" class="nav-link" id="nav-admin" style="display:none;"><span class="nav-dot"></span>管理者</a>
     </nav>
@@ -351,6 +352,16 @@
     }
 
     const topic = state.manifest.topics.find((t) => t.name === topicName);
+    const startBtn = document.getElementById("btn-start");
+    if (topic.type === "codes") {
+      cardUnits.style.display = "none";
+      cardCount.style.display = "none";
+      startBtn.disabled = false;
+      startBtn.textContent = "進入代碼練習（寫中文／寫代碼）→";
+      document.getElementById("start-hint").style.display = "none";
+      return;
+    }
+    startBtn.textContent = "開始測驗 →";
     const list = document.getElementById("units-list");
     list.innerHTML = "";
     unitQuestionCounts = {};
@@ -449,6 +460,9 @@
 
   function updateStartBtn() {
     const btn = document.getElementById("btn-start");
+    const cur = state.manifest && state.manifest.topics.find((t) => t.name === document.getElementById("select-topic").value);
+    if (cur && cur.type === "codes") return;
+    btn.textContent = "開始測驗 →";
     const hint = document.getElementById("start-hint");
     btn.disabled = state.selectedUnits.size === 0;
     hint.style.display = state.selectedUnits.size === 0 ? "block" : "none";
@@ -542,6 +556,8 @@
   // ── Start quiz ──
   document.getElementById("btn-start").addEventListener("click", async () => {
     const topic = document.getElementById("select-topic").value;
+    const topicData = state.manifest.topics.find((t) => t.name === topic);
+    if (topicData && topicData.type === "codes") { window.location.href = "codes.html"; return; }
     const units = [...state.selectedUnits];
     const mode = document.querySelector("input[name=mode]:checked").value;
     const n = parseInt(document.getElementById("input-n").value, 10) || 10;

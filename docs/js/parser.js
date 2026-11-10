@@ -155,6 +155,13 @@ async function loadQuestions(topic, selectedUnits) {
     return [];
   }
 
+  // 代碼題庫（JSON，非選擇題）
+  if (topicData.type === "codes") {
+    if (typeof loadCodeQuestionsForReview !== "function") return [];
+    const all = await loadCodeQuestionsForReview();
+    return all.filter((q) => selectedUnits.includes(q.unit));
+  }
+
   const units = topicData.units.filter((u) => selectedUnits.includes(u.unit));
   const allQuestions = [];
 
