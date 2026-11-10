@@ -9,7 +9,7 @@
   ],
   "mnemonic": "AMS＝AMSterdam 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "002",
@@ -21,7 +21,7 @@
   ],
   "mnemonic": "ATH＝ATHens 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "003",
@@ -119,7 +119,7 @@
   ],
   "mnemonic": "BRUssels 前三字母；中文「布魯」也正好對 BRU。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "011",
@@ -167,7 +167,7 @@
   ],
   "mnemonic": "CoPenHagen → C‧P‧H。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "015",
@@ -239,7 +239,7 @@
   ],
   "mnemonic": "FRAnkfurt 前三字母；中文「法」＝FRA。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "021",
@@ -324,7 +324,7 @@
   ],
   "mnemonic": "汶萊首都 Bandar Seri BegaWaN → B＋WN。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "028",
@@ -457,7 +457,7 @@
   ],
   "mnemonic": "羽田 HaNeDa → H‧N‧D。",
   "note": "東京有 HND／NRT／TYO 三個代碼",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "039",
@@ -470,7 +470,7 @@
   ],
   "mnemonic": "成田 NaRiTa → N‧R‧T。",
   "note": "東京有 HND／NRT／TYO 三個代碼",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "040",
@@ -482,7 +482,7 @@
   ],
   "mnemonic": "TokYO → T＋YO。",
   "note": "東京有 HND／NRT／TYO 三個代碼",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "041",
@@ -530,7 +530,7 @@
   ],
   "mnemonic": "FUKuoka 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "045",
@@ -629,7 +629,7 @@
   ],
   "mnemonic": "Tiger 開頭 TI 倒過來就是 IT。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "053",
@@ -641,7 +641,7 @@
   ],
   "mnemonic": "澳門賭場喊「Next！下一把」→ N‧X。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "054",
@@ -665,7 +665,7 @@
   ],
   "mnemonic": "港（Harbour）灣（Bay）→ H‧B。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "056",
@@ -717,7 +717,7 @@
   ],
   "mnemonic": "China ＋ 總部廣州 GuangZhou 的 Z → C‧Z。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "060",
@@ -729,7 +729,7 @@
   ],
   "mnemonic": "Shandong ＋ China → S‧C。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "061",
@@ -754,7 +754,7 @@
   ],
   "mnemonic": "廈門 XiaMen 的 M ＋ 福建 Fujian 的 F。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "063",
@@ -767,7 +767,7 @@
   ],
   "mnemonic": "China airlInes → C‧I。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "064",
@@ -779,7 +779,7 @@
   ],
   "mnemonic": "長「榮」＝ BRight 光榮 → BR。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "065",
@@ -815,7 +815,7 @@
   ],
   "mnemonic": "Hong Kong 的 H ＋ X（香港叉燒）。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "068",
@@ -840,7 +840,7 @@
   ],
   "mnemonic": "Cathay 的 C ＋ X。",
   "note": "",
-  "product": ""
+  "product": "公司行程常搭"
  },
  {
   "id": "070",
@@ -912,7 +912,7 @@
   ],
   "mnemonic": "DaLian → D‧L ＋ C（City）。注意和大理 DLU 區分。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "092",
@@ -924,7 +924,7 @@
   ],
   "mnemonic": "HaRBin → H‧R‧B。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "105",
@@ -936,7 +936,7 @@
   ],
   "mnemonic": "Chang 取 C‧G，「春」硬記成 Q → CGQ。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "106",
@@ -972,7 +972,7 @@
   ],
   "mnemonic": "SHEnyang 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "071",
@@ -1032,7 +1032,7 @@
   ],
   "mnemonic": "WeNZhou → W‧N‧Z。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "094",
@@ -1056,7 +1056,7 @@
   ],
   "mnemonic": "NinGBo → N‧G‧B。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "107",
@@ -1154,7 +1154,7 @@
   ],
   "mnemonic": "福州舊稱 FOoChow → F‧O‧C。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "079",
@@ -1166,7 +1166,7 @@
   ],
   "mnemonic": "XiaMeN → X‧M‧N。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "082",
@@ -1178,7 +1178,7 @@
   ],
   "mnemonic": "汕頭舊稱 SWAtow 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "083",
@@ -1190,7 +1190,7 @@
   ],
   "mnemonic": "桂林舊拼 KWeiLin → K‧W‧L。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "085",
@@ -1214,7 +1214,7 @@
   ],
   "mnemonic": "HAiKou → HA＋K。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "091",
@@ -1226,7 +1226,7 @@
   ],
   "mnemonic": "SanYa → S‧Y ＋ X。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "093",
@@ -1250,7 +1250,7 @@
   ],
   "mnemonic": "Hong KonG → H‧K‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "119",
@@ -1262,7 +1262,7 @@
   ],
   "mnemonic": "諧音硬記：Macau Fun Macau（澳門好好玩）。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "120",
@@ -1274,7 +1274,7 @@
   ],
   "mnemonic": "NanNinG → N‧N‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "087",
@@ -1286,7 +1286,7 @@
   ],
   "mnemonic": "ChangSha → C‧S ＋ X。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "095",
@@ -1298,7 +1298,7 @@
   ],
   "mnemonic": "張家界舊名「大庸」DaYonG → D‧Y‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "102",
@@ -1310,7 +1310,7 @@
   ],
   "mnemonic": "鄭州舊拼 ChenGchOw → C‧G‧O。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "114",
@@ -1322,7 +1322,7 @@
   ],
   "mnemonic": "WUHan 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "080",
@@ -1334,7 +1334,7 @@
   ],
   "mnemonic": "KunMinG → K‧M‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "084",
@@ -1359,7 +1359,7 @@
   ],
   "mnemonic": "重慶舊拼 ChungKinG → C‧K‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "098",
@@ -1383,7 +1383,7 @@
   ],
   "mnemonic": "貴陽舊拼 KWEiyang 前三字母。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "104",
@@ -1395,7 +1395,7 @@
   ],
   "mnemonic": "LiJianG → L‧J‧G。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "115",
@@ -1407,7 +1407,7 @@
   ],
   "mnemonic": "DaLi → D‧L ＋ U。注意和大連 DLC 區分。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "074",
@@ -1419,7 +1419,7 @@
   ],
   "mnemonic": "西安 Xi'an 諧音「SI-A」。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "099",
@@ -1479,7 +1479,7 @@
   ],
   "mnemonic": "烏魯木齊舊拼 URumChi → U‧R‧C。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "123",
@@ -1614,7 +1614,7 @@
   ],
   "mnemonic": "Taipei SongShan Airport → T‧S‧A。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "134",
@@ -1627,7 +1627,7 @@
   ],
   "mnemonic": "TaiPEi → T‧P‧E。",
   "note": "",
-  "product": ""
+  "product": "公司行程常去"
  },
  {
   "id": "135",
@@ -1665,5 +1665,203 @@
   "mnemonic": "VietJet → V‧J。",
   "note": "",
   "product": "台中出發 峴港團"
+ },
+ {
+  "id": "138",
+  "category": "產品線補充",
+  "code": "KMJ",
+  "zh": "熊本（日本）",
+  "accept": [
+   "熊本"
+  ],
+  "mnemonic": "KuMamoto ＋ J（Japan）→ K‧M‧J。",
+  "note": "",
+  "product": "星宇 台中－熊本"
+ },
+ {
+  "id": "139",
+  "category": "產品線補充",
+  "code": "TAK",
+  "zh": "高松（日本）",
+  "accept": [
+   "高松"
+  ],
+  "mnemonic": "TAKamatsu 前三字母。",
+  "note": "",
+  "product": "星宇 台中－高松"
+ },
+ {
+  "id": "140",
+  "category": "產品線補充",
+  "code": "CDG",
+  "zh": "巴黎（戴高樂）",
+  "accept": [
+   "巴黎",
+   "戴高樂"
+  ],
+  "mnemonic": "Charles De Gaulle → C‧D‧G。",
+  "note": "",
+  "product": "荷比法盧團"
+ },
+ {
+  "id": "141",
+  "category": "產品線補充",
+  "code": "DXB",
+  "zh": "杜拜",
+  "accept": [
+   "杜拜",
+   "迪拜"
+  ],
+  "mnemonic": "DuBai → D‧B，中間夾一個 X。",
+  "note": "",
+  "product": "杜拜團"
+ },
+ {
+  "id": "142",
+  "category": "產品線補充",
+  "code": "IST",
+  "zh": "伊斯坦堡（土耳其）",
+  "accept": [
+   "伊斯坦堡",
+   "伊斯坦布爾"
+  ],
+  "mnemonic": "IStanbul → I‧S‧T。",
+  "note": "",
+  "product": "土耳其團"
+ },
+ {
+  "id": "143",
+  "category": "產品線補充",
+  "code": "MAN",
+  "zh": "曼徹斯特（英國）",
+  "accept": [
+   "曼徹斯特"
+  ],
+  "mnemonic": "MANchester 前三字母。",
+  "note": "",
+  "product": "英格蘭・蘇格蘭・愛爾蘭團"
+ },
+ {
+  "id": "144",
+  "category": "產品線補充",
+  "code": "CMN",
+  "zh": "卡薩布蘭加（摩洛哥）",
+  "accept": [
+   "卡薩布蘭加",
+   "卡薩布蘭卡"
+  ],
+  "mnemonic": "Casablanca Mohammed V 機場 → C ＋ MN。",
+  "note": "",
+  "product": "摩洛哥團"
+ },
+ {
+  "id": "145",
+  "category": "產品線補充",
+  "code": "DUB",
+  "zh": "都柏林（愛爾蘭）",
+  "accept": [
+   "都柏林"
+  ],
+  "mnemonic": "DUBlin 前三字母。",
+  "note": "",
+  "product": "南北愛爾蘭團"
+ },
+ {
+  "id": "146",
+  "category": "產品線補充",
+  "code": "MXP",
+  "zh": "米蘭（馬爾彭薩）",
+  "accept": [
+   "米蘭",
+   "馬爾彭薩"
+  ],
+  "mnemonic": "MalPensa → M‧P，中間夾一個 X。",
+  "note": "",
+  "product": "義大利團"
+ },
+ {
+  "id": "147",
+  "category": "產品線補充",
+  "code": "CAI",
+  "zh": "開羅（埃及）",
+  "accept": [
+   "開羅"
+  ],
+  "mnemonic": "CAIro 前三字母。",
+  "note": "",
+  "product": "埃及團"
+ },
+ {
+  "id": "148",
+  "category": "產品線補充",
+  "code": "FM",
+  "zh": "上海航空",
+  "accept": [
+   "上海航空",
+   "上航"
+  ],
+  "mnemonic": "FM 像收音機頻道，「上海頻道」→ 上海航空。",
+  "note": "",
+  "product": "江南團"
+ },
+ {
+  "id": "149",
+  "category": "產品線補充",
+  "code": "HO",
+  "zh": "吉祥航空",
+  "accept": [
+   "吉祥"
+  ],
+  "mnemonic": "吉祥＝「好（HO）」運。",
+  "note": "",
+  "product": "希臘團、英愛團"
+ },
+ {
+  "id": "150",
+  "category": "產品線補充",
+  "code": "EK",
+  "zh": "阿聯酋航空",
+  "accept": [
+   "阿聯酋"
+  ],
+  "mnemonic": "Emirates 的 E ＋ K。",
+  "note": "",
+  "product": "杜拜團"
+ },
+ {
+  "id": "151",
+  "category": "產品線補充",
+  "code": "TK",
+  "zh": "土耳其航空",
+  "accept": [
+   "土耳其"
+  ],
+  "mnemonic": "TurKish → T‧K。",
+  "note": "",
+  "product": "土耳其團"
+ },
+ {
+  "id": "152",
+  "category": "產品線補充",
+  "code": "EY",
+  "zh": "阿提哈德航空",
+  "accept": [
+   "阿提哈德"
+  ],
+  "mnemonic": "EtihaD 的 E ＋ Y。",
+  "note": "",
+  "product": "摩洛哥團"
+ },
+ {
+  "id": "153",
+  "category": "產品線補充",
+  "code": "9C",
+  "zh": "春秋航空",
+  "accept": [
+   "春秋"
+  ],
+  "mnemonic": "秋天在 9 月 → 9 ＋ C（China）。",
+  "note": "",
+  "product": "高雄出發 上海"
  }
 ]
