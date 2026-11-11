@@ -137,7 +137,7 @@ async function getUserQuestionResults(userId) {
 }
 
 async function getAllUsers() {
-  const res = await fetch(`${_url("users")}?select=id,name&order=name`, {
+  const res = await fetch(`${_url("users")}?select=id,name,created_at&order=name`, {
     headers: _headers(),
   });
   await _check(res, "讀取所有使用者");

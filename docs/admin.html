@@ -265,7 +265,8 @@
     const rows = regularAccs.map(u => {
       const sc = sessionCountMap[u.id] || 0;
       const note = notes[u.id] || "";
-      const createdAt = u.created_at ? u.created_at.slice(0, 10) : "—";
+      // 以本機（台灣）時區顯示 YYYY-MM-DD
+      const createdAt = u.created_at ? new Date(u.created_at).toLocaleDateString("sv-SE") : "—";
       const safeName = u.name.replace(/'/g, "\\'");
 
       // 名稱：有紀錄才可點擊跳轉
