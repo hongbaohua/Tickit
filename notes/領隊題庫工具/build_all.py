@@ -68,8 +68,12 @@ def apply_level(a, b, lv):
     if not lv: return
     for el in (a, b): el['class'] = el.get('class', []) + [f'tight{min(lv, 3)}']
     if lv >= 4:
-        a['style'] = re.sub(r';?break-inside:avoid', '', a.get('style', ''))
-        b['style'] = b.get('style', '') + ';break-before:avoid'
+        if 'break-inside:avoid' in a.get('style', '') or a.name in ('p', 'blockquote'):
+            # short block: move it together with its note rather than split it
+            w = BeautifulSoup('<div class="keep" style="break-inside:avoid"></div>', 'html.parser').div
+            a.insert_before(w); w.append(a.extract()); w.append(b.extract())
+        else:
+            b['style'] = b.get('style', '') + ';break-before:avoid'
     if lv >= 3:
         # still slipping: tighten the blocks above it on the same page as well
         n = 0
@@ -164,10 +168,38 @@ for f in files:
     _s = _BS(open(html, encoding='utf-8').read(), 'html.parser')
     for _h in _s.find_all(['h2', 'h3', 'h4']):
         _w = _s.new_tag('div', attrs={'class': 'hk'}); _h.wrap(_w)
+    for _l in _s.find_all(['ul', 'ol']):
+        if len(_l.find_all('li')) <= 6 and len(_l.get_text()) < 400:
+            _l['style'] = (_l.get('style', '') + ';break-inside:avoid').lstrip(';')
     for _p in _s.find_all('p'):
         _n = _p.find_next_sibling()
         if _n is not None and _n.name == 'table' and len(_p.get_text()) < 120 and not _p.find_parent(['td', 'li']):
-            _w = _s.new_tag('div', attrs={'class': 'hk'}); _p.wrap(_w)
+            if 'break-inside:avoid' in _n.get('style', ''):
+                _w = _s.new_tag('div', attrs={'class': 'keep', 'style': 'break-inside:avoid'})
+                _p.insert_before(_w); _w.append(_p.extract()); _w.append(_n.extract())
+            else:
+                _w = _s.new_tag('div', attrs={'class': 'hk'}); _p.wrap(_w)
+    # heading chains: heading (+ short intro) (+ sub-heading) + a block that must not split -> one unit
+    def _avoid(el):
+        return el is not None and getattr(el, 'name', None) in ('table', 'div', 'ul', 'ol') and (
+            'break-inside:avoid' in el.get('style', '') or (el.name == 'div' and set(el.get('class', [])) & CALLOUT))
+    for _h in list(_s.find_all('div', class_='hk')):
+        if _h.parent is None or _h.find_parent('div', class_='keep'):
+            continue
+        chain = [_h]; nx = _h.find_next_sibling()
+        while nx is not None and len(chain) < 5:
+            if nx.name == 'div' and 'hk' in nx.get('class', []):
+                chain.append(nx)
+            elif nx.name == 'p' and len(nx.get_text()) < 150:
+                chain.append(nx)
+            else:
+                break
+            nx = nx.find_next_sibling()
+        if _avoid(nx) and len(nx.get_text()) < 900:
+            chain.append(nx)
+            _w = _s.new_tag('div', attrs={'class': 'keep', 'style': 'break-inside:avoid'})
+            chain[0].insert_before(_w)
+            for el in chain: _w.append(el.extract())
     open(html, 'w', encoding='utf-8').write(str(_s))
     # overflow check on a copy
     chk = f'{work}/{stem}.chk.html'
