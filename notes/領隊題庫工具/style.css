@@ -21,3 +21,9 @@ div.trap { background:#fdf0ef; border-left:5px solid #c0392b; }
 div.tip { background:#fffde8; border:1px dashed #d4b800; }
 div.answer { background:#f6f6f6; border:1px solid #ccc; font-size:10pt; }
 div > p:first-child { margin-top:2px; } div > p:last-child, div > ol:last-child, div > ul:last-child { margin-bottom:2px; }
+/* typesetting: keep headings with following content, avoid stray lines */
+h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
+.hk { break-inside: avoid; break-after: avoid; } .hk::after { content: ""; display: block; height: 38mm; margin-bottom: -38mm; }
+p, li, td, th, blockquote { orphans: 3; widows: 3; text-wrap: pretty; }
+td, th { word-break: keep-all; overflow-wrap: anywhere; }
+ul, ol { break-before: avoid; }

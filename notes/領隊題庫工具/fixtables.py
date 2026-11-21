@@ -58,7 +58,11 @@ def fix(path):
         for x in w:
             cg.append(soup.new_tag('col', style=f'width:{100 * x / tot:.1f}%'))
         t.insert(0, cg)
-        t['style'] = 'table-layout:fixed;width:100%'
+        fr = [x / tot for x in w]
+        est = 0
+        for r in rows:
+            est += max(math.ceil(max(vlen(c.get_text()), 1) / max(fr[i] * LINE - 1, 1)) for i, c in enumerate(r[:n])) + 0.4
+        t['style'] = 'table-layout:fixed;width:100%' + (';break-inside:avoid' if est <= 26 else '')
     open(path, 'w', encoding='utf-8').write(str(soup))
 
 if __name__ == '__main__':

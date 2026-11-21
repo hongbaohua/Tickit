@@ -58,6 +58,11 @@ for f in files:
     subprocess.run(['pandoc', tmp, '-f', fmt, '-t', 'html5', '-s', '--metadata', f'pagetitle={stem}',
                     '-c', 'style.css', '-o', html], check=True)
     fixtables.fix(html)
+    from bs4 import BeautifulSoup as _BS
+    _s = _BS(open(html, encoding='utf-8').read(), 'html.parser')
+    for _h in _s.find_all(['h2', 'h3', 'h4']):
+        _w = _s.new_tag('div', attrs={'class': 'hk'}); _h.wrap(_w)
+    open(html, 'w', encoding='utf-8').write(str(_s))
     # overflow check on a copy
     chk = f'{work}/{stem}.chk.html'
     open(chk, 'w', encoding='utf-8').write(open(html, encoding='utf-8').read().replace('</head>', CHECK_JS + '</head>'))
@@ -118,5 +123,17 @@ for stem, pdf, n in chapters:
             problems.append(f'{stem}: page {i+1} blank bottom {blank:.0%}')
         os.remove(im)
 
+# heading stranded at page bottom: last text line on a page equals a heading
+from bs4 import BeautifulSoup
+for stem, pdf, n in chapters:
+    heads = set()
+    for h in BeautifulSoup(open(f'{work}/{stem}.html', encoding='utf-8').read(), 'html.parser').find_all(['h1','h2','h3','h4']):
+        heads.add(re.sub(r'\s+', '', h.get_text()))
+    txt = subprocess.run(['pdftotext', '-layout', f'{out}/{stem}.pdf', '-'], capture_output=True, text=True).stdout
+    for i, pg in enumerate(txt.split('\f')[:-1]):
+        lines = [re.sub(r'\s+', '', l) for l in pg.split('\n') if l.strip()]
+        body = [l for l in lines if not l.startswith(('第', '導讀')) or '本章' not in l]
+        if body and body[-1] in heads:
+            problems.append(f'{stem}: page {i+1} ends with heading {body[-1]}')
 print('total pages', total)
 print('\n'.join(problems) or 'no problems')

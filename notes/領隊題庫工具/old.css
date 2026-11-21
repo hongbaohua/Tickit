@@ -12,3 +12,9 @@ code { background:#f2f2f2; padding:0 3px; border-radius:3px; }
 strong { color:#b03a2e; }
 li { margin: 2px 0; }
 hr { border:none; border-top:1px dashed #bbb; }
+/* typesetting: keep headings with following content, avoid stray lines */
+h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
+.hk { break-inside: avoid; break-after: avoid; } .hk::after { content: ""; display: block; height: 38mm; margin-bottom: -38mm; }
+p, li, td, th, blockquote { orphans: 3; widows: 3; text-wrap: pretty; }
+td, th { word-break: keep-all; overflow-wrap: anywhere; }
+ul, ol { break-before: avoid; }
