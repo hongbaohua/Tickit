@@ -45,6 +45,108 @@ def chrome(args):
     return subprocess.run(['google-chrome', '--headless=new', '--no-sandbox', '--disable-gpu',
                            '--no-pdf-header-footer'] + args, capture_output=True, text=True).stdout
 
+CALLOUT = {'info', 'plain', 'example', 'exam', 'trap', 'tip', 'answer'}
+
+def is_block(t):
+    return getattr(t, 'name', None) in ('p', 'ul', 'ol', 'table', 'div', 'blockquote')
+
+def pairs_of(soup):
+    out = []
+    for t in soup.find_all(['table', 'div', 'p', 'ul', 'ol', 'blockquote']):
+        if t.find_parent(['td', 'li']) or (t.name == 'div' and 'hk' in t.get('class', [])):
+            continue
+        nxt = t.find_next_sibling()
+        if not is_block(nxt) or (nxt.name == 'div' and 'hk' in nxt.get('class', [])):
+            continue
+        callout = nxt.name == 'div' and set(nxt.get('class', [])) & CALLOUT
+        prev_callout = t.name == 'div' and set(t.get('class', [])) & CALLOUT
+        if (callout and not prev_callout) or t.name == 'table':
+            out.append((t, nxt))
+    return out
+
+def apply_level(a, b, lv):
+    if not lv: return
+    for el in (a, b): el['class'] = el.get('class', []) + [f'tight{min(lv, 3)}']
+    if lv >= 4:
+        a['style'] = re.sub(r';?break-inside:avoid', '', a.get('style', ''))
+        b['style'] = b.get('style', '') + ';break-before:avoid'
+    if lv >= 3:
+        # still slipping: tighten the blocks above it on the same page as well
+        n = 0
+        for p in a.find_previous_siblings():
+            if n >= 8 or p.name == 'hr': break
+            if is_block(p) and 'hk' not in p.get('class', []):
+                p['class'] = p.get('class', []) + [f'tight{min(lv - 1, 3)}']
+                n += 1
+
+def keep_with_previous(html, pdf, stem):
+    # a note right after a table (or a callout box after anything) must start on the page where its
+    # predecessor ends. When it slips to the next page, tighten both blocks and render again.
+    from bs4 import BeautifulSoup as BS
+    base = open(html, encoding='utf-8').read()
+    level = {}
+    for it in range(7):
+        soup = BS(base, 'html.parser')
+        prs = pairs_of(soup)
+        for k, (a, b) in enumerate(prs):
+            apply_level(a, b, level.get(k, 0))
+            mk = lambda tag: BS(f'<span class="mk">{tag}</span>', 'html.parser').span
+            last = a.find_all('tr')[-1].find(['td', 'th']) if a.name == 'table' else (a.find_all('li')[-1] if a.name in ('ul', 'ol') and a.find_all('li') else a)
+            last.append(mk(f'QE{k}Q'))
+            (b.find(['p', 'li', 'td', 'th']) or b).insert(0, mk(f'QS{k}Q'))
+        test = html[:-5] + '.fit.html'
+        open(test, 'w', encoding='utf-8').write(str(soup))
+        chrome(['--print-to-pdf=' + pdf, 'file://' + test])
+        txt = subprocess.run(['pdftotext', pdf, '-'], capture_output=True, text=True).stdout.split('\f')
+        page = {}
+        for i, pg in enumerate(txt):
+            for m in re.finditer(r'Q([ES]\d+)Q', pg): page.setdefault(m.group(1), i)
+        bad = [k for k in range(len(prs)) if page.get(f'S{k}', 0) > page.get(f'E{k}', 0)]
+        if not bad:
+            break
+        if it == 6:
+            for k in bad:
+                a, b = prs[k]
+                problems.append(f'{stem}: p{page.get(f"E{k}",0)+1} [{a.name} {a.get_text()[:15]!r}] -> [{b.get_text()[:15]!r}]')
+            break
+        for k in bad: level[k] = level.get(k, 0) + 1
+        # level 4+: let the predecessor split so its tail travels with the note
+    # final render without markers but with the same tightening
+    soup = BS(base, 'html.parser')
+    for k, (a, b) in enumerate(pairs_of(soup)):
+        apply_level(a, b, level.get(k, 0))
+    open(html, 'w', encoding='utf-8').write(str(soup))
+    chrome(['--print-to-pdf=' + pdf, 'file://' + html])
+    # a last page holding only a few lines: tighten the whole chapter slightly to pull them back
+    for cls in ('compact1', 'compact2'):
+        pages_txt = subprocess.run(['pdftotext', pdf, '-'], capture_output=True, text=True).stdout.split('\f')
+        pages_txt = [p for p in pages_txt if p.strip()]
+        if len(pages_txt) < 2 or len([l for l in pages_txt[-1].split('\n') if l.strip()]) > 6:
+            break
+        n0 = len(pages_txt)
+        body = soup.find('body'); body['class'] = [cls]
+        open(html + '.c.html', 'w', encoding='utf-8').write(str(soup))
+        chrome(['--print-to-pdf=' + pdf + '.c.pdf', 'file://' + html + '.c.html'])
+        if len(PdfReader(pdf + '.c.pdf').pages) < n0:
+            os.replace(html + '.c.html', html); os.replace(pdf + '.c.pdf', pdf)
+            break
+    # final verification of note-with-predecessor on the layout actually shipped
+    from bs4 import BeautifulSoup as BS2
+    v = BS2(open(html, encoding='utf-8').read(), 'html.parser')
+    prs = pairs_of(v)
+    for k, (a, b) in enumerate(prs):
+        last = a.find_all('tr')[-1].find(['td', 'th']) if a.name == 'table' else (a.find_all('li')[-1] if a.name in ('ul', 'ol') and a.find_all('li') else a)
+        last.append(BS2(f'<span class="mk">QE{k}Q</span>', 'html.parser').span)
+        (b.find(['p', 'li', 'td', 'th']) or b).insert(0, BS2(f'<span class="mk">QS{k}Q</span>', 'html.parser').span)
+    open(html + '.v.html', 'w', encoding='utf-8').write(str(v))
+    chrome(['--print-to-pdf=' + pdf + '.v.pdf', 'file://' + html + '.v.html'])
+    page = {}
+    for i, pg in enumerate(subprocess.run(['pdftotext', pdf + '.v.pdf', '-'], capture_output=True, text=True).stdout.split('\f')):
+        for m in re.finditer(r'Q([ES]\d+)Q', pg): page.setdefault(m.group(1), i)
+    for k, (a, b) in enumerate(prs):
+        if page.get(f'S{k}', 0) > page.get(f'E{k}', 0):
+            problems.append(f'{stem}: VERIFY p{page.get(f"E{k}",0)+1} note separated from {a.name} {a.get_text()[:15]!r}')
+
 files = sorted(glob.glob(f'{src}/*.md'))
 chapters = []
 problems = []
@@ -62,6 +164,10 @@ for f in files:
     _s = _BS(open(html, encoding='utf-8').read(), 'html.parser')
     for _h in _s.find_all(['h2', 'h3', 'h4']):
         _w = _s.new_tag('div', attrs={'class': 'hk'}); _h.wrap(_w)
+    for _p in _s.find_all('p'):
+        _n = _p.find_next_sibling()
+        if _n is not None and _n.name == 'table' and len(_p.get_text()) < 120 and not _p.find_parent(['td', 'li']):
+            _w = _s.new_tag('div', attrs={'class': 'hk'}); _p.wrap(_w)
     open(html, 'w', encoding='utf-8').write(str(_s))
     # overflow check on a copy
     chk = f'{work}/{stem}.chk.html'
@@ -71,7 +177,7 @@ for f in files:
     bad = json.loads(m.group(1).replace('&quot;', '"')) if m else ['CHECK FAILED']
     for b in bad: problems.append(f'{stem}: {b}')
     pdf = f'{work}/{stem}.raw.pdf'
-    chrome(['--print-to-pdf=' + pdf, 'file://' + html])
+    keep_with_previous(html, pdf, stem)
     chapters.append((stem, pdf, len(PdfReader(pdf).pages)))
 
 total = sum(c[2] for c in chapters)
