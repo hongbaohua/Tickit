@@ -17,7 +17,7 @@ h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
 .hk { break-inside: avoid; break-after: avoid; } .hk::after { content: ""; display: block; height: 38mm; margin-bottom: -38mm; }
 p, li, td, th, blockquote { orphans: 3; widows: 3; text-wrap: pretty; }
 td, th { word-break: keep-all; overflow-wrap: anywhere; }
-ul, ol { break-before: avoid; }
+p + ul, p + ol { break-before: avoid; }
 /* markers used only while fitting (out of flow, invisible) */
 .mk { position: absolute; font-size: 2px; color: #fff; }
 /* progressive tightening so a note stays on the page of the block it explains */

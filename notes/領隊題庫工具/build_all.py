@@ -184,11 +184,11 @@ for f in files:
         return el is not None and getattr(el, 'name', None) in ('table', 'div', 'ul', 'ol') and (
             'break-inside:avoid' in el.get('style', '') or (el.name == 'div' and set(el.get('class', [])) & CALLOUT))
     for _h in list(_s.find_all('div', class_='hk')):
-        if _h.parent is None or _h.find_parent('div', class_='keep'):
+        if _h.parent is None or _h.find_parent('div', class_='keep') or _h.find('h2'):
             continue
         chain = [_h]; nx = _h.find_next_sibling()
         while nx is not None and len(chain) < 5:
-            if nx.name == 'div' and 'hk' in nx.get('class', []):
+            if nx.name == 'div' and 'hk' in nx.get('class', []) and not nx.find('h2'):
                 chain.append(nx)
             elif nx.name == 'p' and len(nx.get_text()) < 150:
                 chain.append(nx)
