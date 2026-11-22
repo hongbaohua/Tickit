@@ -31,3 +31,4 @@ div.tight3, p.tight3, ul.tight3, ol.tight3 { font-size: 9.3pt; line-height: 1.4;
 .hk:has(> h2)::after { height: 60mm; margin-bottom: -60mm; }
 body.compact1 { line-height: 1.65; } body.compact1 td, body.compact1 th { padding-top: 3px; padding-bottom: 3px; } body.compact1 h2 { margin-top: 18px; } body.compact1 h3 { margin-top: 14px; }
 body.compact2 { line-height: 1.55; font-size: 10.5pt; } body.compact2 td, body.compact2 th { padding-top: 2px; padding-bottom: 2px; } body.compact2 h2 { margin-top: 14px; } body.compact2 h3 { margin-top: 12px; }
+li:has(> ol), li:has(> ul) { break-inside: avoid; }
