@@ -8,6 +8,7 @@ import sys, os, re, subprocess, glob, shutil, json
 from pypdf import PdfReader, PdfWriter
 sys.path.insert(0, os.path.dirname(__file__))
 import fixtables
+from bs4 import BeautifulSoup
 
 ed, src, css, out = sys.argv[1:5]
 book = sys.argv[sys.argv.index('--book') + 1] if '--book' in sys.argv else None
