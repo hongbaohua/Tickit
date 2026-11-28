@@ -35,3 +35,5 @@ li:has(> ol), li:has(> ul) { break-inside: avoid; }
 .mk { position: absolute; font-size: 2px; color: #fff; }
 body.compact1 { line-height: 1.65; } body.compact1 td, body.compact1 th { padding-top: 3px; padding-bottom: 3px; } body.compact1 h2 { margin-top: 16px; } body.compact1 h3 { margin-top: 12px; }
 body.compact2 { line-height: 1.55; } body.compact2 td, body.compact2 th { padding-top: 2px; padding-bottom: 2px; } body.compact2 h2 { margin-top: 12px; } body.compact2 h3 { margin-top: 10px; }
+.sec { break-inside: avoid; }
+.hk.secr::after { content: ""; display: block; height: 70mm; margin-bottom: -70mm; }

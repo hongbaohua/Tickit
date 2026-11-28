@@ -82,6 +82,51 @@ def prepare(html):
         # a short lead-in sentence stays with the table/list it introduces
         if a.name == 'p' and len(a.get_text()) < 120 and b.name in ('table', 'ul', 'ol'):
             add_cls(a, 'lead')
+    # a section start (heading + what it introduces + its first block) is one unit:
+    # if it does not fit at the bottom of a page, the whole section starts on the next page
+    top = [c for c in body.children if getattr(c, 'name', None)]
+    i = 0; n = 0
+    while i < len(top):
+        if 'hk' not in top[i].get('class', []): i += 1; continue
+        chain = [top[i]]; j = i + 1
+        while j < len(top) and ('hk' in top[j].get('class', []) or (top[j].name == 'p' and len(top[j].get_text()) < 150)):
+            chain.append(top[j]); j += 1
+        if j < len(top):
+            chain.append(top[j]); j += 1
+            if chain[-1].name == 'table' and j < len(top) and 'note' in top[j].get('class', []):
+                chain.append(top[j]); j += 1
+        w = s.new_tag('div', attrs={'class': 'sec', 'data-sec': str(n)}); n += 1
+        chain[0].insert_before(w)
+        for el in chain: w.append(el.extract())
+        i = j
+    open(html, 'w', encoding='utf-8').write(str(s))
+
+SEC_JS = r"""
+<style>@media screen { body { width: 180mm; margin: 0; } }</style>
+<script>
+window.addEventListener('load', () => {
+  const r = {};
+  document.querySelectorAll('div.sec').forEach(d => { r[d.dataset.sec] = d.getBoundingClientRect().height; });
+  const p = document.createElement('pre'); p.id = 'sec'; p.textContent = JSON.stringify(r); document.body.appendChild(p);
+});
+</script>
+"""
+
+def limit_sections(html):
+    # a section unit taller than ~55% of a page would leave too much blank: let it split,
+    # but still require room for the heading plus a good start of its content
+    dom = chrome(['--virtual-time-budget=3000', '--dump-dom', 'file://' + html + '.sec.html']) if False else None
+    t = html + '.sec.html'
+    open(t, 'w', encoding='utf-8').write(open(html, encoding='utf-8').read().replace('</head>', SEC_JS + '</head>'))
+    m = re.search(r'<pre id="sec">(.*?)</pre>', chrome(['--virtual-time-budget=3000', '--dump-dom', 'file://' + t]), re.S)
+    hts = json.loads(m.group(1).replace('&quot;', '"')) if m else {}
+    page_px = (297 - 31) / 25.4 * 96
+    s = BS(open(html, encoding='utf-8').read(), 'html.parser')
+    for d in s.find_all('div', class_='sec'):
+        if hts.get(d['data-sec'], 0) > 0.55 * page_px:
+            hk = d.find('div', class_='hk')
+            if hk: add_cls(hk, 'secr')
+            d.unwrap()
     open(html, 'w', encoding='utf-8').write(str(s))
 
 def top_blocks(s):
@@ -186,6 +231,7 @@ for f in files:
                     '-c', 'style.css', '-o', html], check=True)
     fixtables.fix(html)
     prepare(html)
+    limit_sections(html)
     chk = f'{work}/{stem}.chk.html'
     open(chk, 'w', encoding='utf-8').write(open(html, encoding='utf-8').read().replace('</head>', CHECK_JS + '</head>'))
     m = re.search(r'<pre id="chk">(.*?)</pre>', chrome(['--virtual-time-budget=3000', '--dump-dom', 'file://' + chk]), re.S)
