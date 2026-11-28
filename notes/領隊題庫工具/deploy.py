@@ -7,7 +7,7 @@ os.makedirs(T+'/教材/詳細版',exist_ok=True)
 for f in glob.glob(W+'/textbook_v2/*.md')+glob.glob(P+'/out_new/*.pdf'): shutil.copy(f,T+'/教材/詳細版')
 N=R+'/notes/領隊題庫工具'
 for f in ['build_v2.py','test_parser.js','t2.js','deploy.py']: shutil.copy(W+'/'+f,N)
-for f in ['build_all.py','fixtables.py','style.css','old.css']: shutil.copy(P+'/'+f,N)
+for f in ['build_v3.py','fixtables.py','style3.css','old3.css']: shutil.copy(P+'/'+f,N)
 for f in glob.glob(W+'/v2/*.json'): shutil.copy(f,N+'/v2')
 m=json.load(open(R+'/docs/questions/manifest.json'))
 u=json.load(open(W+'/units_v2.json'))
